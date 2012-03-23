@@ -8,6 +8,7 @@ using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.Xsd;
 using O2.DotNetWrappers.DotNet;
 using O2.DotNetWrappers.Windows;
+using O2.DotNetWrappers.ExtensionMethods;
 using O2.Interfaces.CIR;
 using O2.Kernel.CodeUtils;
 
@@ -273,9 +274,9 @@ namespace O2.Core.CIR.CirUtils
                 if (!remapLineNumber || textToFind == "append" || textToFind == "toString")
                     return lineNumber;
                 var mappedLineNumber = lineNumber > 0  ? lineNumber : 1;
-                while (mappedLineNumber > 0  && mappedLineNumber < Files.getFileSize(fileName))
+                while (mappedLineNumber > 0  && mappedLineNumber < fileName.fileInfo().Length)
                 {
-                    var lineContents = Files.getLineFromSourceCode(fileName, (uint) mappedLineNumber, false /*useFileCacheIfPossible*/);
+                    var lineContents = Files_WinForms.getLineFromSourceCode(fileName, (uint) mappedLineNumber, false /*useFileCacheIfPossible*/);
                     if (lineContents.IndexOf(textToFind) == -1)
                         if (ascendingSearch)
                             mappedLineNumber++;
@@ -314,7 +315,7 @@ namespace O2.Core.CIR.CirUtils
         {
             var remappedLineNumber = GetMappedLineNumber(textToFind, fileName, lineNumber, ascendingSearch, remapLineNumber);
             if (remappedLineNumber != 0)
-                return Files.getLineFromSourceCode(fileName, (uint)remappedLineNumber);
+                return Files_WinForms.getLineFromSourceCode(fileName, (uint)remappedLineNumber);
             return "";
         }
     }

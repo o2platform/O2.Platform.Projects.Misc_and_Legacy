@@ -22,7 +22,7 @@ namespace O2.Core.CIR.Ascx.DotNet
 
         private void llBackUpGAC_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            GacUtils.backupGac(getBackupFilePath(directory_ToBackupGAC.getCurrentDirectory()));
+            //GacUtils.backupGac(getBackupFilePath(directory_ToBackupGAC.getCurrentDirectory()));
         }
 
         private void tvListOfGacAssemblies_AfterSelect(object sender, TreeViewEventArgs e)

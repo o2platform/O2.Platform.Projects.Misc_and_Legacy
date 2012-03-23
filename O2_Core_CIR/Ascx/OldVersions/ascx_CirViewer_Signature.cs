@@ -10,6 +10,7 @@ using O2.DotNetWrappers.Filters;
 using O2.Interfaces.CIR;
 using O2.Interfaces.Messages;
 using O2.Kernel;
+using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -106,7 +107,8 @@ namespace O2.Core.CIR.Ascx
         {
             if (false == DesignMode)
             {
-                PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                //PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                KO2MessageQueue.getO2KernelQueue().onMessages += o2MessageQueue_onMessages;
 
                 asv_CalledFunctions.setSearchMode(ascx_SignatureViewer.SearchModes.CalledFunctions);
                 asv_CalledFunctions.setViewMode(ascx_SignatureViewer.ViewModes.List);

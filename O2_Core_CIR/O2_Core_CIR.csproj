@@ -10,12 +10,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>O2.Core.CIR</RootNamespace>
     <AssemblyName>O2_Core_CIR</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -127,6 +128,8 @@
     <Compile Include="Xsd\CirDump.cs">
       <DependentUpon>CirDump.xsd</DependentUpon>
     </Compile>
+    <Content Include="_External_Dlls\Mono.Cecil.dll" />
+    <Content Include="_External_Dlls\Mono.Cecil.Pdb.dll" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ascx\ascx_CirAnalysis.resx">
@@ -196,29 +199,21 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\O2 Modules Using 3rd Party Dlls\O2_External_O2Mono\O2_External_O2Mono.csproj">
+    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.BCL\O2.FluentSharp.BCL.csproj">
+      <Project>{DF7E73CB-02AC-4689-BB8C-AC21FFCCDDC5}</Project>
+      <Name>O2.FluentSharp.BCL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.CoreLib\O2.FluentSharp.CoreLib.csproj">
+      <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
+      <Name>O2.FluentSharp.CoreLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\O2_External_O2Mono\O2_External_O2Mono.csproj">
       <Project>{F457A7EB-A573-41BB-BC12-61ABE5ACF702}</Project>
       <Name>O2_External_O2Mono</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_DotNetWrappers\O2 DotNet Wrappers.csproj">
-      <Project>{1F252725-D8BE-408A-BE5C-2D11D0DE8586}</Project>
-      <Name>O2 DotNet Wrappers</Name>
     </ProjectReference>
     <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
       <Name>O2 ImportExport OunceLabs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_Interfaces\O2_Interfaces.csproj">
-      <Project>{64223518-03C2-4818-8C82-F045037E3DFE}</Project>
-      <Name>O2_Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_Kernel\O2 Kernel.csproj">
-      <Project>{BDB9EFED-296A-4535-99C6-F0B83316E80C}</Project>
-      <Name>O2 Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_Views_ASCX\O2_Views_ASCX.csproj">
-      <Project>{7BFDC99E-0FC7-42FC-9E32-83F77B2BE8F0}</Project>
-      <Name>O2_Views_ASCX</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

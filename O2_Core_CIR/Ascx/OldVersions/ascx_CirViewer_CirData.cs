@@ -9,6 +9,7 @@ using O2.Interfaces.CIR;
 using O2.Interfaces.Messages;
 using O2.Kernel;
 using O2.Kernel.CodeUtils;
+using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -25,7 +26,8 @@ namespace O2.Core.CIR.Ascx
         {
             if (false == DesignMode)
             {
-                PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                //PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                KO2MessageQueue.getO2KernelQueue().onMessages += o2MessageQueue_onMessages;
 
                 afv_Classes.setViewName("Classes");
                 afv_Classes.setCheckBoxesState(true);

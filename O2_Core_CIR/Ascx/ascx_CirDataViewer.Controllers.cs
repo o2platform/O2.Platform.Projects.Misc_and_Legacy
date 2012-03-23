@@ -37,7 +37,8 @@ namespace O2.Core.CIR.Ascx
         {
             if (runOnLoad && false == DesignMode)
             {
-                PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                //PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                KO2MessageQueue.getO2KernelQueue().onMessages += o2MessageQueue_onMessages;
                 cirDataAnalysis = new CirDataAnalysis();                                                
                 runOnLoad = false;                                
             }
@@ -484,7 +485,7 @@ namespace O2.Core.CIR.Ascx
             {
                 var userMessage = string.Format("new CirData file Created: {0}", savedCirDataFile);
                 DI.log.info(userMessage);
-                DI.log.showMessageBox(userMessage);
+                //DI.log.showMessageBox(userMessage);
             }
         }
 

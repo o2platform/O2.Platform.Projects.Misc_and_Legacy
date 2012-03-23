@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using O2.DotNetWrappers.DotNet;
 using O2.DotNetWrappers.ExtensionMethods;
 using O2.Kernel;
+using O2.Core.CIR.CirObjects;
+using O2.Kernel.InterfacesBaseImpl;
 
 
 namespace O2.Core.CIR.Ascx
@@ -64,7 +66,8 @@ namespace O2.Core.CIR.Ascx
         {
             if (false == DesignMode)
             {
-                PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                //PublicDI.o2MessageQueue.onMessages += o2MessageQueue_onMessages;
+                KO2MessageQueue.getO2KernelQueue().onMessages += o2MessageQueue_onMessages;
             }
         }
 
