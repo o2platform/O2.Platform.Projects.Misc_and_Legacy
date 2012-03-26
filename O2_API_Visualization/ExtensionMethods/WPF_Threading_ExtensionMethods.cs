@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Threading;
-using O2.Kernel.ExtensionMethods;
+using O2.DotNetWrappers.ExtensionMethods;
 //O2Ref:WindowsBase.dll
 //O2Ref:System.Core.dll
 

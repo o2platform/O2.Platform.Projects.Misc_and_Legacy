@@ -21,7 +21,7 @@ namespace O2.Core.CIR.ExtensionMethods
 
         public static ascx_CirDataViewer show(this ICirData cirData, int namespaceDepth)
         {
-            var cirDataViewer = typeof(ascx_CirDataViewer).openControlAsForm<ascx_CirDataViewer>("CirData", 500, 300);
+            var cirDataViewer = "CirData".popupWindow(500, 300).add_Control<ascx_CirDataViewer>();
             cirDataViewer.namespaceDepth(namespaceDepth);
             cirDataViewer.loadCirData(cirData);
             cirDataViewer.showLoadedFunctions();
