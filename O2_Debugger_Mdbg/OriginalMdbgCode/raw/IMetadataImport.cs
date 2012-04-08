@@ -5,18 +5,19 @@
 //---------------------------------------------------------------------
 using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Runtime.InteropServices;
+using System.Globalization;
+using System.Diagnostics;
 
-// NOTE: For MDBG_FAKE_COM we compile this file by itself into a .dll, disassemble to IL, and then strip 
-// the assembly header out and include the il along with the others in the interop assembly
-
-namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
+namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
 {
+
     // GUID Copied from Cor.h
     [Guid("7DAC8207-D3AE-4c75-9B67-92801A497D44"),
      InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
     ] // IID_IMetadataImport from cor.h
+
     // This should be a private interface, but
     // we cannot do that becuase we are then getting an exception
     // "The specified type must be visible from COM." @ CorMetadataImport::GetRawInterface
@@ -36,10 +37,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //STDMETHOD(EnumTypeDefs)(HCORENUM *phEnum, mdTypeDef rTypeDefs[],ULONG cMax, ULONG *pcTypeDefs) PURE;
         //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);  
         void EnumTypeDefs(
-            ref IntPtr phEnum,
-            [ComAliasName("mdTypeDef*")] out int rTypeDefs,
-            uint cMax /*must be 1*/,
-            [ComAliasName("ULONG*")] out uint pcTypeDefs);
+                            ref IntPtr phEnum,
+                            [ComAliasName("mdTypeDef*")] out int rTypeDefs,
+                            uint cMax /*must be 1*/,
+                            [ComAliasName("ULONG*")] out uint pcTypeDefs);
 
         //STDMETHOD(EnumInterfaceImpls)(HCORENUM *phEnum, mdTypeDef td, mdInterfaceImpl rImpls[], ULONG cMax, ULONG* pcImpls) PURE;
         void EnumInterfaceImpls_(IntPtr phEnum, int td);
@@ -52,10 +53,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         mdToken     tkEnclosingClass,       // [IN] TypeDef/TypeRef for Enclosing class.
         //         mdTypeDef   *ptd) PURE;             // [OUT] Put the TypeDef token here.
         void FindTypeDefByName(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string szTypeDef,
-            [In] int tkEnclosingClass,
-            [ComAliasName("mdTypeDef*")] [Out] out int token
-            );
+                               [In, MarshalAs(UnmanagedType.LPWStr)] string szTypeDef,
+                               [In] int tkEnclosingClass,
+                               [ComAliasName("mdTypeDef*")] [Out] out int token
+                               );
 
         //     STDMETHOD(GetScopeProps)(               // S_OK or error.
         //         LPWSTR      szName,                 // [OUT] Put the name here.
@@ -67,7 +68,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
             [In] int cchName,
             [ComAliasName("ULONG*")] out int pchName,
             out Guid mvid
-            );
+        );
 
         //     STDMETHOD(GetModuleFromScope)(          // S_OK.
         //         mdModule    *pmd) PURE;             // [OUT] Put mdModule token here.
@@ -84,9 +85,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                              [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szTypeDef,
                              [In] int cchTypeDef,
                              [ComAliasName("ULONG*")] [Out] out int pchTypeDef,
-                             [Out, MarshalAs(UnmanagedType.U4)] out TypeAttributes pdwTypeDefFlags,
+                             [Out, MarshalAs(UnmanagedType.U4)] out System.Reflection.TypeAttributes pdwTypeDefFlags,
                              [ComAliasName("mdToken*")] [Out] out int ptkExtends
-            );
+                             );
 
         //     STDMETHOD(GetInterfaceImplProps)(       // S_OK or error.
         //         mdInterfaceImpl iiImpl,             // [IN] InterfaceImpl token.
@@ -101,15 +102,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cchName,                // [IN] Size of buffer.
         //         ULONG       *pchName) PURE;         // [OUT] Size of Name.
         void GetTypeRefProps(
-            int tr,
-            [ComAliasName("mdToken*")] [Out] out int ptkResolutionScope,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
-            [In] int cchName,
-            [ComAliasName("ULONG*")] out int pchName
-            );
+                             int tr,
+                             [ComAliasName("mdToken*")] [Out] out int ptkResolutionScope,
+                             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
+                             [In] int cchName,
+                             [ComAliasName("ULONG*")] out int pchName
+                             );
 
+        // This API is evil. Don't use it.
         //     STDMETHOD(ResolveTypeRef)(mdTypeRef tr, REFIID riid, IUnknown **ppIScope, mdTypeDef *ptd) PURE;
-        void ResolveTypeRef_();
+        void ResolveTypeRef(int tr, ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object scope, out int typeDef);
 
         //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -139,7 +141,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                          [ComAliasName("mdMethodDef*")] out int mdMethodDef,
                          int cMax, /*must be 1*/
                          [ComAliasName("ULONG*")] out int pcTokens
-            );
+                         );
 
         //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.             
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
@@ -158,7 +160,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
         //void EnumFields_();
         /*[PreserveSig]*/
-
         void EnumFields(ref IntPtr phEnum,
                         int cl,
                         [ComAliasName("mdFieldDef*")] out int mdFieldDef,
@@ -266,7 +267,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                             [ComAliasName("ULONG*")] [Out] out uint pcbSigBlob,
                             [ComAliasName("ULONG*")] [Out] out uint pulCodeRVA,
                             [ComAliasName("DWORD*")] [Out] out uint pdwImplFlags
-            );
+                            );
 
         //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.   
         //         mdMemberRef mr,                     // [IN] given memberref 
@@ -283,7 +284,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                                [ComAliasName("ULONG*")] [Out] out uint pchMember,
                                [ComAliasName("PCCOR_SIGNATURE*")] [Out] out IntPtr ppvSigBlob,
                                [ComAliasName("ULONG*")] [Out] out int pbSig
-            );
+                               );
 
         //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -291,7 +292,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         mdProperty  rProperties[],          // [OUT] Put Properties here.   
         //         ULONG       cMax,                   // [IN] Max properties to put.  
         //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.    
-        void EnumProperties_();
+        void EnumProperties(ref IntPtr phEnum,
+                            int mdTypeDef,
+                            [ComAliasName("mdPropertyDef*")] out int mdPropertyDef,
+                            int countMax /*must be 1*/,
+                            [ComAliasName("ULONG*")] out uint pcTokens);
 
         //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -406,8 +411,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         void GetUserString([In] int stk,
                            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szString,
                            [In] int cchString,
-                           [ComAliasName("ULONG*")] out int pchString
-            );
+                           [ComAliasName("ULONG*")] out  int pchString
+                           );
 
         //     STDMETHOD(GetPinvokeMap)(               // S_OK or error.
         //         mdToken     tk,                     // [IN] FieldDef or MethodDef.
@@ -453,12 +458,12 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cMax,                   // [IN] Size of rCustomAttributes.
         //         ULONG       *pcCustomAttributes) PURE;  // [OUT, OPTIONAL] Put count of token values here.
         void EnumCustomAttributes(ref IntPtr phEnum,
-                                  int tk,
-                                  int tkType,
-                                  [ComAliasName("mdCustomAttribute*")] out int mdCustomAttribute,
-                                  uint cMax /*must be 1*/,
-                                  [ComAliasName("ULONG*")] out uint pcTokens
-            );
+                         int tk,
+                         int tkType,
+                         [ComAliasName("mdCustomAttribute*")]out int mdCustomAttribute,
+                         uint cMax /*must be 1*/,
+                         [ComAliasName("ULONG*")]out uint pcTokens
+                         );
 
         //     STDMETHOD(GetCustomAttributeProps)(     // S_OK or error.
         //         mdCustomAttribute cv,               // [IN] CustomAttribute token.
@@ -513,7 +518,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                            [ComAliasName("DWORD*")] out int pdwCPlusTypeFlab,
                            [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
                            [ComAliasName("ULONG*")] out int pcchValue
-            );
+                           );
 
         //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error. 
         //         mdProperty  prop,                   // [IN] property token  
@@ -555,7 +560,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                            [ComAliasName("DWORD*")] out uint pdwCPlusTypeFlag,
                            [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
                            [ComAliasName("ULONG*")] out uint pcchValue
-            );
+                           );
 
         //     STDMETHOD(GetCustomAttributeByName)(    // S_OK or error.
         //         mdToken     tkObj,                  // [IN] Object with Custom Attribute.
@@ -564,10 +569,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       *pcbData) PURE;         // [OUT] Put size of data here.
         [PreserveSig]
         int GetCustomAttributeByName(
-            int tkObj,
-            [MarshalAs(UnmanagedType.LPWStr)] string szName,
-            out IntPtr ppData,
-            out uint pcbData);
+                            int tkObj,
+                            [MarshalAs(UnmanagedType.LPWStr)]string szName,
+                            out IntPtr ppData,
+                            out uint pcbData);
 
         //     STDMETHOD_(BOOL, IsValidToken)(         // True or False.
         //         mdToken     tk) PURE;               // [IN] Given token.
@@ -589,16 +594,19 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         mdToken     pd,                     // [IN] Type, Field, or Method token.
         //         int         *pbGlobal) PURE;        // [OUT] Put 1 if global, 0 otherwise.
         void IsGlobal_();
-    } // IMetadataImport
+
+    }      // IMetadataImport
+
 
 
     // IMetaDataImport2
     [Guid("FCE5EFA0-8BBA-4f8e-A036-8F2022B08466"),
-     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
+        InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
     ]
     [CLSCompliant(false)]
     public interface IMetadataImport2 : IMetadataImport
     {
+        #region inheritted methods from IMetadataImport
         // Need imports from IMetaDataImport to adjust IM2 vtable slots.
 
         //STDMETHOD_(void, CloseEnum)(HCORENUM hEnum) PURE;
@@ -614,10 +622,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //STDMETHOD(EnumTypeDefs)(HCORENUM *phEnum, mdTypeDef rTypeDefs[],ULONG cMax, ULONG *pcTypeDefs) PURE;
         //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);  
         new void EnumTypeDefs(
-            ref IntPtr phEnum,
-            [ComAliasName("mdTypeDef*")] out int rTypeDefs,
-            uint cMax /*must be 1*/,
-            [ComAliasName("ULONG*")] out uint pcTypeDefs);
+                            ref IntPtr phEnum,
+                            [ComAliasName("mdTypeDef*")] out int rTypeDefs,
+                            uint cMax /*must be 1*/,
+                            [ComAliasName("ULONG*")] out uint pcTypeDefs);
 
         //STDMETHOD(EnumInterfaceImpls)(HCORENUM *phEnum, mdTypeDef td, mdInterfaceImpl rImpls[], ULONG cMax, ULONG* pcImpls) PURE;
         new void EnumInterfaceImpls_(IntPtr phEnum, int td);
@@ -630,10 +638,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         mdToken     tkEnclosingClass,       // [IN] TypeDef/TypeRef for Enclosing class.
         //         mdTypeDef   *ptd) PURE;             // [OUT] Put the TypeDef token here.
         new void FindTypeDefByName(
-            [In, MarshalAs(UnmanagedType.LPWStr)] string szTypeDef,
-            [In] int tkEnclosingClass,
-            [ComAliasName("mdTypeDef*")] [Out] out int token
-            );
+                               [In, MarshalAs(UnmanagedType.LPWStr)] string szTypeDef,
+                               [In] int tkEnclosingClass,
+                               [ComAliasName("mdTypeDef*")] [Out] out int token
+                               );
 
         //     STDMETHOD(GetScopeProps)(               // S_OK or error.
         //         LPWSTR      szName,                 // [OUT] Put the name here.
@@ -645,7 +653,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
             [In] int cchName,
             [ComAliasName("ULONG*")] out int pchName,
             out Guid mvid
-            );
+        );
 
         //     STDMETHOD(GetModuleFromScope)(          // S_OK.
         //         mdModule    *pmd) PURE;             // [OUT] Put mdModule token here.
@@ -659,12 +667,12 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         DWORD       *pdwTypeDefFlags,       // [OUT] Put flags here.
         //         mdToken     *ptkExtends) PURE;      // [OUT] Put base class TypeDef/TypeRef here.
         new void GetTypeDefProps([In] int td,
-                                 [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szTypeDef,
-                                 [In] int cchTypeDef,
-                                 [ComAliasName("ULONG*")] [Out] out int pchTypeDef,
-                                 [Out, MarshalAs(UnmanagedType.U4)] out TypeAttributes pdwTypeDefFlags,
-                                 [ComAliasName("mdToken*")] [Out] out int ptkExtends
-            );
+                             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szTypeDef,
+                             [In] int cchTypeDef,
+                             [ComAliasName("ULONG*")] [Out] out int pchTypeDef,
+                             [Out, MarshalAs(UnmanagedType.U4)] out System.Reflection.TypeAttributes pdwTypeDefFlags,
+                             [ComAliasName("mdToken*")] [Out] out int ptkExtends
+                             );
 
         //     STDMETHOD(GetInterfaceImplProps)(       // S_OK or error.
         //         mdInterfaceImpl iiImpl,             // [IN] InterfaceImpl token.
@@ -679,15 +687,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cchName,                // [IN] Size of buffer.
         //         ULONG       *pchName) PURE;         // [OUT] Size of Name.
         new void GetTypeRefProps(
-            int tr,
-            [ComAliasName("mdToken*")] [Out] out int ptkResolutionScope,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
-            [In] int cchName,
-            [ComAliasName("ULONG*")] out int pchName
-            );
+                             int tr,
+                             [ComAliasName("mdToken*")] [Out] out int ptkResolutionScope,
+                             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
+                             [In] int cchName,
+                             [ComAliasName("ULONG*")] out int pchName
+                             );
 
+        // This API is evil. Don't use it.
         //     STDMETHOD(ResolveTypeRef)(mdTypeRef tr, REFIID riid, IUnknown **ppIScope, mdTypeDef *ptd) PURE;
-        new void ResolveTypeRef_();
+        new void ResolveTypeRef(int tr, ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object scope, out int typeDef);
 
         //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -713,11 +722,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cMax,                   // [IN] Max MethodDefs to put.  
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
         new void EnumMethods(ref IntPtr phEnum,
-                             int cl,
-                             [ComAliasName("mdMethodDef*")] out int mdMethodDef,
-                             int cMax, /*must be 1*/
-                             [ComAliasName("ULONG*")] out int pcTokens
-            );
+                         int cl,
+                         [ComAliasName("mdMethodDef*")] out int mdMethodDef,
+                         int cMax, /*must be 1*/
+                         [ComAliasName("ULONG*")] out int pcTokens
+                         );
 
         //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.             
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
@@ -735,12 +744,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cMax,                   // [IN] Max FieldDefs to put.   
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
         /*[PreserveSig]*/
-
         new void EnumFields(ref IntPtr phEnum,
-                            int cl,
-                            [ComAliasName("mdFieldDef*")] out int mdFieldDef,
-                            int cMax /*must be 1*/,
-                            [ComAliasName("ULONG*")] out uint pcTokens);
+                        int cl,
+                        [ComAliasName("mdFieldDef*")] out int mdFieldDef,
+                        int cMax /*must be 1*/,
+                        [ComAliasName("ULONG*")] out uint pcTokens);
 
         //     STDMETHOD(EnumFieldsWithName)(         // S_OK, S_FALSE, or error.              
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
@@ -758,10 +766,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cMax,                   // [IN] Max ParamDefs to put.   
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumParams(ref IntPtr phEnum,
-                            int mdMethodDef,
-                            [ComAliasName("mdParamDef*")] out int mdParamDef,
-                            int cMax /*must be 1*/,
-                            [ComAliasName("ULONG*")] out uint pcTokens);
+                        int mdMethodDef,
+                        [ComAliasName("mdParamDef*")] out int mdParamDef,
+                        int cMax /*must be 1*/,
+                        [ComAliasName("ULONG*")] out uint pcTokens);
 
         //     STDMETHOD(EnumMemberRefs)(              // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -833,16 +841,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       *pulCodeRVA,            // [OUT] codeRVA    
         //         DWORD       *pdwImplFlags) PURE;    // [OUT] Impl. Flags    
         new void GetMethodProps([In] uint md,
-                                [ComAliasName("mdTypeDef*")] [Out] out int pClass,
-                                [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMethod,
-                                [In] int cchMethod,
-                                [ComAliasName("ULONG*")] [Out] out int pchMethod,
-                                [ComAliasName("DWORD*")] [Out] out uint pdwAttr,
-                                [ComAliasName("PCCOR_SIGNATURE*")] [Out] out IntPtr ppvSigBlob,
-                                [ComAliasName("ULONG*")] [Out] out uint pcbSigBlob,
-                                [ComAliasName("ULONG*")] [Out] out uint pulCodeRVA,
-                                [ComAliasName("DWORD*")] [Out] out uint pdwImplFlags
-            );
+                            [ComAliasName("mdTypeDef*")] [Out] out int pClass,
+                            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMethod,
+                            [In] int cchMethod,
+                            [ComAliasName("ULONG*")] [Out] out int pchMethod,
+                            [ComAliasName("DWORD*")] [Out] out uint pdwAttr,
+                            [ComAliasName("PCCOR_SIGNATURE*")] [Out] out IntPtr ppvSigBlob,
+                            [ComAliasName("ULONG*")] [Out] out uint pcbSigBlob,
+                            [ComAliasName("ULONG*")] [Out] out uint pulCodeRVA,
+                            [ComAliasName("DWORD*")] [Out] out uint pdwImplFlags
+                            );
 
         //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.   
         //         mdMemberRef mr,                     // [IN] given memberref 
@@ -853,13 +861,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to meta data blob value  
         //         ULONG       *pbSig) PURE;           // [OUT] actual size of signature blob  
         new void GetMemberRefProps([In] uint mr,
-                                   [ComAliasName("mdMemberRef*")] [Out] out int ptk,
-                                   [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMember,
-                                   [In] int cchMember,
-                                   [ComAliasName("ULONG*")] [Out] out uint pchMember,
-                                   [ComAliasName("PCCOR_SIGNATURE*")] [Out] out IntPtr ppvSigBlob,
-                                   [ComAliasName("ULONG*")] [Out] out int pbSig
-            );
+                               [ComAliasName("mdMemberRef*")] [Out] out int ptk,
+                               [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMember,
+                               [In] int cchMember,
+                               [ComAliasName("ULONG*")] [Out] out uint pchMember,
+                               [ComAliasName("PCCOR_SIGNATURE*")] [Out] out IntPtr ppvSigBlob,
+                               [ComAliasName("ULONG*")] [Out] out int pbSig
+                               );
 
         //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -867,7 +875,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         mdProperty  rProperties[],          // [OUT] Put Properties here.   
         //         ULONG       cMax,                   // [IN] Max properties to put.  
         //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.    
-        new void EnumProperties_();
+        new void EnumProperties(ref IntPtr phEnum,
+                                int mdTypeDef,
+                                [ComAliasName("mdPropertyDef*")] out int mdPropertyDef,
+                                int countMax /*must be 1*/,
+                                [ComAliasName("ULONG*")] out uint pcTokens);
 
         //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error. 
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -980,10 +992,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cchString,              // [IN] Max chars of room in szString.
         //         ULONG       *pchString) PURE;       // [OUT] How many chars in actual string.
         new void GetUserString([In] int stk,
-                               [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szString,
-                               [In] int cchString,
-                               [ComAliasName("ULONG*")] out int pchString
-            );
+                           [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szString,
+                           [In] int cchString,
+                           [ComAliasName("ULONG*")] out  int pchString
+                           );
 
         //     STDMETHOD(GetPinvokeMap)(               // S_OK or error.
         //         mdToken     tk,                     // [IN] FieldDef or MethodDef.
@@ -1029,12 +1041,12 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       cMax,                   // [IN] Size of rCustomAttributes.
         //         ULONG       *pcCustomAttributes) PURE;  // [OUT, OPTIONAL] Put count of token values here.
         new void EnumCustomAttributes(ref IntPtr phEnum,
-                                      int tk,
-                                      int tkType,
-                                      [ComAliasName("mdCustomAttribute*")] out int mdCustomAttribute,
-                                      uint cMax /*must be 1*/,
-                                      [ComAliasName("ULONG*")] out uint pcTokens
-            );
+                         int tk,
+                         int tkType,
+                         [ComAliasName("mdCustomAttribute*")]out int mdCustomAttribute,
+                         uint cMax /*must be 1*/,
+                         [ComAliasName("ULONG*")]out uint pcTokens
+                         );
 
         //     STDMETHOD(GetCustomAttributeProps)(     // S_OK or error.
         //         mdCustomAttribute cv,               // [IN] CustomAttribute token.
@@ -1079,17 +1091,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         void const  **ppValue,              // [OUT] constant value 
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         new void GetFieldProps(int mb,
-                               [ComAliasName("mdTypeDef*")] out int mdTypeDef,
-                               [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szField,
-                               int cchField,
-                               [ComAliasName("ULONG*")] out int pchField,
-                               [ComAliasName("DWORD*")] out int pdwAttr,
-                               [ComAliasName("PCCOR_SIGNATURE*")] out IntPtr ppvSigBlob,
-                               [ComAliasName("ULONG*")] out int pcbSigBlob,
-                               [ComAliasName("DWORD*")] out int pdwCPlusTypeFlab,
-                               [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
-                               [ComAliasName("ULONG*")] out int pcchValue
-            );
+                           [ComAliasName("mdTypeDef*")] out int mdTypeDef,
+                           [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szField,
+                           int cchField,
+                           [ComAliasName("ULONG*")] out int pchField,
+                           [ComAliasName("DWORD*")] out int pdwAttr,
+                           [ComAliasName("PCCOR_SIGNATURE*")] out IntPtr ppvSigBlob,
+                           [ComAliasName("ULONG*")] out int pcbSigBlob,
+                           [ComAliasName("DWORD*")] out int pdwCPlusTypeFlab,
+                           [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
+                           [ComAliasName("ULONG*")] out int pcchValue
+                           );
 
         //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error. 
         //         mdProperty  prop,                   // [IN] property token  
@@ -1122,16 +1134,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         void const  **ppValue,              // [OUT] Constant value.
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         new void GetParamProps(int tk,
-                               [ComAliasName("mdMethodDef*")] out int pmd,
-                               [ComAliasName("ULONG*")] out uint pulSequence,
-                               [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
-                               uint cchName,
-                               [ComAliasName("ULONG*")] out uint pchName,
-                               [ComAliasName("DWORD*")] out uint pdwAttr,
-                               [ComAliasName("DWORD*")] out uint pdwCPlusTypeFlag,
-                               [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
-                               [ComAliasName("ULONG*")] out uint pcchValue
-            );
+                           [ComAliasName("mdMethodDef*")] out int pmd,
+                           [ComAliasName("ULONG*")] out uint pulSequence,
+                           [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName,
+                           uint cchName,
+                           [ComAliasName("ULONG*")] out uint pchName,
+                           [ComAliasName("DWORD*")] out uint pdwAttr,
+                           [ComAliasName("DWORD*")] out uint pdwCPlusTypeFlag,
+                           [ComAliasName("UVCP_CONSTANT*")] out IntPtr ppValue,
+                           [ComAliasName("ULONG*")] out uint pcchValue
+                           );
 
         //     STDMETHOD(GetCustomAttributeByName)(    // S_OK or error.
         //         mdToken     tkObj,                  // [IN] Object with Custom Attribute.
@@ -1140,10 +1152,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG       *pcbData) PURE;         // [OUT] Put size of data here.
         [PreserveSig]
         new int GetCustomAttributeByName(
-            int tkObj,
-            [MarshalAs(UnmanagedType.LPWStr)] string szName,
-            out IntPtr ppData,
-            out uint pcbData);
+                            int tkObj,
+                            [MarshalAs(UnmanagedType.LPWStr)]string szName,
+                            out IntPtr ppData,
+                            out uint pcbData);
 
         //     STDMETHOD_(BOOL, IsValidToken)(         // True or False.
         //         mdToken     tk) PURE;               // [IN] Given token.
@@ -1167,6 +1179,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         int         *pbGlobal) PURE;        // [OUT] Put 1 if global, 0 otherwise.
         new void IsGlobal_();
 
+        #endregion // inheritted methods from IMetadataImport
+
         //-----------------------------------------------------------------------------
         // Begin IMetaDataImport2
         //-----------------------------------------------------------------------------
@@ -1179,14 +1193,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
           ULONG       cMax,                   // [IN] Max GenericParams to put.  
           ULONG       *pcGenericParams) PURE; // [OUT] Put # put here.    
         */
-
         void EnumGenericParams(
-            ref IntPtr hEnum,
-            int tk,
-            [ComAliasName("mdGenericParam*")] out int rGenericParams,
-            uint cMax, // must be 1
-            [ComAliasName("ULONG*")] out uint pcGenericParams
-            );
+                                ref IntPtr hEnum,
+                                int tk,
+                                [ComAliasName("mdGenericParam*")] out int rGenericParams,
+                                uint cMax, // must be 1
+                                [ComAliasName("ULONG*")] out uint pcGenericParams
+        );
 
         //         STDMETHOD(GetGenericParamProps)(        // S_OK or error.
         //         mdGenericParam gp,                  // [IN] GenericParam
@@ -1205,7 +1218,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                                   [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder wzName,
                                   ulong cchName,
                                   [ComAliasName("ULONG*")] out ulong pchName
-            );
+                                  );
 
         //         STDMETHOD(GetMethodSpecProps)(
         //         mdMethodSpec mi,                    // [IN] The method instantiation
@@ -1217,7 +1230,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
                                 [ComAliasName("mdToken*")] out int tkParent,
                                 [ComAliasName("PCCOR_SIGNATURE*")] out IntPtr ppvSigBlob,
                                 [ComAliasName("ULONG*")] out int pcbSigBlob
-            );
+                                );
 
         //         STDMETHOD(EnumGenericParamConstraints)(
         //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
@@ -1257,6 +1270,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
     [Guid("EE62470B-E94B-424e-9B7C-2F00C9249F93"),
      InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
     ] // IID_IMetadataAssemblyImport from cor.h
+
     // This should be a private interface, but
     // we cannot do that becuase we are then getting an exception
     // "The specified type must be visible from COM." @ CorMetadataImport::GetRawInterface
@@ -1360,5 +1374,58 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi
         //         ULONG    cMax,                      // [IN] The max number to put
         //         ULONG    *pcAssemblies) PURE;       // [OUT] The number of assemblies returned.
         // };  // IMetaDataAssemblyImport
+    }
+
+
+    // Get the geometry of the tables. This is useful for GetTableInfo, which can tell how
+    // many rows a table has, which can then be used for quick enumeration of tokens.
+    [Guid("D8F579AB-402D-4b8e-82D9-5D63B1065C68"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [CLSCompliant(false)]
+    public interface IMetadataTables
+    {
+        //STDMETHOD (GetStringHeapSize) (    
+        //    ULONG   *pcbStrings) PURE;          // [OUT] Size of the string heap.
+        void GetStringHeapSize(out uint countBytesStrings);
+
+        //STDMETHOD (GetBlobHeapSize) (    
+        //    ULONG   *pcbBlobs) PURE;            // [OUT] Size of the Blob heap.
+        void GetBlobHeapSize(out uint countBytesBlobs);
+
+        //STDMETHOD (GetGuidHeapSize) (    
+        //    ULONG   *pcbGuids) PURE;            // [OUT] Size of the Guid heap.
+        void GetGuidHeapSize(out uint countBytesGuids);
+
+        //STDMETHOD (GetUserStringHeapSize) (  
+        //    ULONG   *pcbBlobs) PURE;            // [OUT] Size of the User String heap.
+        void GetUserStringHeapSize(out uint countByteBlobs);
+
+        //STDMETHOD (GetNumTables) (    
+        //    ULONG   *pcTables) PURE;            // [OUT] Count of tables.
+        void GetNumTables(out uint countTables);
+
+
+        //STDMETHOD (GetTableIndex) (   
+        //    ULONG   token,                      // [IN] Token for which to get table index.
+        //    ULONG   *pixTbl) PURE;              // [OUT] Put table index here.
+        void GetTableIndex(uint token, out uint tableIndex);
+
+
+        //STDMETHOD (GetTableInfo) (    
+        //    ULONG   ixTbl,                      // [IN] Which table.
+        //    ULONG   *pcbRow,                    // [OUT] Size of a row, bytes.
+        //    ULONG   *pcRows,                    // [OUT] Number of rows.
+        //    ULONG   *pcCols,                    // [OUT] Number of columns in each row.
+        //    ULONG   *piKey,                     // [OUT] Key column, or -1 if none.
+        //    const char **ppName) PURE;          // [OUT] Name of the table.
+        void GetTableInfo(
+            uint tableIndex,
+            out uint countByteRows,
+            out uint countRows,
+            out uint countColumns,
+            out uint columnPrimaryKey,
+            [Out, MarshalAs(UnmanagedType.LPStr)] out String name);
+
+
+        // Other methods are not yet imported...
     }
 }

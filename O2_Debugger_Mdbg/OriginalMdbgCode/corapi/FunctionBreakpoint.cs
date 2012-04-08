@@ -3,18 +3,17 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
+using System;
 
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+namespace Microsoft.Samples.Debugging.CorDebug
 {
-    public sealed class CorFunctionBreakpoint : CorBreakpoint
+    public sealed  class CorFunctionBreakpoint : CorBreakpoint
     {
-        private readonly ICorDebugFunctionBreakpoint m_breakpoint;
+        private ICorDebugFunctionBreakpoint m_breakpoint;
 
-        internal CorFunctionBreakpoint(ICorDebugFunctionBreakpoint breakpoint) : base(breakpoint)
+        internal CorFunctionBreakpoint (ICorDebugFunctionBreakpoint breakpoint) : base(breakpoint)
         {
             m_breakpoint = breakpoint;
         }
@@ -24,17 +23,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             get
             {
                 ICorDebugFunction f = null;
-                m_breakpoint.GetFunction(out f);
-                return new CorFunction(f);
+                m_breakpoint.GetFunction (out f);
+                return new CorFunction (f);
             }
         }
 
         public int Offset
         {
-            get
+            get 
             {
                 uint off = 0;
-                m_breakpoint.GetOffset(out off);
+                m_breakpoint.GetOffset (out off);
                 return (int) off;
             }
         }

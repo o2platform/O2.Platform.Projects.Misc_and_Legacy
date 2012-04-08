@@ -4,20 +4,20 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
-namespace O2.Debugger.Mdbg.Tools.Mdbg
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.MdbgEngine;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Tools.Mdbg
 {
     /// <summary>
     /// Base class for implementing stop option policies, used to customize and determine what the
@@ -25,34 +25,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public abstract class MDbgStopOptionPolicy
     {
-        #region DebuggerBehavior enum
-
-        /// <summary>
-        /// Possible behaviors of the debugger when it receives a callback.
-        /// </summary>
-        public enum DebuggerBehavior
-        {
-            /// <summary>
-            /// The debugger should ignore this callback.
-            /// </summary>
-            Ignore,
-            /// <summary>
-            /// The debugger should log this callback.
-            /// </summary>
-            Log,
-            /// <summary>
-            /// The debugger should stop on this callback.
-            /// </summary>
-            Stop
-        } ;
-
-        #endregion
-
-        /// <summary>
-        /// The acronym associated with the stop option policy. 
-        /// </summary>
-        public string Acronym { get; set; }
-
         /// <summary>
         /// Sets the debugger behavior for this stop option policy.
         /// </summary>
@@ -71,6 +43,46 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Prints the stop option policy.
         /// </summary>
         public abstract void Print();
+
+        /// <summary>
+        /// The acronym associated with the stop option policy. 
+        /// </summary>
+        public string Acronym
+        {
+            get
+            {
+                return m_acronym;
+            }
+            set
+            {
+                m_acronym = value;
+            }
+        }
+
+        /// <summary>
+        /// Possible behaviors of the debugger when it receives a callback.
+        /// </summary>
+        public enum DebuggerBehavior
+        {
+            /// <summary>
+            /// The debugger should ignore this callback.
+            /// </summary>
+            Ignore,
+            /// <summary>
+            /// The debugger should log this callback.
+            /// </summary>
+            Log,
+            /// <summary>
+            /// The debugger should notify this callback.
+            /// </summary>
+            Notify,
+            /// <summary>
+            /// The debugger should stop on this callback.
+            /// </summary>
+            Stop
+        };
+
+        private string m_acronym;
     }
 
     /// <summary>
@@ -78,9 +90,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public class SimpleStopOptionPolicy : MDbgStopOptionPolicy
     {
-        private DebuggerBehavior m_behavior;
-        private string m_fullName;
-
         /// <summary>
         /// Default constructor. Sets the default behavior to DebuggerBehaviors.ignore.
         /// </summary>
@@ -94,24 +103,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         }
 
         /// <summary>
-        /// The full name of this stop option policy.
-        /// </summary>
-        protected string FullName
-        {
-            get { return m_fullName; }
-            set { m_fullName = value; }
-        }
-
-        /// <summary>
-        /// The current debugger behavior for this stop option policy.
-        /// </summary>
-        protected DebuggerBehavior Behavior
-        {
-            get { return m_behavior; }
-            set { m_behavior = value; }
-        }
-
-        /// <summary>
         /// Acts on the current callback, based on the current debugger behavior for this stop
         /// option policy.
         /// </summary>
@@ -119,23 +110,45 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="args">Callback arguments.</param>
         public override void ActOnCallback(MDbgProcess currentProcess, CustomPostCallbackEventArgs args)
         {
-            var eventArgs = args.CallbackArgs as CorEventArgs;
+            CorEventArgs eventArgs = args.CallbackArgs as CorEventArgs;
             switch (m_behavior)
             {
                 case DebuggerBehavior.Stop:
-                    args.Controller.Stop(eventArgs.Thread,
-                                         MDbgUtil.CreateStopReasonFromEventArgs(eventArgs, currentProcess));
+                    args.Controller.Stop(eventArgs.Thread, MDbgUtil.CreateStopReasonFromEventArgs(eventArgs, currentProcess));
                     break;
                 case DebuggerBehavior.Log:
-                    CommandBase.WriteOutput(eventArgs + "\n");
+                    CommandBase.WriteOutput(eventArgs.ToString() + "\n");
                     break;
+                case DebuggerBehavior.Notify:
+                    CommandBase.WriteOutput(eventArgs.ToString() + "\n");
+                    MDbgThread currentThread = currentProcess.Threads.GetThreadFromThreadId((args.CallbackArgs as CorThreadEventArgs).Thread.Id);
+
+                    try
+                    {
+                        // Getting the current notification may not be implemented.
+                        MDbgValue notification = currentThread.CurrentNotification;
+                        if (notification != null)
+                        {
+                            CommandBase.WriteOutput(notification.GetStringValue(true));
+                        }
+                        else
+                        {
+                            CommandBase.WriteOutput("custom notification is null\n");
+                        }
+                    }
+                    catch (NotImplementedException)
+                    {
+                        Trace.WriteLine("Custom Notifications Not Implemented");
+                    }
+                    break;
+
             }
         }
 
         /// <summary>
         /// Sets the debugger behavior for this stop option policy.
         /// </summary>
-        /// <param name="behavior">stop, log, or ignore</param>
+        /// <param name="behavior">stop, log, notify, or ignore</param>
         /// <param name="arguments">Must be null.</param>
         public override void SetBehavior(DebuggerBehavior behavior, string arguments)
         {
@@ -153,16 +166,48 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         {
             string output = "(" + Acronym + ") " + m_fullName + ": ";
             int length = output.Length;
-            var sb = new StringBuilder(output);
+            StringBuilder sb = new StringBuilder(output);
             for (int i = 0; i < 25 - length; i++)
             {
                 //to ensure proper spacing
                 sb.Append(" ");
             }
-            CommandBase.WriteOutput(sb + Enum.GetName(typeof (DebuggerBehavior), m_behavior));
+            CommandBase.WriteOutput(sb + Enum.GetName(typeof(DebuggerBehavior), m_behavior));
         }
-    }
 
+        /// <summary>
+        /// The full name of this stop option policy.
+        /// </summary>
+        protected string FullName
+        {
+            get
+            {
+                return m_fullName;
+            }
+            set
+            {
+                m_fullName = value;
+            }
+        }
+
+        /// <summary>
+        /// The current debugger behavior for this stop option policy.
+        /// </summary>
+        protected DebuggerBehavior Behavior
+        {
+            get
+            {
+                return m_behavior;
+            }
+            set
+            {
+                m_behavior = value;
+            }
+        }
+
+        private string m_fullName;
+        private DebuggerBehavior m_behavior;
+    }
 
     /// <summary>
     /// Details debugger's behavior when the process it is attached to throws an exception. The user
@@ -170,10 +215,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public class ExceptionStopOptionPolicy : MDbgStopOptionPolicy
     {
-        private readonly List<ExceptionStopOptionPolicyItem> m_items;
-        private DebuggerBehavior m_default;
-        private bool m_exceptionEnhancedOn;
-
         /// <summary>
         /// Default constructor. Sets the default behavior to ignore all exceptions, and sets
         /// the ExceptionEnhanced switch to false.
@@ -186,25 +227,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         }
 
         /// <summary>
-        /// A master switch to control whether the debugger should act on all exception callbacks.
-        /// If it is set to true, the debugger acts on all exception callbacks. If it is set to 
-        /// false, the debugger acts only on DEBUG_EXCEPTION_FIRST_CHANCE callbacks.
-        /// </summary>
-        public bool ExceptionEnhancedOn
-        {
-            get { return m_exceptionEnhancedOn; }
-            set { m_exceptionEnhancedOn = value; }
-        }
-
-        /// <summary>
-        /// Default behavior.
-        /// </summary>
-        public DebuggerBehavior Default
-        {
-            get { return m_default; }
-        }
-
-        /// <summary>
         /// Acts on the debugger callback, based on the stop option policy settings and the 
         /// type of exception thrown.
         /// </summary>
@@ -212,41 +234,52 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="args">Callback arguments.</param>
         public override void ActOnCallback(MDbgProcess currentProcess, CustomPostCallbackEventArgs args)
         {
-            var ea = args.CallbackArgs as CorException2EventArgs;
-            var ua = args.CallbackArgs as CorExceptionUnwind2EventArgs;
+            CorException2EventArgs ea = args.CallbackArgs as CorException2EventArgs;
+            CorExceptionUnwind2EventArgs ua = args.CallbackArgs as CorExceptionUnwind2EventArgs;
             bool bException2 = (ea != null);
 
             if (m_exceptionEnhancedOn ||
-                (bException2 && (ea.EventType == CorDebugExceptionCallbackType.DEBUG_EXCEPTION_FIRST_CHANCE)))
+               (bException2 && (ea.EventType == CorDebugExceptionCallbackType.DEBUG_EXCEPTION_FIRST_CHANCE)))
             {
                 MDbgThread currentThread = null;
-                currentThread =
-                    currentProcess.Threads.GetThreadFromThreadId((args.CallbackArgs as CorThreadEventArgs).Thread.Id);
+                currentThread = currentProcess.Threads.GetThreadFromThreadId((args.CallbackArgs as CorThreadEventArgs).Thread.Id);
 
-                string exceptionType = currentThread.CurrentException.TypeName;
+                string exceptionType = null;
+                DebuggerBehavior behavior;
+                try
+                {
+                    // Getting the current exception may not be implemented.
+                    exceptionType = currentThread.CurrentException.TypeName;
+                    behavior = DetermineBehavior(exceptionType);
+                }
+                catch (NotImplementedException)
+                {
+                    behavior = this.m_default;
+                }
 
-                switch (DetermineBehavior(exceptionType))
+                switch (behavior)
                 {
                     case DebuggerBehavior.Stop:
                         if (bException2)
                         {
                             args.Controller.Stop(ea.Thread, new ExceptionThrownStopReason(ea.AppDomain,
-                                                                                          ea.Thread, ea.Frame, ea.Offset,
-                                                                                          ea.EventType, ea.Flags,
-                                                                                          m_exceptionEnhancedOn));
+                                ea.Thread, ea.Frame, ea.Offset, ea.EventType, ea.Flags, m_exceptionEnhancedOn));
                         }
                         else
                         {
                             args.Controller.Stop(ua.Thread, new ExceptionUnwindStopReason(ua.AppDomain,
-                                                                                          ua.Thread, ua.EventType,
-                                                                                          ua.Flags));
+                                ua.Thread, ua.EventType, ua.Flags));
                         }
                         break;
                     case DebuggerBehavior.Log:
-                        CommandBase.WriteOutput("Exception thrown: " + currentThread.CurrentException.TypeName +
-                                                " at function " + currentThread.CurrentFrame.Function.FullName +
-                                                " in source file " + currentThread.CurrentSourcePosition.Path +
-                                                ":" + currentThread.CurrentSourcePosition.Line);
+                        string output = "Exception thrown: " + currentThread.CurrentException.TypeName +
+                                        " at function " + currentThread.CurrentFrame.Function.FullName;
+                        if (currentThread.CurrentSourcePosition != null)
+                        {
+                            output += " in source file " + currentThread.CurrentSourcePosition.Path +
+                                      ":" + currentThread.CurrentSourcePosition.Line;
+                        }
+                        CommandBase.WriteOutput(output);
                         if (m_exceptionEnhancedOn)
                         {
                             if (bException2)
@@ -398,6 +431,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
                             m_items.Add(new ExceptionStopOptionPolicyItem(type, behavior));
                         }
                     }
+
                 }
             }
         }
@@ -413,24 +447,22 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
                 // behavior for specific exception types has not been specified - just print default behavior
                 switch (m_default)
                 {
-                    case DebuggerBehavior.Stop:
-                        CommandBase.WriteOutput(" Stop on all exceptions");
+                    case DebuggerBehavior.Stop: CommandBase.WriteOutput(" Stop on all exceptions");
                         break;
-                    default:
-                        CommandBase.WriteOutput(" " + Enum.GetName(typeof (DebuggerBehavior), m_default)
-                                                + " all exceptions");
+                    default: CommandBase.WriteOutput(" " + Enum.GetName(typeof(DebuggerBehavior), m_default)
+                        + " all exceptions");
                         break;
                 }
             }
             else
             {
                 // print default behavior and all other settings specified, in order of increasing precedence
-                CommandBase.WriteOutput("Default: " + Enum.GetName(typeof (DebuggerBehavior), m_default));
+                CommandBase.WriteOutput("Default: " + Enum.GetName(typeof(DebuggerBehavior), m_default));
 
                 foreach (ExceptionStopOptionPolicyItem item in m_items)
                 {
                     CommandBase.WriteOutput(item.ExceptionType + ": " +
-                                            Enum.GetName(typeof (DebuggerBehavior), item.Behavior));
+                        Enum.GetName(typeof(DebuggerBehavior), item.Behavior));
                 }
             }
         }
@@ -480,6 +512,38 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         {
             return m_items.Count;
         }
+
+        /// <summary>
+        /// A master switch to control whether the debugger should act on all exception callbacks.
+        /// If it is set to true, the debugger acts on all exception callbacks. If it is set to 
+        /// false, the debugger acts only on DEBUG_EXCEPTION_FIRST_CHANCE callbacks.
+        /// </summary>
+        public bool ExceptionEnhancedOn
+        {
+            get
+            {
+                return m_exceptionEnhancedOn;
+            }
+            set
+            {
+                m_exceptionEnhancedOn = value;
+            }
+        }
+
+        /// <summary>
+        /// Default behavior.
+        /// </summary>
+        public DebuggerBehavior Default
+        {
+            get
+            {
+                return m_default;
+            }
+        }
+
+        private DebuggerBehavior m_default;
+        private bool m_exceptionEnhancedOn;
+        private List<ExceptionStopOptionPolicyItem> m_items;
     }
 
     /// <summary>
@@ -494,20 +558,43 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="behavior">Debugger behavior - stop, log, or ignore</param>
         public ExceptionStopOptionPolicyItem(string exceptionType, MDbgStopOptionPolicy.DebuggerBehavior behavior)
         {
-            ExceptionType = exceptionType;
-            Behavior = behavior;
+            m_exceptionType = exceptionType;
+            m_behavior = behavior;
         }
 
         /// <value>
         ///   Exception type, or regular expression.
         /// </value>
-        public string ExceptionType { get; set; }
+        public string ExceptionType
+        {
+            get
+            {
+                return m_exceptionType;
+            }
+            set
+            {
+                m_exceptionType = value;
+            }
+        }
 
         /// <value>
         ///   Behavior of debugger when it encounters exception of type ExceptionType,
         ///   or matching the regular expression ExceptionType.
         /// </value>
-        public MDbgStopOptionPolicy.DebuggerBehavior Behavior { get; set; }
+        public MDbgStopOptionPolicy.DebuggerBehavior Behavior
+        {
+            get
+            {
+                return m_behavior;
+            }
+            set
+            {
+                m_behavior = value;
+            }
+        }
+
+        private string m_exceptionType;
+        private MDbgStopOptionPolicy.DebuggerBehavior m_behavior;
     }
 
     /// <summary>
@@ -518,8 +605,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public class ExceptionEnhancedStopOptionPolicy : MDbgStopOptionPolicy
     {
-        private readonly ExceptionStopOptionPolicy m_esop;
-
         /// <summary>
         /// Default constructor. Sets the acronym to "ee".
         /// </summary>
@@ -539,6 +624,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="args">Callback arguments.</param>
         public override void ActOnCallback(MDbgProcess currentProcess, CustomPostCallbackEventArgs args)
         {
+
         }
 
         /// <summary>
@@ -564,8 +650,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
                     m_esop.ExceptionEnhancedOn = false;
                     break;
                 case DebuggerBehavior.Log:
-                    throw new MDbgShellException(
-                        "ExceptionEnhanced can only be switched on and off, using the catch and ignore commands.");
+                    throw new MDbgShellException("ExceptionEnhanced can only be switched on and off, using the catch and ignore commands.");
             }
 
             // To preserve legacy behavior, if m_esop contains no MDbgExceptionPolicyItem objects
@@ -579,6 +664,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
             {
                 m_esop.SetBehavior(behavior, null);
             }
+
         }
 
         /// <summary>
@@ -587,7 +673,9 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// </summary>
         public override void Print()
         {
-            CommandBase.WriteOutput("(ee) ExceptionEnhanced:  " + m_esop.ExceptionEnhancedOn);
+            CommandBase.WriteOutput("(ee) ExceptionEnhanced:  " + m_esop.ExceptionEnhancedOn.ToString());
         }
+
+        private ExceptionStopOptionPolicy m_esop;
     }
 }

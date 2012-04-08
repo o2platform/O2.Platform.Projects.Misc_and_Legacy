@@ -1,25 +1,30 @@
-//---------------------------------------------------------------------
+﻿//---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 #region Using directives
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
 
 #endregion
 
-namespace O2.Debugger.Mdbg.gui
+using System.Globalization;
+using Microsoft.Samples.Tools.Mdbg;
+using Microsoft.Samples.Debugging.MdbgEngine;
+using Microsoft.Samples.Tools.Mdbg.Extension;
+using System.Diagnostics;
+
+namespace gui
 {
     // Tool window to evaluate simple expressions.
-    internal partial class QuickViewWindow : DebuggerToolWindow
+    partial class QuickViewWindow : DebuggerToolWindow
     {
         public QuickViewWindow(MainForm mainForm)
             : base(mainForm)
@@ -27,7 +32,7 @@ namespace O2.Debugger.Mdbg.gui
             InitializeComponent();
 
             // Hook handler for lazily expanding
-            treeView1.BeforeExpand += treeView1_BeforeExpand;
+            treeView1.BeforeExpand += new TreeViewCancelEventHandler(treeView1_BeforeExpand);
         }
 
         protected override void RefreshToolWindowInternal()
@@ -40,38 +45,39 @@ namespace O2.Debugger.Mdbg.gui
         // called on UI thread.
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char) 13)
+            if (e.KeyChar == (char)13)
             {
                 e.Handled = true;
-                string arg = textBox1.Text;
+                string arg = this.textBox1.Text;
                 MDbgValue val = Resolve(arg);
-                Util.Print(MainForm, val, treeView1);
+                Util.Print(MainForm, val, this.treeView1);                
             }
         }
 
         // Resolve the expression to a value.
         // Returns "Null" if we can't resolve the arg.
         // called on UI thread.
-        private MDbgValue Resolve(string arg)
+        MDbgValue Resolve(string arg)
         {
             MDbgValue var = null;
             MainForm.ExecuteOnWorkerThreadIfStoppedAndBlock(delegate(MDbgProcess proc)
-                                                                {
-                                                                    MDbgFrame frame = GetCurrentFrame(proc);
-                                                                    if (frame == null)
-                                                                    {
-                                                                        return;
-                                                                    }
+            {
+                MDbgFrame frame = GetCurrentFrame(proc);
+                if (frame == null)
+                {
+                    return;
+                }
 
-                                                                    var = proc.ResolveVariable(arg, frame);
-                                                                });
+                var = proc.ResolveVariable(arg, frame);
+            });
             return var;
         }
 
         // When tree mode, add stuff to it.
-        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             Util.TryExpandNode(MainForm, e.Node);
-        }
-    } // end QuickViewWindow
+        }        
+
+    }      // end QuickViewWindow
 }

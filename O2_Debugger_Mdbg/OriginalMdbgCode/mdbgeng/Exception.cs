@@ -6,12 +6,16 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata;
+
+
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// MDbgException class.  Represents errors that occur in mdbg.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgException : ApplicationException, ISerializable
     {
         /// <summary>
@@ -55,7 +59,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <summary>
     /// MDbgSpecialSourcePositionException class.  Represents errors that occur because the current source position is special.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgSpecialSourcePositionException : MDbgException, ISerializable
     {
         /// <summary>
@@ -94,12 +98,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             : base(info, context)
         {
         }
+
     }
 
     /// <summary>
     /// MDbgNoCurrentFrameException class.  Represents errors that occur because there is no current frame.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgNoCurrentFrameException : MDbgException, ISerializable
     {
         /// <summary>
@@ -107,6 +112,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         public MDbgNoCurrentFrameException()
             : base("No current frame")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the MDbgNoCurrentFrameException with the specified inner Exception.
+        /// </summary>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public MDbgNoCurrentFrameException(Exception innerException)
+            : base("No current frame", innerException)
         {
         }
 
@@ -143,7 +157,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <summary>
     /// MDbgNoActiveInstanceException class.  Represents errors that occur because there is no active instance.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgNoActiveInstanceException : MDbgException, ISerializable
     {
         /// <summary>
@@ -187,7 +201,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <summary>
     /// MDbgValueException class.  Represents errors that occur because a value is bad.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgValueException : MDbgException, ISerializable
     {
         /// <summary>
@@ -230,7 +244,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <summary>
     /// MDbgInvalidArgumentException class.  Represents errors that occur because an argument is invalid.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgInvalidArgumentException : MDbgException, ISerializable
     {
         /// <summary>
@@ -274,13 +288,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <summary>
     /// MDbgAmbiguousModuleNameException class.  Represents errors that occur because a module name is ambiguous.  For example if you had mscorlib.exe and mscorlib.dll and asked for mscorlib.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgAmbiguousModuleNameException : MDbgException, ISerializable
     {
         /// <summary>
         /// Initializes a new instance of the MDbgAmbiguousModuleNameException.
         /// </summary>
-        public MDbgAmbiguousModuleNameException() : base("Ambiguous module name")
+        public MDbgAmbiguousModuleNameException()
+            : base("Ambiguous module name")
         {
         }
 
@@ -312,18 +327,20 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             : base(info, context)
         {
         }
+
     }
 
     /// <summary>
     /// MDbgValueWrongTypeException class.  Represents errors that occur because a value is of the wrong type.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgValueWrongTypeException : MDbgException, ISerializable
     {
         /// <summary>
         /// Initializes a new instance of the MDbgValueWrongTypeException.
         /// </summary>
-        public MDbgValueWrongTypeException() : base("value is of wrong type")
+        public MDbgValueWrongTypeException()
+            : base("value is of wrong type")
         {
         }
 
@@ -356,4 +373,5 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
         }
     }
+
 }

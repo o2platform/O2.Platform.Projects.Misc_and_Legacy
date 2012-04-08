@@ -6,14 +6,15 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Text;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
+    using System.Diagnostics.SymbolStore;
+
     // Interface does not need to be marked with the serializable attribute
+    using System;
+	using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComImport,
@@ -21,44 +22,47 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComVisible(false)
     ]
-    internal interface ISymUnmanagedVariable
+    internal interface ISymUnmanagedVariable 
     {
         void GetName(int cchName,
-                     out int pcchName,
-                     [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
+                        out int pcchName,
+                        [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
 
         void GetAttributes(out int pRetVal);
 
         void GetSignature(int cSig,
-                          out int pcSig,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] byte[] sig);
+                             out int pcSig,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] byte[] sig);
 
-        void GetAddressKind(out int pRetVal);
+        void GetAddressKind(out int  pRetVal);
 
-        void GetAddressField1(out int pRetVal);
+        void GetAddressField1(out int  pRetVal);
 
-        void GetAddressField2(out int pRetVal);
+        void GetAddressField2(out int  pRetVal);
 
-        void GetAddressField3(out int pRetVal);
+        void GetAddressField3(out int  pRetVal);
 
-        void GetStartOffset(out int pRetVal);
+        void GetStartOffset(out int  pRetVal);
 
-        void GetEndOffset(out int pRetVal);
-    }
+        void GetEndOffset(out int  pRetVal);
+    }    
 
     /// <include file='doc\ISymVariable.uex' path='docs/doc[@for="ISymbolVariable"]/*' />
+
     internal class SymVariable : ISymbolVariable
     {
-        private readonly ISymUnmanagedVariable m_unmanagedVariable;
+        ISymUnmanagedVariable m_unmanagedVariable;
 
         internal SymVariable(ISymUnmanagedVariable variable)
         {
+            // We should not wrap null instances
+            if (variable == null)
+                throw new ArgumentNullException("variable");
+
             m_unmanagedVariable = variable;
         }
-
-        #region ISymbolVariable Members
-
-        public String Name
+        
+        public String Name 
         {
             get
             {
@@ -69,15 +73,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                 m_unmanagedVariable.GetName(cchName, out cchName, Name);
                 return Name.ToString();
             }
-        }
+          }
 
-        public Object Attributes
-        {
+        public Object Attributes 
+        { 
             get
             {
                 int RetVal;
                 m_unmanagedVariable.GetAttributes(out RetVal);
-                return RetVal;
+                return (object)RetVal;
             }
         }
 
@@ -90,18 +94,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             m_unmanagedVariable.GetSignature(cData, out cData, Data);
             return Data;
         }
-
-        public SymAddressKind AddressKind
+    
+        public SymAddressKind AddressKind 
         {
-            get
-            {
+           get
+           {
                 int RetVal;
                 m_unmanagedVariable.GetAddressKind(out RetVal);
-                return (SymAddressKind) RetVal;
-            }
+                return (SymAddressKind)RetVal;
+           }
         }
 
-        public int AddressField1
+        public int AddressField1 
         {
             get
             {
@@ -111,7 +115,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             }
         }
 
-        public int AddressField2
+        public int AddressField2 
         {
             get
             {
@@ -121,8 +125,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             }
         }
 
-        public int AddressField3
-        {
+        public int AddressField3 
+        { 
             get
             {
                 int RetVal;
@@ -131,8 +135,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             }
         }
 
-        public int StartOffset
-        {
+        public int StartOffset 
+        { 
             get
             {
                 int RetVal;
@@ -141,8 +145,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             }
         }
 
-        public int EndOffset
-        {
+        public int EndOffset 
+        { 
             get
             {
                 int RetVal;
@@ -150,7 +154,5 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                 return RetVal;
             }
         }
-
-        #endregion
     }
 }

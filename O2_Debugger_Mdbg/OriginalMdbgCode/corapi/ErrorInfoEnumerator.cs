@@ -3,28 +3,25 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     /** 
      * Exposes an enumerator for ErrorInfo objects. 
      *
      * This is horribly broken at this point, as ErrorInfo isn't implemented yet.
      */
-
     internal class CorErrorInfoEnumerator : IEnumerable, IEnumerator, ICloneable
     {
-        private readonly ICorDebugErrorInfoEnum m_enum;
+        private ICorDebugErrorInfoEnum m_enum;
 
         private Object m_einfo;
 
-        internal CorErrorInfoEnumerator(ICorDebugErrorInfoEnum erroInfoEnumerator)
+        internal CorErrorInfoEnumerator (ICorDebugErrorInfoEnum erroInfoEnumerator)
         {
             m_enum = erroInfoEnumerator;
         }
@@ -32,53 +29,41 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         //
         // ICloneable interface
         //
-
-        #region ICloneable Members
-
-        public Object Clone()
+        public Object Clone ()
         {
             ICorDebugEnum clone = null;
-            m_enum.Clone(out clone);
-            return new CorErrorInfoEnumerator((ICorDebugErrorInfoEnum) clone);
+            m_enum.Clone (out clone);
+            return new CorErrorInfoEnumerator ((ICorDebugErrorInfoEnum)clone);
         }
-
-        #endregion
 
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
-        public IEnumerator GetEnumerator()
+        public IEnumerator GetEnumerator ()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
-        public bool MoveNext()
+        public bool MoveNext ()
         {
             return false;
         }
 
-        public void Reset()
+        public void Reset ()
         {
-            m_enum.Reset();
+            m_enum.Reset ();
             m_einfo = null;
         }
 
         public Object Current
         {
-            get { return m_einfo; }
+            get 
+            {
+                return m_einfo;
+            }
         }
-
-        #endregion
     } /* class ErrorInfoEnumerator */
 } /* namespace */

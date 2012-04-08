@@ -3,22 +3,20 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
-using System.Diagnostics;
-using System.Diagnostics.SymbolStore;
 using System.Globalization;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using CorFunctionBreakpoint=O2.Debugger.Mdbg.Debugging.CorDebug.CorFunctionBreakpoint;
-using HResult=O2.Debugger.Mdbg.Debugging.CorDebug.HResult;
+using System.Diagnostics;
+using System.Reflection;
+using System.Diagnostics.SymbolStore;
+using System.Runtime.InteropServices;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata;
+using System.Collections.Generic;
+
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// Event arguments for when a breakpoint is added or removed from a breakpoint collection
@@ -26,12 +24,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// <seealso cref="MDbgBreakpointCollection"/>
     public class BreakpointCollectionChangedEventArgs : EventArgs
     {
-        private readonly MDbgBreakpoint m_breakpoint;
-
         internal BreakpointCollectionChangedEventArgs(MDbgBreakpoint breakpoint)
         {
             m_breakpoint = breakpoint;
         }
+
+        MDbgBreakpoint m_breakpoint;
 
         /// <summary>
         /// Get the breakpoint that was added or removed.
@@ -47,14 +45,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public sealed class MDbgBreakpointCollection : MarshalByRefObject, IEnumerable
     {
-        private readonly ArrayList m_items = new ArrayList();
-        internal int m_freeBreakpointNumber = 1;
-        internal MDbgProcess m_process;
-
         internal MDbgBreakpointCollection(MDbgProcess process)
         {
             Debug.Assert(process != null);
             m_process = process;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return m_items.GetEnumerator();
         }
 
         /// <value>
@@ -62,36 +61,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </value>
         public int Count
         {
-            get { return m_items.Count; }
-        }
-
-        /// <summary>
-        /// Returns an appdomain from its number. 
-        /// </summary>
-        /// <value>
-        ///     Returns null if the breakpoint doesn't exist.
-        /// </value>
-        public MDbgBreakpoint this[int breakpointNum]
-        {
             get
             {
-                foreach (MDbgBreakpoint b in m_items)
-                {
-                    if (b.Number == breakpointNum)
-                        return b;
-                }
-                return null;
+                return m_items.Count;
             }
         }
 
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return m_items.GetEnumerator();
-        }
-
-        #endregion
 
         /// <summary>
         /// Fired when a breakpoint is added to this collection. Once this is fired, the breakpoint is in the collection
@@ -116,6 +91,25 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
 
         /// <summary>
+        /// Returns an appdomain from its number. 
+        /// </summary>
+        /// <value>
+        ///     Returns null if the breakpoint doesn't exist.
+        /// </value>
+        public MDbgBreakpoint this[int breakpointNum]
+        {
+            get
+            {
+                foreach (MDbgBreakpoint b in m_items)
+                {
+                    if (b.Number == breakpointNum)
+                        return b;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Locates MDbgBreakpoint object from the CorBreakpoint object.
         /// </summary>
         /// <param name="corBreakpoint">breakpoint object from CorXXX layer.</param>
@@ -124,11 +118,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         ///     returns null if there the breakpoint was not known to the breakpoint
         ///     collection.
         /// </remarks>
-        public MDbgBreakpoint Lookup(CorDebug.CorBreakpoint corBreakpoint)
+        public MDbgBreakpoint Lookup(CorBreakpoint corBreakpoint)
         {
             foreach (MDbgBreakpoint b in m_items)
             {
-                foreach (CorDebug.CorBreakpoint cb in b.CorBreakpoints)
+                foreach (CorBreakpoint cb in b.CorBreakpoints)
                 {
                     if (cb == corBreakpoint)
                     {
@@ -177,9 +171,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </remarks>
         public MDbgBreakpoint CreateBreakpoint(string managedModule, string className, string methodName, int offset)
         {
-            return new MDbgFunctionBreakpoint(this,
-                                              new BreakpointFunctionLocation(managedModule, className, methodName,
-                                                                             offset));
+            return new MDbgFunctionBreakpoint(this, new BreakpointFunctionLocation(managedModule, className, methodName, offset));
         }
 
         /// <summary>
@@ -213,7 +205,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         // location has to be retrieved from existing breakpoint
         public MDbgBreakpoint CreateBreakpoint(object location)
         {
-            var l = location as ISequencePointResolver;
+            ISequencePointResolver l = location as ISequencePointResolver;
             Debug.Assert(l != null);
             if (l == null)
                 throw new ArgumentException("incorrect value", "location");
@@ -225,9 +217,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         public void DeleteAll()
         {
-            var al = (ArrayList) m_items.Clone();
+            ArrayList al = (ArrayList)m_items.Clone();
             for (int i = 0; i < al.Count; i++)
-                ((MDbgBreakpoint) al[i]).Delete();
+                ((MDbgBreakpoint)al[i]).Delete();
         }
 
         internal void Clear()
@@ -253,6 +245,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             foreach (MDbgBreakpoint b in m_items)
             {
                 b.BindToModule(loadedModule);
+            }
+        }
+
+        internal void OnModuleUnloaded(MDbgModule unloadedModule)
+        {
+            foreach (MDbgBreakpoint b in m_items)
+            {
+                b.OnModuleUnloaded(unloadedModule);
             }
         }
 
@@ -287,6 +287,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 RemoveBreakpoint(this, new BreakpointCollectionChangedEventArgs(breakpoint));
             }
         }
+
+        internal MDbgProcess m_process;
+        internal int m_freeBreakpointNumber = 1;
+
+        private ArrayList m_items = new ArrayList();
+
     }
 
     /// <summary>
@@ -297,14 +303,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// CreateBreakpoint methods on MDbgBreakpoint collection.
     /// <see cref="MDbgBreakpointCollection"/>
     /// </remarks>
-    public abstract class MDbgBreakpoint : MarshalByRefObject
+    abstract public class MDbgBreakpoint : MarshalByRefObject
     {
-        // if breakpointCollection is null, the breakpoint is considered a free breakoint (not associated with any
+        // if breakpointCollection is null, the breakpoint is considered a free breakpoint (not associated with any
         // collection)
-        private readonly int m_breakpointNum;
-        internal MDbgBreakpointCollection m_breakpointCollection;
-        internal ArrayList m_breakpoints;
-
         internal MDbgBreakpoint(MDbgBreakpointCollection breakpointCollection)
         {
             m_breakpointCollection = breakpointCollection;
@@ -322,6 +324,17 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
         }
 
+        /// <summary>
+        /// Notify that this breakpoint has change properties. 
+        /// This will cause the NotifyChange event to fire on the BreakpointCollection
+        /// </summary>
+        protected void NotifyChanged()
+        {
+            if (m_breakpointCollection != null)
+            {
+                m_breakpointCollection.NotifyChanged(this);
+            }
+        }
 
         /// <summary>
         /// Gets or sets if the breakpoint is enabled.
@@ -336,67 +349,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// Throws an InvalidOperationException if the breakpoint is not yet bound and therefore cannot 
         /// be enabled.
         /// </exception>
-        public bool Enabled
+        public abstract bool Enabled
         {
-            get
-            {
-                if (m_breakpoints == null)
-                {
-                    // we don't have any breakpoints, so they are "by definition" disabled.
-                    return false;
-                }
-                else
-                {
-                    Debug.Assert(m_breakpoints.Count > 0); // we have to have at least one breakpoint in the array;
-
-                    var bp = (CorDebug.CorBreakpoint) m_breakpoints[0];
-                    bool active = bp.IsActive;
-#if DEBUG
-                    // all breakpoints have to have same Active Status
-                    for (int i = 1; i < m_breakpoints.Count; i++)
-                    {
-                        Debug.Assert(((CorDebug.CorBreakpoint) m_breakpoints[i]).IsActive == active);
-                    }
-#endif
-                    return active;
-                }
-            }
-            set
-            {
-                if (m_breakpoints == null
-                    && value)
-                {
-                    throw new InvalidOperationException("Cannot enable not bound breakpoints.");
-                }
-
-                if (m_breakpoints != null)
-                {
-                    for (int i = 0; i < m_breakpoints.Count; ++i)
-                    {
-                        try
-                        {
-                            (m_breakpoints[i] as CorDebug.CorBreakpoint).Activate(value);
-                        }
-                        catch (COMException e)
-                        {
-                            if (e.ErrorCode != (int) CorDebug.HResult.CORDBG_E_PROCESS_TERMINATED)
-                                throw;
-                            // currently CORDBG_E_PROCESS_TERMINATED means that the breakpoint
-                            // reference is invalid. This can happen for e.g. in case when an
-                            // appdomain gets unloaded with a breakpoint set in it. Any operation
-                            // on such breakpoint resuts in CORDBG_E_PROCESS_TERMINATED exception.
-
-                            // in this situation we should remove the breakpoint from our collection.
-                            m_breakpoints.RemoveAt(i);
-
-                            // since we have removed element at current position, the next item is
-                            // also at position i. We need to compensate for the ++i in for statement
-                            --i;
-                        }
-                    }
-                }
-            }
+            get;
+            set;
         }
+
 
         /// <summary>
         /// Gets or sets if the breakpoint is bound.
@@ -406,9 +364,32 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         ///     are breakpoints for which a code that they should break in 
         ///     has already been loaded into the process.
         /// </value>
-        public bool IsBound
+        public abstract bool IsBound
         {
-            get { return (m_breakpoints != null); }
+            get;
+        }
+
+        /// <summary>
+        /// Breakpoint objects representing current breakpoint.
+        /// </summary>
+        /// <remarks>
+        ///     The returned value is a collection of CorXXX objects representing
+        ///     different breakpoints. If the code has been loaded into multiple
+        ///     appdomains than the breakpoints.
+        /// </remarks>
+        public abstract IEnumerable CorBreakpoints
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Returns CorBreakpoint object.
+        /// </summary>
+        /// If the breakpoint is represented by more than one occurance of
+        /// breakpoint object, only the first instance is returned.
+        public abstract CorBreakpoint CorBreakpoint
+        {
+            get;
         }
 
         /// <summary>
@@ -422,53 +403,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </value>
         public int Number
         {
-            get { return m_breakpointNum; }
-        }
-
-        /// <summary>
-        /// Breakpoint objects representing current breakpoint.
-        /// </summary>
-        /// <remarks>
-        ///     The returned value is a collection of CorXXX objects representing
-        ///     different breakpoints. If the code has been loaded into multiple
-        ///     appdomains than the breakpoints.
-        /// </remarks>
-        public IEnumerable CorBreakpoints
-        {
             get
             {
-                if (m_breakpoints == null)
-                    return new ArrayList();
-                else
-                    return m_breakpoints;
+                return m_breakpointNum;
             }
         }
-
-        /// <summary>
-        /// Returns CorBreakpoint object.
-        /// </summary>
-        /// If the breakpoint is represented by more than one occurance of
-        /// breakpoint object, only the first instance is returned.
-        public CorDebug.CorBreakpoint CorBreakpoint
-        {
-            get
-            {
-                if (m_breakpoints == null)
-                    return null;
-                else
-                    return (CorDebug.CorBreakpoint) m_breakpoints[0];
-            }
-        }
-
-        /// <summary>
-        /// Gets the location of the breakpoint.
-        /// </summary>
-        /// <value>
-        /// Returns an object that represents a location of the breakpoint. The breakpoint can be
-        /// re-created in different debugging sessions by calling CreateBreakpoint and passing in
-        /// the location object.
-        /// </value>
-        public abstract Object Location { get; }
 
         /// <summary>
         /// Deletes the breakpoint.
@@ -482,6 +421,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         /// <summary>
+        /// Gets the location of the breakpoint.
+        /// </summary>
+        /// <value>
+        /// Returns an object that represents a location of the breakpoint. The breakpoint can be
+        /// re-created in different debugging sessions by calling CreateBreakpoint and passing in
+        /// the location object.
+        /// </value>
+        public abstract Object Location
+        {
+            get;
+        }
+
+        /// <summary>
         /// Obtains a string representation of this instance.
         /// </summary>
         /// <returns>
@@ -489,7 +441,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </returns>
         public override string ToString()
         {
-            var s = new StringBuilder("Breakpoint #");
+            StringBuilder s = new StringBuilder("Breakpoint #");
             s.Append(m_breakpointNum).Append((IsBound ? " bound" : " unbound"));
             return s.ToString();
         }
@@ -506,10 +458,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         public abstract bool BindToModule(MDbgModule managedModule);
 
         /// <summary>
+        /// Called by the breakpoint manager everytime a managed module unloads
+        /// </summary>
+        /// <param name="module">The module which is being unloaded</param>
+        public abstract void OnModuleUnloaded(MDbgModule module);
+
+        /// <summary>
         /// Binds the breakpoint.
         /// </summary>
         /// <returns>true on success, else false.</returns>
         protected abstract bool Bind();
+
+        internal MDbgBreakpointCollection m_breakpointCollection;
+        private int m_breakpointNum;
     }
 
     /// <summary>
@@ -598,8 +559,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <remarks>
         ///     Resolved is usually called for every loaded module.
         /// </remarks>
-        bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule,
-                             out MDbgFunction managedFunction, out int ilOffset);
+        bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule, out MDbgFunction managedFunction, out int ilOffset);
     }
 
     /// <summary>
@@ -607,9 +567,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class BreakpointLineNumberLocation : ISequencePointResolver, IBreakpointBySourceLine
     {
-        private readonly string m_file;
-        private readonly int m_lineNo;
-
         /// <summary>
         /// Constructs new BreakpointLineNumberLocation object.
         /// </summary>
@@ -626,28 +583,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             m_lineNo = lineNumber;
         }
 
-        #region IBreakpointBySourceLine Members
-
-        /// <value>
-        ///     File where the breakpoint is defined.
-        /// </value>
-        public string FileName
-        {
-            get { return m_file; }
-        }
-
-        /// <value>
-        ///     Line where the breakpoint is defined.
-        /// </value>
-        public int LineNumber
-        {
-            get { return m_lineNo; }
-        }
-
-        #endregion
-
-        #region ISequencePointResolver Members
-
         /// <summary>
         /// Function tries to resolve the breakpoint from breakpoint description.
         /// </summary>
@@ -659,8 +594,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <remarks>
         ///     Resolved is usually called for every loaded module.
         /// </remarks>
-        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule,
-                                    out MDbgFunction managedFunction, out int ILoffset)
+        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule, out MDbgFunction managedFunction, out int ILoffset)
         {
             Debug.Assert(m_lineNo > 0 && m_file.Length > 0);
 
@@ -674,17 +608,16 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             foreach (ISymbolDocument doc in managedModule.SymReader.GetDocuments())
             {
                 if (String.Compare(doc.URL, m_file, true, CultureInfo.InvariantCulture) == 0 ||
-                    String.Compare(Path.GetFileName(doc.URL), m_file, true, CultureInfo.InvariantCulture) == 0)
+                    String.Compare(System.IO.Path.GetFileName(doc.URL), m_file, true, CultureInfo.InvariantCulture) == 0)
                 {
                     int lineNo = 0;
                     try
                     {
                         lineNo = doc.FindClosestLine(m_lineNo);
                     }
-                    catch (COMException e)
+                    catch (System.Runtime.InteropServices.COMException e)
                     {
-                        if (e.ErrorCode == (int) CorDebug.HResult.E_FAIL)
-
+                        if (e.ErrorCode == (int)HResult.E_FAIL)
                             // we continue, because this location is not in this file, let's
                             // keep trying to search for next file.
                             continue;
@@ -708,8 +641,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return false;
         }
 
-        #endregion
-
         /// <summary>
         /// Obtains a string representation of this instance.
         /// </summary>
@@ -721,8 +652,23 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             // Using the full path makes debugging output inconsistant during automated test runs.
             // For testing purposes we'll get rid of them.
             //return "line "+m_lineNo+" in "+m_file;
-            return "line " + m_lineNo + " in " + Path.GetFileName(m_file);
+            return "line " + m_lineNo + " in " + System.IO.Path.GetFileName(m_file);
         }
+
+        /// <value>
+        ///     File where the breakpoint is defined.
+        /// </value>
+        public string FileName
+        { get { return m_file; } }
+
+        /// <value>
+        ///     Line where the breakpoint is defined.
+        /// </value>
+        public int LineNumber
+        { get { return m_lineNo; } }
+
+        private string m_file;
+        private int m_lineNo;
     }
 
     /// <summary>
@@ -730,10 +676,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class BreakpointFunctionLocation : ISequencePointResolver, IBreakpointByFunctionName
     {
-        private readonly string m_className;
-        private readonly int m_ILoffset = -1;
-        private readonly string m_methodName;
-        private readonly string m_moduleName;
 
         /// <summary>
         /// Constructs new BreakpointFunctionLocation object.
@@ -743,7 +685,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="methodName">A name of method.</param>
         /// <param name="ilOffset">An il offset within a method description.</param>
         public BreakpointFunctionLocation(string moduleName, string className,
-                                          string methodName, int ilOffset)
+                                    string methodName, int ilOffset)
         {
             if (methodName == null || methodName.Length == 0)
                 throw new ArgumentException("methodName must be specified");
@@ -756,44 +698,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             m_ILoffset = ilOffset;
         }
 
-        #region IBreakpointByFunctionName Members
-
-        /// <value>
-        ///     Name of the module.
-        /// </value>
-        public string ModuleName
-        {
-            get { return m_moduleName; }
-        }
-
-        /// <value>
-        ///     Name of the class.
-        /// </value>
-        public string ClassName
-        {
-            get { return m_className; }
-        }
-
-        /// <value>
-        ///     Name of the method.
-        /// </value>
-        public string MethodName
-        {
-            get { return m_methodName; }
-        }
-
-        /// <value>
-        ///     IL offset within the method.
-        /// </value>
-        public int ILOffset
-        {
-            get { return m_ILoffset; }
-        }
-
-        #endregion
-
-        #region ISequencePointResolver Members
-
         /// <summary>
         /// Function tries to resolve the breakpoint from breakpoint description.
         /// </summary>
@@ -805,8 +709,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <remarks>
         ///     Resolved is usually called for every loaded module.
         /// </remarks>
-        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule,
-                                    out MDbgFunction managedFunction, out int ilOffset)
+        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule, out MDbgFunction managedFunction, out int ilOffset)
         {
             managedFunction = null;
             ilOffset = m_ILoffset;
@@ -817,14 +720,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     return false;
             }
 
-            managedFunction = functionBreakpoint.m_breakpointCollection.m_process.ResolveFunctionName(managedModule,
-                                                                                                      m_className,
-                                                                                                      m_methodName);
+            managedFunction = functionBreakpoint.m_breakpointCollection.m_process.ResolveFunctionName(managedModule, m_className, m_methodName);
 
             return managedFunction != null;
         }
-
-        #endregion
 
         /// <summary>
         /// Obtains a string representation of this instance.
@@ -834,9 +733,37 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </returns>
         public override string ToString()
         {
-            return ((m_moduleName.Length == 0 ? "" : m_moduleName + "!") + m_className + "::" + m_methodName + "(+" +
-                    m_ILoffset + ")");
+            return ((m_moduleName.Length == 0 ? "" : m_moduleName + "!") + m_className + "::" + m_methodName + "(+" + m_ILoffset + ")");
         }
+
+        /// <value>
+        ///     Name of the module.
+        /// </value>
+        public string ModuleName
+        { get { return m_moduleName; } }
+
+        /// <value>
+        ///     Name of the class.
+        /// </value>
+        public string ClassName
+        { get { return m_className; } }
+
+        /// <value>
+        ///     Name of the method.
+        /// </value>
+        public string MethodName
+        { get { return m_methodName; } }
+
+        /// <value>
+        ///     IL offset within the method.
+        /// </value>
+        public int ILOffset
+        { get { return m_ILoffset; } }
+
+        private string m_moduleName;
+        private string m_className;
+        private string m_methodName;
+        private int m_ILoffset = -1;
     }
 
 
@@ -846,9 +773,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class BreakpointFunctionToken : ISequencePointResolver
     {
-        private readonly MDbgFunction m_function;
-        private readonly int m_ILoffset = -1;
-
         /// <summary>
         /// Constructs new BreakpointFunctionToken object.
         /// </summary>
@@ -861,8 +785,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             m_ILoffset = ilOffset;
         }
 
-        #region ISequencePointResolver Members
-
         /// <summary>
         /// Function tries to resolve the breakpoint from breakpoint description.
         /// </summary>
@@ -874,8 +796,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <remarks>
         ///     Resolved is usually called for every loaded module.
         /// </remarks>
-        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule,
-                                    out MDbgFunction managedFunction, out int ilOffset)
+        public bool ResolveLocation(MDbgFunctionBreakpoint functionBreakpoint, MDbgModule managedModule, out MDbgFunction managedFunction, out int ilOffset)
         {
             managedFunction = null;
             ilOffset = -1;
@@ -889,8 +810,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return true;
         }
 
-        #endregion
-
         /// <summary>
         /// Obtains a string representation of this instance.
         /// </summary>
@@ -901,6 +820,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             return (m_function.FullName + "(+" + m_ILoffset + ")");
         }
+
+        private MDbgFunction m_function;
+        private int m_ILoffset = -1;
     }
 
 
@@ -915,7 +837,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </remarks>
     public class MDbgFunctionBreakpoint : MDbgBreakpoint
     {
-        private readonly ISequencePointResolver m_location;
 
         /// <summary>
         /// Constructs a new breakoint in the debugged process.
@@ -927,10 +848,126 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             m_location = location;
             Bind();
+            NotifyChanged();
+        }
 
-            if (breakpointCollection != null)
+        /// <summary>
+        /// Breakpoint objects representing current breakpoint.
+        /// </summary>
+        /// <remarks>
+        ///     The returned value is a collection of CorXXX objects representing
+        ///     different breakpoints. If the code has been loaded into multiple
+        ///     appdomains than the breakpoints.
+        /// </remarks>
+        public override IEnumerable CorBreakpoints
+        {
+            get
             {
-                breakpointCollection.NotifyChanged(this);
+                if (!IsBound)
+                    return new ArrayList();
+                else
+                    return (IEnumerable)new List<CorFunctionBreakpoint>(m_breakpoints.Values);
+            }
+        }
+
+        /// <summary>
+        /// Returns CorBreakpoint object.
+        /// </summary>
+        /// If the breakpoint is represented by more than one occurance of
+        /// breakpoint object, only the first instance is returned.
+        public override CorBreakpoint CorBreakpoint
+        {
+            get
+            {
+                if (!IsBound)
+                    return null;
+                else
+                {
+                    List<CorFunctionBreakpoint> bps = new List<CorFunctionBreakpoint>(m_breakpoints.Values);
+                    return (CorBreakpoint)bps[0];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets if the breakpoint is enabled.
+        /// </summary>
+        /// <value>
+        /// Sets or gets value showing if the breakpoint is enabled or not.
+        /// </value>
+        /// <remarks>
+        ///     When breakpoint is not enabled, it won't be hit.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Throws an InvalidOperationException if the breakpoint is not yet bound and therefore cannot 
+        /// be enabled.
+        /// </exception>
+        public override bool Enabled
+        {
+            get
+            {
+                if (!IsBound)
+                {
+                    // we don't have any breakpoints, so they are "by definition" disabled.
+                    return false;
+                }
+                else
+                {
+                    List<CorFunctionBreakpoint> bps = new List<CorFunctionBreakpoint>(m_breakpoints.Values);
+                    bool active = bps[0].IsActive;
+
+                    // all breakpoints have to have same Active Status
+                    for (int i = 1; i < bps.Count; i++)
+                    {
+                        Debug.Assert(bps[i].IsActive == active);
+                    }
+
+                    return active;
+                }
+            }
+            set
+            {
+                if (!IsBound
+                   && value == true)
+                {
+                    throw new InvalidOperationException("Cannot enable not bound breakpoints.");
+                }
+
+                if (m_breakpoints != null)
+                {
+                    foreach (CorFunctionBreakpoint bp in m_breakpoints.Values)
+                    {
+                        try
+                        {
+                            bp.Activate(value);
+                        }
+                        catch (COMException e)
+                        {
+                            if (e.ErrorCode != (int)HResult.CORDBG_E_PROCESS_TERMINATED)
+                                throw;
+                            // currently CORDBG_E_PROCESS_TERMINATED means that the breakpoint
+                            // reference is invalid. This can happen for e.g. in case when an
+                            // appdomain gets unloaded with a breakpoint set in it. Any operation
+                            // on such breakpoint resuts in CORDBG_E_PROCESS_TERMINATED exception.
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets if the breakpoint is bound.
+        /// </summary>
+        /// <value>
+        ///     Is true if the breakpoint has been bound. Bound breakpoints
+        ///     are breakpoints for which a code that they should break in 
+        ///     has already been loaded into the process.
+        /// </value>
+        public override bool IsBound
+        {
+            get
+            {
+                return (m_breakpoints != null && m_breakpoints.Count > 0);
             }
         }
 
@@ -939,18 +976,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </value>
         public override Object Location
         {
-            get { return m_location; }
-        }
-
-        /// <summary>
-        /// Notify that this breakpoint has change properties. 
-        /// This will cause the NotifyChange event to fire on the BreakpointCollection
-        /// </summary>
-        protected void NotifyChanged()
-        {
-            if (m_breakpointCollection != null)
+            get
             {
-                m_breakpointCollection.NotifyChanged(this);
+                return m_location;
             }
         }
 
@@ -965,34 +993,21 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         ///     gets loaded into the debugged process or whenever a dynamic module loads a new class
         ///     or new symbols. This adds any missing bindings, but will not duplicate any that already exist.
         /// </remarks>
-        public override sealed bool BindToModule(MDbgModule managedModule)
+        public sealed override bool BindToModule(MDbgModule managedModule)
         {
             MDbgFunction func;
             int ILoffset;
 
-            // Note that in some cases (eg. source/line breakpoints) we may actually
-            // want to bind to multiple locations in this module instead of just one.
+            // If we already bound a breakpoint in this module then nothing to do
+            if (m_breakpoints != null && m_breakpoints.ContainsKey(managedModule))
+                return false;
+
+            // If we can't resolve the location in this module then there is nothing to do
             if (!m_location.ResolveLocation(this, managedModule, out func, out ILoffset))
                 return false;
 
-            if (m_breakpoints != null)
-            {
-                // Assume all breakpoints are CorFunctionBreakpoints.
-                // If this ever becomes invalid, we'll need a new check here to avoid 
-                // duplicating that type of breakpoint.
-                foreach (CorDebug.CorFunctionBreakpoint cb in m_breakpoints)
-                {
-                    // If we find a CorBreakpoint that already matches this location
-                    // don't add a new one, or the debugger will stop twice when it's hit.
-                    // Note that CorFunction instances are 1:1 with a specific function in a 
-                    // specific module and AppDomain (but represents all generic instantiations).
-                    if (cb.Function == func.CorFunction && cb.Offset == ILoffset)
-                        return false;
-                }
-            }
-
             // Use the resolved information to get a raw CorBreakpoint object.
-            CorBreakpoint breakpoint = null;
+            CorFunctionBreakpoint breakpoint = null;
             try
             {
                 if (ILoffset == 0)
@@ -1006,12 +1021,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
                     if (code == null)
                     {
-                        throw new MDbgException(String.Format(CultureInfo.InvariantCulture,
-                                                              "IL Code for function {0} is null",
-                                                              new Object[] {func.FullName}));
+                        throw new MDbgException(String.Format(CultureInfo.InvariantCulture, "IL Code for function {0} is null", new Object[] { func.FullName }));
                     }
                     breakpoint = code.CreateBreakpoint(ILoffset);
                 }
+            }
+            catch (NotImplementedException)
+            {
+                return false;
             }
             catch (COMException)
             {
@@ -1023,15 +1040,27 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             breakpoint.Activate(true);
             if (m_breakpoints == null)
             {
-                m_breakpoints = new ArrayList();
+                m_breakpoints = new Dictionary<MDbgModule, CorFunctionBreakpoint>();
             }
-            m_breakpoints.Add(breakpoint);
+            m_breakpoints.Add(managedModule, breakpoint);
 
             MDbgProcess p = managedModule.Process;
-            CustomBreakpointEventHandler handler = InternalOnHitHandler;
+            CustomBreakpointEventHandler handler = new CustomBreakpointEventHandler(this.InternalOnHitHandler);
             p.RegisterCustomBreakpoint(breakpoint, handler);
 
             return true;
+        }
+
+        /// <summary>
+        /// Event handler for a module unload
+        /// </summary>
+        /// <param name="module">Module that is being unloaded</param>
+        public override void OnModuleUnloaded(MDbgModule module)
+        {
+            if (m_breakpoints != null)
+            {
+                m_breakpoints.Remove(module);
+            }
         }
 
         /// <summary>
@@ -1063,10 +1092,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         // Common on-hit handler.
-        private void InternalOnHitHandler(object sender, CustomBreakpointEventArgs e)
+        void InternalOnHitHandler(object sender, CustomBreakpointEventArgs e)
         {
             // Mark call to derived class.
-            object stopreason = OnHitHandler(e);
+            object stopreason = this.OnHitHandler(e);
 
             // If stop-reason supplied, then stop the shell.
             if (stopreason != null)
@@ -1098,12 +1127,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <returns>The name is in mdbg's format as displayed in mdbg's 'break' command.</returns>
         public override string ToString()
         {
-            string location = (m_location == null)
-                                  ?
-                                      "?"
-                                  :
-                                      m_location.ToString();
+            string location = (m_location == null) ?
+                "?" :
+                m_location.ToString();
             return base.ToString() + " (" + location + ")";
         }
+
+        private ISequencePointResolver m_location;
+        private Dictionary<MDbgModule, CorFunctionBreakpoint> m_breakpoints;
     }
 }

@@ -1,44 +1,45 @@
-//---------------------------------------------------------------------
+﻿//---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 #region Using directives
 
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 
 #endregion
 
-namespace O2.Debugger.Mdbg.gui
+using System.IO;
+
+namespace gui
 {
-    internal partial class LaunchProcess : Form
+    partial class LaunchProcess : Form
     {
         public LaunchProcess()
         {
             InitializeComponent();
 
-            textBoxWorkingDir.Text = Directory.GetCurrentDirectory();
+            this.textBoxWorkingDir.Text  = System.IO.Directory.GetCurrentDirectory();
         }
 
         #region Properties
-
         // Properties for caller to get stuff.
 
         // Process working directory.
-        private string m_Arguments;
-        private string m_ProcessName;
-        private string m_WorkingDir;
-
+        string m_WorkingDir;
         public string WorkingDir
         {
-            get { return m_WorkingDir; }
+            get { return m_WorkingDir;}
         }
 
         // Arguments to pass to process.
-
+        string m_Arguments;
         public string Arguments
         {
             get { return m_Arguments; }
@@ -46,43 +47,44 @@ namespace O2.Debugger.Mdbg.gui
 
         // Full path to process name
         // This will be null if the cancelled.
-
+        string m_ProcessName;
         public string ProcessName
         {
             get { return m_ProcessName; }
         }
-
         #endregion
 
         private void buttonLaunch_Click(object sender, EventArgs e)
         {
             // Need to cache results because once we close the form,we'll lose all
             // the text boxes.
-            m_WorkingDir = textBoxWorkingDir.Text;
-            m_Arguments = textBoxArgs.Text;
-            m_ProcessName = textBoxProcessName.Text;
-            Close();
+            m_WorkingDir = this.textBoxWorkingDir.Text;
+            m_Arguments = this.textBoxArgs.Text;
+            m_ProcessName = this.textBoxProcessName.Text;
+            this.Close();
         }
 
         private void buttonOpenProcess_Click(object sender, EventArgs e)
         {
-            var f = new OpenFileDialog();
-            f.DefaultExt = "exe";
-            f.CheckFileExists = true;
-            f.CheckPathExists = true;
-            f.ValidateNames = true;
-            f.InitialDirectory = textBoxWorkingDir.Text;
-            f.Multiselect = false;
-            f.Title = "Select executable to start debugging.";
-
-            DialogResult x = f.ShowDialog();
-            if (x != DialogResult.OK)
+            using (OpenFileDialog f = new OpenFileDialog())
             {
-                return;
-            }
+                f.DefaultExt = "exe";
+                f.CheckFileExists = true;
+                f.CheckPathExists = true;
+                f.ValidateNames = true;
+                f.InitialDirectory = this.textBoxWorkingDir.Text;
+                f.Multiselect = false;
+                f.Title = "Select executable to start debugging.";
 
-            textBoxProcessName.Text = f.FileName;
-            textBoxWorkingDir.Text = Directory.GetCurrentDirectory();
+                DialogResult x = f.ShowDialog();
+                if (x != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.textBoxProcessName.Text = f.FileName;
+                this.textBoxWorkingDir.Text = System.IO.Directory.GetCurrentDirectory();
+            }
         }
     }
 }

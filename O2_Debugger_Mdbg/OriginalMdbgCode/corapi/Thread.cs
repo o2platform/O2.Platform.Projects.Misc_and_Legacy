@@ -3,24 +3,44 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using System.Runtime.Serialization;
+using System.Runtime.InteropServices;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     public struct CorActiveFunction
     {
-        private readonly CorFunction m_function;
-        private readonly int m_ilOffset;
+        public int ILoffset
+        {
+            get
+            {
+                return m_ilOffset;
+            }
+        }
+        private int m_ilOffset;
 
-        private readonly CorModule m_module;
+        public CorFunction Function
+        {
+            get
+            {
+                return m_function;
+            }
+        }
+        private CorFunction m_function;
+
+        public CorModule Module
+        {
+            get
+            {
+                return m_module;
+            }
+        }
+        private CorModule m_module;
 
         internal CorActiveFunction(int ilOffset, CorFunction managedFunction, CorModule managedModule)
         {
@@ -28,44 +48,48 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             m_function = managedFunction;
             m_module = managedModule;
         }
-
-        public int ILoffset
-        {
-            get { return m_ilOffset; }
-        }
-
-        public CorFunction Function
-        {
-            get { return m_function; }
-        }
-
-        public CorModule Module
-        {
-            get { return m_module; }
-        }
     }
 
     public enum CorStackWalkType
     {
-        PureV3StackWalk, // true representation of the V3 ICorDebugStackWalk API
-        ExtendedV3StackWalk // V3 ICorDebugStackWalk API with internal frames interleaved
+        PureV3StackWalk,        // true representation of the V3 ICorDebugStackWalk API
+        ExtendedV3StackWalk     // V3 ICorDebugStackWalk API with internal frames interleaved
+    }
+
+    /// <summary>
+    /// An object which a thread is blocked on
+    /// </summary>
+    public struct CorBlockingObject
+    {
+        public CorValue BlockingObject;
+        public CorDebugBlockingReason BlockingReason;
+        public TimeSpan Timeout;
     }
 
     /** A thread in the debugged process. */
-
     public sealed class CorThread : WrapperBase
     {
-        private readonly ICorDebugThread m_th;
-
         internal CorThread(ICorDebugThread thread)
             : base(thread)
         {
             m_th = thread;
         }
 
+        internal ICorDebugThread GetInterface()
+        {
+            return m_th;
+        }
+
+        [CLSCompliant(false)]
+        public ICorDebugThread Raw
+        {
+            get 
+            { 
+                return m_th;
+            }
+        }
 
         /** The process that this thread is in. */
-
         public CorProcess Process
         {
             get
@@ -77,19 +101,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** the OS id of the thread. */
-
         public int Id
         {
             get
             {
                 uint id = 0;
                 m_th.GetID(out id);
-                return (int) id;
+                return (int)id;
             }
         }
 
         /** The handle of the active part of the thread. */
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IntPtr Handle
         {
             get
@@ -101,7 +124,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** The AppDomain that owns the thread. */
-
         public CorAppDomain AppDomain
         {
             get
@@ -113,7 +135,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** Set the current debug state of the thread. */
-
         [CLSCompliant(false)]
         public CorDebugThreadState DebugState
         {
@@ -123,11 +144,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                 m_th.GetDebugState(out s);
                 return s;
             }
-            set { m_th.SetDebugState(value); }
+            set
+            {
+                m_th.SetDebugState(value);
+            }
         }
 
         /** the user state. */
-
         [CLSCompliant(false)]
         public CorDebugUserState UserState
         {
@@ -140,7 +163,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** the exception object which is currently being thrown by the thread. */
-
         public CorValue CurrentException
         {
             get
@@ -151,12 +173,75 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
+        /** gets the current custom notification object on the thread or null if
+         * no such object exists.
+         * */
+        public CorValue CurrentNotification
+        {
+            get
+            {
+                ICorDebugThread4 th4 = (ICorDebugThread4)m_th;
+
+                ICorDebugValue v = null;
+                th4.GetCurrentCustomDebuggerNotification(out v);
+                return (v == null) ? null : new CorValue(v);
+            }
+        }
+
+        /// <summary>
+        /// Returns true if this thread has an unhandled managed exception
+        /// </summary>
+        public bool HasUnhandledException
+        {
+            get
+            {
+                // This is only supported on ICorDebugThread4
+                ICorDebugThread4 th4 = m_th as ICorDebugThread4;
+                if (th4 == null)
+                    throw new NotSupportedException();
+                else
+                {
+                    int ret = th4.HasUnhandledException();
+                    if (ret == (int)HResult.S_OK)
+                        return true;
+                    else if (ret == (int)HResult.S_FALSE)
+                        return false;
+                    else
+                        Marshal.ThrowExceptionForHR(ret);
+                    // unreachable
+                    throw new Exception();
+                }
+            }
+        }
+
         /** 
          * Clear the current exception object, preventing it from being thrown.
          */
+        public void ClearCurrentException()
+        {
+            m_th.ClearCurrentException();
+        }
+
+        /** 
+         * Intercept the current exception.
+         */
+        public void InterceptCurrentException(CorFrame frame)
+        {
+            ICorDebugThread2 m_th2 = (ICorDebugThread2)m_th;
+            m_th2.InterceptCurrentException(frame.m_frame);
+        }
+
+        /** 
+         * create a stepper object relative to the active frame in this thread.
+         */
+        public CorStepper CreateStepper()
+        {
+            ICorDebugStepper s = null;
+            m_th.CreateStepper(out s);
+            return new CorStepper(s);
+        }
 
         /** All stack chains in the thread. */
-
         public IEnumerable Chains
         {
             get
@@ -168,7 +253,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** The most recent chain in the thread, if any. */
-
         public CorChain ActiveChain
         {
             get
@@ -180,7 +264,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** Get the active frame. */
-
         public CorFrame ActiveFrame
         {
             get
@@ -192,7 +275,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** Get the register set for the active part of the thread. */
-
         public CorRegisterSet RegisterSet
         {
             get
@@ -204,9 +286,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** Creates an evaluation object. */
+        public CorEval CreateEval()
+        {
+            ICorDebugEval e = null;
+            m_th.CreateEval(out e);
+            return e == null ? null : new CorEval(e);
+        }
 
         /** Get the runtime thread object. */
-
         public CorValue ThreadVariable
         {
             get
@@ -217,88 +304,156 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        internal ICorDebugThread GetInterface()
-        {
-            return m_th;
-        }
-
-        public void ClearCurrentException()
-        {
-            m_th.ClearCurrentException();
-        }
-
-        /** 
-         * Intercept the current exception.
-         */
-
-        public void InterceptCurrentException(CorFrame frame)
-        {
-            var m_th2 = (ICorDebugThread2) m_th;
-            m_th2.InterceptCurrentException(frame.m_frame);
-        }
-
-        /** 
-         * create a stepper object relative to the active frame in this thread.
-         */
-
-        public CorStepper CreateStepper()
-        {
-            ICorDebugStepper s = null;
-            m_th.CreateStepper(out s);
-            return new CorStepper(s);
-        }
-
-        public CorEval CreateEval()
-        {
-            ICorDebugEval e = null;
-            m_th.CreateEval(out e);
-            return e == null ? null : new CorEval(e);
-        }
-
         public CorActiveFunction[] GetActiveFunctions()
         {
-            var m_th2 = (ICorDebugThread2) m_th;
+            ICorDebugThread2 m_th2 = (ICorDebugThread2)m_th;
             UInt32 pcFunctions;
             m_th2.GetActiveFunctions(0, out pcFunctions, null);
-            var afunctions = new COR_ACTIVE_FUNCTION[pcFunctions];
+            COR_ACTIVE_FUNCTION[] afunctions = new COR_ACTIVE_FUNCTION[pcFunctions];
             m_th2.GetActiveFunctions(pcFunctions, out pcFunctions, afunctions);
-            var caf = new CorActiveFunction[pcFunctions];
+            CorActiveFunction[] caf = new CorActiveFunction[pcFunctions];
             for (int i = 0; i < pcFunctions; ++i)
             {
-                caf[i] = new CorActiveFunction((int) afunctions[i].ilOffset,
-                                               new CorFunction((ICorDebugFunction) afunctions[i].pFunction),
-                                               afunctions[i].pModule == null
-                                                   ? null
-                                                   : new CorModule(afunctions[i].pModule)
-                    );
+                caf[i] = new CorActiveFunction((int)afunctions[i].ilOffset,
+                                               new CorFunction((ICorDebugFunction)afunctions[i].pFunction),
+                                               afunctions[i].pModule == null ? null : new CorModule(afunctions[i].pModule)
+                                               );
             }
             return caf;
         }
+     
+        public bool IsV3
+        {
+            get
+            {
+                ICorDebugThread3 th3 = m_th as ICorDebugThread3;
+                if (th3 == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        /** 
+         * If PureV3StackWalk is specified, then this method returns a CorStackWalk, which does not expose
+         * ICorDebugInternalFrames.  If ExtendedV3StackWalk is specified, then this method returns a 
+         * CorStackWalkEx, which derives from CorStackWalk and interleaves ICorDebugInternalFrames.
+         */
+        public CorStackWalk CreateStackWalk (CorStackWalkType type)
+        {
+            ICorDebugThread3 th3 = m_th as ICorDebugThread3;
+            if (th3 == null)
+            {
+                return null;
+            }
+
+            ICorDebugStackWalk s = null;
+            th3.CreateStackWalk (out s);
+            if (type == CorStackWalkType.PureV3StackWalk)
+            {
+                return new CorStackWalk(s, this);
+            }
+            else
+            {
+                return new CorStackWalkEx(s, this);
+            }
+        }
+        public CorStackWalk CreateStackWalk()
+        {
+            return CreateStackWalk(CorStackWalkType.PureV3StackWalk);
+        }
+
+        public CorFrame[] GetActiveInternalFrames()
+        {
+            ICorDebugThread3 th3 = (ICorDebugThread3)m_th;
+
+            UInt32 cInternalFrames = 0;
+            th3.GetActiveInternalFrames(0, out cInternalFrames, null);
+
+            ICorDebugInternalFrame2[] ppInternalFrames = new ICorDebugInternalFrame2[cInternalFrames];
+            th3.GetActiveInternalFrames(cInternalFrames, out cInternalFrames, ppInternalFrames);
+
+            CorFrame[] corFrames = new CorFrame[cInternalFrames];
+            for (int i = 0; i < cInternalFrames; i++)
+            {
+                corFrames[i] = new CorFrame(ppInternalFrames[i] as ICorDebugFrame);
+            }
+            return corFrames;
+        }
+
+        ///<summary>
+        ///Returns an array of objects which this thread is blocked on
+        ///</summary>
+        public CorBlockingObject[] GetBlockingObjects()
+        {
+            ICorDebugThread4 th4 = m_th as ICorDebugThread4;
+            if (th4 == null)
+                throw new NotSupportedException();
+            ICorDebugEnumBlockingObject blockingObjectEnumerator;
+            th4.GetBlockingObjects(out blockingObjectEnumerator);
+            uint countBlockingObjects;
+            blockingObjectEnumerator.GetCount(out countBlockingObjects);
+            CorDebugBlockingObject[] rawBlockingObjects = new CorDebugBlockingObject[countBlockingObjects];
+            uint countFetched;
+            blockingObjectEnumerator.Next(countBlockingObjects, rawBlockingObjects, out countFetched);
+            Debug.Assert(countFetched == countBlockingObjects);
+            CorBlockingObject[] blockingObjects = new CorBlockingObject[countBlockingObjects];
+            for(int i = 0; i < countBlockingObjects; i++)
+            {
+                blockingObjects[i].BlockingObject = new CorValue(rawBlockingObjects[i].BlockingObject);
+                if(rawBlockingObjects[i].Timeout == uint.MaxValue)
+                {
+                    blockingObjects[i].Timeout = TimeSpan.MaxValue;
+                }
+                else
+                {
+                    blockingObjects[i].Timeout = TimeSpan.FromMilliseconds(rawBlockingObjects[i].Timeout);
+                }
+                blockingObjects[i].BlockingReason = rawBlockingObjects[i].BlockingReason;
+            }
+            return blockingObjects;
+        }
+
+        private ICorDebugThread m_th;
+
     } /* class Thread */
+
 
 
     public enum CorFrameType
     {
-        ILFrame,
-        NativeFrame,
-        InternalFrame,
+        ILFrame, NativeFrame, InternalFrame,          
+            RuntimeUnwindableFrame
     }
 
 
     public sealed class CorFrame : WrapperBase
     {
-        internal ICorDebugFrame m_frame;
-        private ICorDebugInternalFrame m_iFrame;
-        private bool m_iFrameCached;
-        private ICorDebugILFrame m_ilFrame;
-        private bool m_ilFrameCached;
-
         internal CorFrame(ICorDebugFrame frame)
             : base(frame)
         {
             m_frame = frame;
         }
 
+        [CLSCompliant(false)]
+        public ICorDebugFrame Raw
+        {
+            get 
+            { 
+                return m_frame;
+            }
+        }
+
+        public CorStepper CreateStepper()
+        {
+            ICorDebugStepper istepper;
+            m_frame.CreateStepper(out istepper);
+            return (istepper == null ? null : new CorStepper(istepper));
+        }
 
         public CorFrame Callee
         {
@@ -345,7 +500,22 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             get
             {
                 ICorDebugFunction ifunction;
-                m_frame.GetFunction(out ifunction);
+                try
+                {
+                    m_frame.GetFunction(out ifunction);
+                }
+                catch (System.Runtime.InteropServices.COMException e)
+                {
+                    if (e.ErrorCode == (int)HResult.CORDBG_E_CODE_NOT_AVAILABLE)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
                 return (ifunction == null ? null : new CorFunction(ifunction));
             }
         }
@@ -356,7 +526,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 uint token;
                 m_frame.GetFunctionToken(out token);
-                return (int) token;
+                return (int)token;
             }
         }
 
@@ -372,6 +542,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                 if (iframe != null)
                     return CorFrameType.InternalFrame;
 
+                ICorDebugRuntimeUnwindableFrame ruf = GetRuntimeUnwindableFrame();
+                if (ruf != null)
+                    return CorFrameType.RuntimeUnwindableFrame;
                 return CorFrameType.NativeFrame;
             }
         }
@@ -392,25 +565,36 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        public IEnumerable TypeParameters
+        [CLSCompliant(false)]
+        public ulong Address
         {
-            get
+            get 
             {
-                ICorDebugTypeEnum icdte = null;
-                ICorDebugILFrame ilf = GetILFrame();
+                ICorDebugInternalFrame iframe = GetInternalFrame();
+                if (iframe == null)
+                {
+                    throw new CorException("Cannot get the frame address on non-internal frame");
+                }
 
-                (ilf as ICorDebugILFrame2).EnumerateTypeParameters(out icdte);
-                return new CorTypeEnumerator(icdte); // icdte can be null, is handled by enumerator
+                ulong address = 0;
+                ICorDebugInternalFrame2 iframe2 = (ICorDebugInternalFrame2)iframe;
+                iframe2.GetAddress(out address);
+                return address;
             }
         }
 
-        public CorStepper CreateStepper()
+        public bool IsCloserToLeaf(CorFrame frameToCompare)
         {
-            ICorDebugStepper istepper;
-            m_frame.CreateStepper(out istepper);
-            return (istepper == null ? null : new CorStepper(istepper));
-        }
+            ICorDebugInternalFrame2 iFrame2 = m_frame as ICorDebugInternalFrame2;
+            if (iFrame2 == null)
+            {
+                throw new ArgumentException("The this object is not an ICorDebugInternalFrame");
+            }
 
+            int isCloser = 0;
+            iFrame2.IsCloserToLeaf(frameToCompare.m_frame, out isCloser);
+            return (isCloser == 0 ? false : true);
+        }
 
         [CLSCompliant(false)]
         public void GetStackRange(out UInt64 startOffset, out UInt64 endOffset)
@@ -436,7 +620,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ICorDebugILFrame ilframe = GetILFrame();
             if (ilframe == null)
                 throw new CorException("Cannot set an IP on non-il frame");
-            ilframe.SetIP((uint) offset);
+            ilframe.SetIP((uint)offset);
         }
 
         public bool CanSetIP(int offset)
@@ -444,7 +628,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ICorDebugILFrame ilframe = GetILFrame();
             if (ilframe == null)
                 return false;
-            return (ilframe.CanSetIP((uint) offset) == (int) HResult.S_OK);
+            return (ilframe.CanSetIP((uint)offset) == (int)HResult.S_OK);
         }
 
         public bool CanSetIP(int offset, out int hresult)
@@ -452,19 +636,69 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ICorDebugILFrame ilframe = GetILFrame();
             if (ilframe == null)
             {
-                hresult = (int) HResult.E_FAIL;
+                hresult = (int)HResult.E_FAIL;
                 return false;
             }
-            hresult = ilframe.CanSetIP((uint) offset);
-            return (hresult == (int) HResult.S_OK);
+            hresult = ilframe.CanSetIP((uint)offset);
+            return (hresult == (int)HResult.S_OK);
         }
 
         [CLSCompliant(false)]
         public void GetNativeIP(out uint offset)
         {
-            var nativeFrame = m_frame as ICorDebugNativeFrame;
+            ICorDebugNativeFrame nativeFrame = m_frame as ICorDebugNativeFrame;
             Debug.Assert(nativeFrame != null);
             nativeFrame.GetIP(out offset);
+        }
+        public bool IsChild
+        {
+            get
+            {
+                ICorDebugNativeFrame2 nativeFrame2 = m_frame as ICorDebugNativeFrame2;
+                if (nativeFrame2 == null)
+                {
+                    return false;
+                }
+
+                int isChild = 0;
+                nativeFrame2.IsChild(out isChild);
+                return (isChild == 0 ? false : true);
+            }
+        }
+
+        [CLSCompliant(false)]
+        public bool IsMatchingParentFrame(CorFrame parentFrame)
+        {
+            if (!this.IsChild)
+            {
+                return false;
+            }
+            ICorDebugNativeFrame2 nativeFrame2 = m_frame as ICorDebugNativeFrame2;
+            Debug.Assert(nativeFrame2 != null);
+
+            ICorDebugNativeFrame2 nativeParentFrame2 = parentFrame.m_frame as ICorDebugNativeFrame2;
+            if (nativeParentFrame2 == null)
+            {
+                return false;
+            }
+
+            int isParent = 0;
+            nativeFrame2.IsMatchingParentFrame(nativeParentFrame2, out isParent);
+            return (isParent == 0 ? false : true);
+        }
+
+        [CLSCompliant(false)]
+        public uint CalleeStackParameterSize
+        {
+            get
+            {
+                ICorDebugNativeFrame2 nativeFrame2 = m_frame as ICorDebugNativeFrame2;
+                Debug.Assert(nativeFrame2 != null);
+
+                uint paramSize = 0;
+                nativeFrame2.GetCalleeStackParameterSize(out paramSize);
+                return paramSize;
+            }
         }
 
         public CorValue GetLocalVariable(int index)
@@ -476,13 +710,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ICorDebugValue value;
             try
             {
-                ilframe.GetLocalVariable((uint) index, out value);
+                ilframe.GetLocalVariable((uint)index, out value);
             }
-            catch (COMException e)
+            catch (System.Runtime.InteropServices.COMException e)
             {
                 // If you are stopped in the Prolog, the variable may not be available.
                 // CORDBG_E_IL_VAR_NOT_AVAILABLE is returned after dubugee triggers StackOverflowException
-                if (e.ErrorCode == (int) HResult.CORDBG_E_IL_VAR_NOT_AVAILABLE)
+                if (e.ErrorCode == (int)HResult.CORDBG_E_IL_VAR_NOT_AVAILABLE)
                 {
                     return null;
                 }
@@ -504,7 +738,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ilframe.EnumerateLocalVariables(out ve);
             uint count;
             ve.GetCount(out count);
-            return (int) count;
+            return (int)count;
         }
 
         public CorValue GetArgument(int index)
@@ -515,7 +749,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
 
             ICorDebugValue value;
-            ilframe.GetArgument((uint) index, out value);
+            ilframe.GetArgument((uint)index, out value);
             return (value == null) ? null : new CorValue(value);
         }
 
@@ -529,7 +763,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ilframe.EnumerateArguments(out ve);
             uint count;
             ve.GetCount(out count);
-            return (int) count;
+            return (int)count;
         }
 
         public void RemapFunction(int newILOffset)
@@ -537,8 +771,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             ICorDebugILFrame ilframe = GetILFrame();
             if (ilframe == null)
                 throw new CorException("Cannot remap on non-il frame.");
-            var ilframe2 = (ICorDebugILFrame2) ilframe;
-            ilframe2.RemapFunction((uint) newILOffset);
+            ICorDebugILFrame2 ilframe2 = (ICorDebugILFrame2)ilframe;
+            ilframe2.RemapFunction((uint)newILOffset);
         }
 
         private ICorDebugILFrame GetILFrame()
@@ -547,6 +781,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 m_ilFrameCached = true;
                 m_ilFrame = m_frame as ICorDebugILFrame;
+
             }
             return m_ilFrame;
         }
@@ -562,6 +797,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             return m_iFrame;
         }
 
+        private ICorDebugRuntimeUnwindableFrame GetRuntimeUnwindableFrame()
+        {
+            if(!m_ruFrameCached) 
+            {
+                m_ruFrameCached = true;
+                
+                m_ruFrame = m_frame as ICorDebugRuntimeUnwindableFrame;
+            }
+            return m_ruFrame;
+        }
         // 'TypeParameters' returns an enumerator that goes yields generic args from
         // both the class and the method. To enumerate just the generic args on the 
         // method, we need to skip past the class args. We have to get that skip value
@@ -573,10 +818,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 throw new ArgumentException("Skip parameter must be positive");
             }
-            IEnumerable e = TypeParameters;
+            IEnumerable e = this.TypeParameters;
             Debug.Assert(e is CorTypeEnumerator);
 
-            // Skip will throw if we try to skip the whole collection 
+            // Skip will throw if we try to skip the whole collection
             int total = (e as CorTypeEnumerator).Count;
             if (skip >= total)
             {
@@ -586,18 +831,48 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             (e as CorTypeEnumerator).Skip(skip);
             return e;
         }
+
+        public IEnumerable TypeParameters
+        {
+            get
+            {
+                ICorDebugTypeEnum icdte = null;
+                ICorDebugILFrame ilf = GetILFrame();
+
+                (ilf as ICorDebugILFrame2).EnumerateTypeParameters(out icdte);
+                return new CorTypeEnumerator(icdte);        // icdte can be null, is handled by enumerator
+            }
+        }
+
+
+
+        private ICorDebugILFrame m_ilFrame = null;
+        private bool m_ilFrameCached = false;
+
+        private ICorDebugInternalFrame m_iFrame = null;
+        private bool m_iFrameCached = false;
+        private ICorDebugRuntimeUnwindableFrame m_ruFrame = null;
+        private bool m_ruFrameCached = false;
+
+        internal ICorDebugFrame m_frame;
     }
 
     public sealed class CorChain : WrapperBase
     {
-        private readonly ICorDebugChain m_chain;
-
         internal CorChain(ICorDebugChain chain)
             : base(chain)
         {
             m_chain = chain;
         }
 
+        [CLSCompliant(false)]
+        public ICorDebugChain Raw
+        {
+            get 
+            { 
+                return m_chain;
+            }
+        }
 
         public CorFrame ActiveFrame
         {
@@ -680,6 +955,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
+        public void GetStackRange(out Int64 pStart, out Int64 pEnd)
+        {
+            UInt64 start = 0;
+            UInt64 end = 0;
+            m_chain.GetStackRange(out start, out end);
+            pStart = (Int64)start;
+            pEnd = (Int64)end;
+        }
+
         public CorThread Thread
         {
             get
@@ -710,21 +994,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        public void GetStackRange(out Int64 pStart, out Int64 pEnd)
-        {
-            UInt64 start = 0;
-            UInt64 end = 0;
-            m_chain.GetStackRange(out start, out end);
-            pStart = (Int64) start;
-            pEnd = (Int64) end;
-        }
+        private ICorDebugChain m_chain;
     }
 
     internal class CorFrameEnumerator : IEnumerable, IEnumerator, ICloneable
     {
-        private readonly ICorDebugFrameEnum m_enum;
-        private CorFrame m_frame;
-
         internal CorFrameEnumerator(ICorDebugFrameEnum frameEnumerator)
         {
             m_enum = frameEnumerator;
@@ -733,42 +1007,29 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         //
         // ICloneable interface
         //
-
-        #region ICloneable Members
-
         public Object Clone()
         {
             ICorDebugEnum clone = null;
             m_enum.Clone(out clone);
-            return new CorFrameEnumerator((ICorDebugFrameEnum) clone);
+            return new CorFrameEnumerator((ICorDebugFrameEnum)clone);
         }
-
-        #endregion
 
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
         public IEnumerator GetEnumerator()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
         public bool MoveNext()
         {
-            var a = new ICorDebugFrame[1];
+            ICorDebugFrame[] a = new ICorDebugFrame[1];
             uint c = 0;
-            int r = m_enum.Next((uint) a.Length, a, out c);
+            int r = m_enum.Next((uint)a.Length, a, out c);
             if (r == 0 && c == 1) // S_OK && we got 1 new element
                 m_frame = new CorFrame(a[0]);
             else
@@ -784,19 +1045,45 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
         public Object Current
         {
-            get { return m_frame; }
+            get
+            {
+                return m_frame;
+            }
         }
 
-        #endregion
+        private ICorDebugFrameEnum m_enum;
+        private CorFrame m_frame;
     }
 
 
     public struct IL2NativeMap
     {
-        private readonly int m_ilOffset;
+        public int IlOffset
+        {
+            get
+            {
+                return m_ilOffset;
+            }
+        }
+        private int m_ilOffset;
 
-        private readonly int m_nativeEndOffset;
-        private readonly int m_nativeStartOffset;
+        public int NativeStartOffset
+        {
+            get
+            {
+                return m_nativeStartOffset;
+            }
+        }
+        private int m_nativeStartOffset;
+
+        public int NativeEndOffset
+        {
+            get
+            {
+                return m_nativeEndOffset;
+            }
+        }
+        private int m_nativeEndOffset;
 
         internal IL2NativeMap(int ilOffset, int nativeStartOffset, int nativeEndOffset)
         {
@@ -804,34 +1091,32 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             m_nativeStartOffset = nativeStartOffset;
             m_nativeEndOffset = nativeEndOffset;
         }
-
-        public int IlOffset
-        {
-            get { return m_ilOffset; }
-        }
-
-        public int NativeStartOffset
-        {
-            get { return m_nativeStartOffset; }
-        }
-
-        public int NativeEndOffset
-        {
-            get { return m_nativeEndOffset; }
-        }
     }
 
 
     public sealed class CorCode : WrapperBase
     {
-        private readonly ICorDebugCode m_code;
-
         internal CorCode(ICorDebugCode code)
             : base(code)
         {
             m_code = code;
         }
 
+        [CLSCompliant(false)]
+        public ICorDebugCode Raw
+        {
+            get 
+            { 
+                return m_code;
+            }
+        }
+
+        public CorFunctionBreakpoint CreateBreakpoint(int offset)
+        {
+            ICorDebugFunctionBreakpoint ibreakpoint;
+            m_code.CreateBreakpoint((uint)offset, out ibreakpoint);
+            return (ibreakpoint == null ? null : new CorFunctionBreakpoint(ibreakpoint));
+        }
 
         [CLSCompliant(false)]
         public ulong Address
@@ -850,53 +1135,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 uint dwFlags;
                 (m_code as ICorDebugCode2).GetCompilerFlags(out dwFlags);
-                return (CorDebugJITCompilerFlags) dwFlags;
+                return (CorDebugJITCompilerFlags)dwFlags;
             }
-        }
-
-        [CLSCompliant(false)]
-        public int Size
-        {
-            get
-            {
-                UInt32 pcBytes;
-                m_code.GetSize(out pcBytes);
-                return (int) pcBytes;
-            }
-        }
-
-        public int VersionNumber
-        {
-            get
-            {
-                UInt32 nVersion;
-                m_code.GetVersionNumber(out nVersion);
-                return (int) nVersion;
-            }
-        }
-
-        public bool IsIL
-        {
-            get
-            {
-                Int32 pbIL;
-                m_code.IsIL(out pbIL);
-                return (pbIL != 0 ? true : false);
-            }
-        }
-
-        public CorFunctionBreakpoint CreateBreakpoint(int offset)
-        {
-            ICorDebugFunctionBreakpoint ibreakpoint;
-            m_code.CreateBreakpoint((uint) offset, out ibreakpoint);
-            return (ibreakpoint == null ? null : new CorFunctionBreakpoint(ibreakpoint));
         }
 
         public byte[] GetCode()
         {
-            var codeSize = (uint) Size;
+            uint codeSize = (uint)this.Size;
 
-            var code = new byte[codeSize];
+            byte[] code = new byte[codeSize];
             uint returnedCode;
             m_code.GetCode(0, codeSize, codeSize, code, out returnedCode);
             Debug.Assert(returnedCode == codeSize);
@@ -911,8 +1158,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             if (pcnumChunks == 0)
                 return new _CodeChunkInfo[0];
 
-            var chunks = new _CodeChunkInfo[pcnumChunks];
-            (m_code as ICorDebugCode2).GetCodeChunks((uint) chunks.Length, out pcnumChunks, chunks);
+            _CodeChunkInfo[] chunks = new _CodeChunkInfo[pcnumChunks];
+            (m_code as ICorDebugCode2).GetCodeChunks((uint)chunks.Length, out pcnumChunks, chunks);
             return chunks;
         }
 
@@ -930,26 +1177,58 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             if (pcMap == 0)
                 return new IL2NativeMap[0];
 
-            var map = new COR_DEBUG_IL_TO_NATIVE_MAP[pcMap];
-            m_code.GetILToNativeMapping((uint) map.Length, out pcMap, map);
+            COR_DEBUG_IL_TO_NATIVE_MAP[] map = new COR_DEBUG_IL_TO_NATIVE_MAP[pcMap];
+            m_code.GetILToNativeMapping((uint)map.Length, out pcMap, map);
 
-            var ret = new IL2NativeMap[map.Length];
+            IL2NativeMap[] ret = new IL2NativeMap[map.Length];
             for (int i = 0; i < map.Length; i++)
             {
-                ret[i] = new IL2NativeMap((int) map[i].ilOffset,
-                                          (int) map[i].nativeStartOffset,
-                                          (int) map[i].nativeEndOffset
-                    );
+                ret[i] = new IL2NativeMap((int)map[i].ilOffset,
+                                          (int)map[i].nativeStartOffset,
+                                          (int)map[i].nativeEndOffset
+                                          );
             }
             return ret;
         }
+
+        [CLSCompliant(false)]
+        public int Size
+        {
+            get
+            {
+                UInt32 pcBytes;
+                m_code.GetSize(out pcBytes);
+                return (int)pcBytes;
+            }
+        }
+
+        public int VersionNumber
+        {
+            get
+            {
+                UInt32 nVersion;
+                m_code.GetVersionNumber(out nVersion);
+                return (int)nVersion;
+            }
+        }
+
+        public bool IsIL
+        {
+            get
+            {
+                Int32 pbIL;
+                m_code.IsIL(out pbIL);
+                return (pbIL != 0 ? true : false);
+            }
+        }
+
+        private ICorDebugCode m_code;
     }
 
     /** Exposes an enumerator for CodeEnum. */
-
     internal class CorCodeEnumerator : IEnumerable, IEnumerator, ICloneable
     {
-        private readonly ICorDebugCodeEnum m_enum;
+        private ICorDebugCodeEnum m_enum;
         private CorCode m_c;
 
         internal CorCodeEnumerator(ICorDebugCodeEnum codeEnumerator)
@@ -960,47 +1239,40 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         //
         // ICloneable interface
         //
-
-        #region ICloneable Members
-
         public Object Clone()
         {
             ICorDebugEnum clone = null;
             m_enum.Clone(out clone);
-            return new CorCodeEnumerator((ICorDebugCodeEnum) clone);
+            return new CorCodeEnumerator((ICorDebugCodeEnum)clone);
         }
-
-        #endregion
 
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
         public IEnumerator GetEnumerator()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
         public bool MoveNext()
         {
-            var a = new ICorDebugCode[1];
+            ICorDebugCode[] a = new ICorDebugCode[1];
             uint c = 0;
-            int r = m_enum.Next((uint) a.Length, a, out c);
+            int r = m_enum.Next((uint)a.Length, a, out c);
             if (r == 0 && c == 1) // S_OK && we got 1 new element
                 m_c = new CorCode(a[0]);
             else
                 m_c = null;
             return m_c != null;
+        }
+
+        public void Skip(uint celt)
+        {
+            m_enum.Skip(celt);
+            m_c = null;
         }
 
         public void Reset()
@@ -1011,28 +1283,36 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
         public Object Current
         {
-            get { return m_c; }
-        }
-
-        #endregion
-
-        public void Skip(uint celt)
-        {
-            m_enum.Skip(celt);
-            m_c = null;
+            get
+            {
+                return m_c;
+            }
         }
     } /* class CodeEnumerator */
 
     public sealed class CorFunction : WrapperBase
     {
-        internal ICorDebugFunction m_function;
-
         internal CorFunction(ICorDebugFunction managedFunction)
             : base(managedFunction)
         {
             m_function = managedFunction;
         }
 
+        [CLSCompliant(false)]
+        public ICorDebugFunction Raw
+        {
+            get 
+            { 
+                return m_function;
+            }
+        }
+
+        public CorFunctionBreakpoint CreateBreakpoint()
+        {
+            ICorDebugFunctionBreakpoint ifuncbreakpoint;
+            m_function.CreateBreakpoint(out ifuncbreakpoint);
+            return (ifuncbreakpoint == null ? null : new CorFunctionBreakpoint(ifuncbreakpoint));
+        }
 
         public CorClass Class
         {
@@ -1043,7 +1323,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                 return (iclass == null ? null : new CorClass(iclass));
             }
         }
-
 
         public CorCode ILCode
         {
@@ -1082,7 +1361,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 UInt32 pMethodDef;
                 m_function.GetToken(out pMethodDef);
-                return (int) pMethodDef;
+                return (int)pMethodDef;
             }
         }
 
@@ -1092,7 +1371,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 UInt32 pVersion;
                 (m_function as ICorDebugFunction2).GetVersionNumber(out pVersion);
-                return (int) pVersion;
+                return (int)pVersion;
             }
         }
 
@@ -1104,40 +1383,32 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                 (m_function as ICorDebugFunction2).GetJMCStatus(out status);
                 return status != 0;
             }
-            set { (m_function as ICorDebugFunction2).SetJMCStatus(value ? 1 : 0); }
+            set
+            {
+                (m_function as ICorDebugFunction2).SetJMCStatus(value ? 1 : 0);
+            }
         }
-
-        public CorFunctionBreakpoint CreateBreakpoint()
-        {
-            ICorDebugFunctionBreakpoint ifuncbreakpoint;
-            m_function.CreateBreakpoint(out ifuncbreakpoint);
-            return (ifuncbreakpoint == null ? null : new CorFunctionBreakpoint(ifuncbreakpoint));
-        }
+        internal ICorDebugFunction m_function;
     }
 
     public sealed class CorContext : WrapperBase
     {
-        // Following functions are not implemented
-        /*
-          void CreateBreakpoint(ref CORDBLib.ICorDebugValueBreakpoint ppBreakpoint);
-          void GetAddress(ref UInt64 pAddress);
-          void GetClass(ref CORDBLib.ICorDebugClass ppClass);
-          void GetContext(ref CORDBLib.ICorDebugContext ppContext);
-          void GetFieldValue(CORDBLib.ICorDebugClass pClass, UInt32 fieldDef, ref CORDBLib.ICorDebugValue ppValue);
-          void GetManagedCopy(ref Object ppObject);
-          void GetSize(ref UInt32 pSize);
-          void GetType(ref UInt32 pType);
-          void GetVirtualMethod(UInt32 memberRef, ref CORDBLib.ICorDebugFunction ppFunction);
-          void IsValueClass(ref Int32 pbIsValueClass);
-          void SetFromManagedCopy(object pObject);
-        */
-        private ICorDebugContext m_context;
-
         internal CorContext(ICorDebugContext context)
             : base(context)
         {
             m_context = context;
         }
+
+        [CLSCompliant(false)]
+        public ICorDebugContext Raw
+        {
+            get 
+            { 
+                return m_context;
+            }
+        }
+
+        private ICorDebugContext m_context;
     }
 
     [Serializable]
@@ -1179,4 +1450,5 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         {
         }
     }
+
 } /* namespace */

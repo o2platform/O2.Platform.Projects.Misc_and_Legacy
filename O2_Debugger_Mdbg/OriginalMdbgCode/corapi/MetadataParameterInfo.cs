@@ -5,22 +5,26 @@
 //---------------------------------------------------------------------
 using System;
 using System.Reflection;
-using System.Runtime.Serialization;
+using System.Collections;
 using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Globalization;
+using System.Diagnostics;
 
-namespace O2.Debugger.Mdbg.Debugging.CorMetadata
+using Microsoft.Samples.Debugging.CorDebug; 
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi; 
+
+namespace Microsoft.Samples.Debugging.CorMetadata
 {
     public sealed class MetadataParameterInfo : ParameterInfo
     {
-        internal MetadataParameterInfo(IMetadataImport importer, int paramToken,
-                                       MemberInfo memberImpl, Type typeImpl)
+        internal MetadataParameterInfo(IMetadataImport importer,int paramToken,
+                                       MemberInfo memberImpl,Type typeImpl)
         {
             int parentToken;
-            uint pulSequence, pdwAttr, pdwCPlusTypeFlag, pcchValue, size;
-
+            uint pulSequence,pdwAttr,pdwCPlusTypeFlag,pcchValue,size;
+            
             IntPtr ppValue;
             importer.GetParamProps(paramToken,
                                    out parentToken,
@@ -32,39 +36,46 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                                    out pdwCPlusTypeFlag,
                                    out ppValue,
                                    out pcchValue
-                );
-            var szName = new StringBuilder((int) size);
+                                   );
+            StringBuilder szName = new StringBuilder((int)size);        
             importer.GetParamProps(paramToken,
                                    out parentToken,
                                    out pulSequence,
                                    szName,
-                                   (uint) szName.Capacity,
+                                   (uint)szName.Capacity,
                                    out size,
                                    out pdwAttr,
                                    out pdwCPlusTypeFlag,
                                    out ppValue,
                                    out pcchValue
-                );
+                                   );
             NameImpl = szName.ToString();
             ClassImpl = typeImpl;
-            PositionImpl = (int) pulSequence;
-            AttrsImpl = (ParameterAttributes) pdwAttr;
-
-            MemberImpl = memberImpl;
+            PositionImpl = (int)pulSequence;
+            AttrsImpl = (ParameterAttributes)pdwAttr;
+            
+            MemberImpl=memberImpl;
         }
 
         private MetadataParameterInfo(SerializationInfo info, StreamingContext context)
         {
+            
         }
 
         public override String Name
         {
-            get { return NameImpl; }
+            get 
+            {
+                return NameImpl;
+            }
         }
 
         public override int Position
-        {
-            get { return PositionImpl; }
+        { 
+            get 
+            { 
+                return PositionImpl; 
+            }
         }
     }
 }

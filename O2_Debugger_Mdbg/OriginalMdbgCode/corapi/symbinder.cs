@@ -1,4 +1,3 @@
-//---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
@@ -6,13 +5,16 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System.Diagnostics.SymbolStore;
+
+
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+
     [
         ComImport,
         Guid("AA544d42-28CB-11d3-bd22-0000f80849bd"),
@@ -30,14 +32,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         // Exceptions should be reserved for truely "exceptional" cases.
         [PreserveSig]
         int GetReaderForFile(IntPtr importer,
-                             [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                             [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
-                             [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                  [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                                  [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
+                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
         [PreserveSig]
         int GetReaderFromStream(IntPtr importer,
-                                IStream stream,
-                                [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                        IStream stream,
+                                        [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
     }
 
     [
@@ -51,22 +53,22 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         // ISymUnmanagedBinder methods (need to define the base interface methods also, per COM interop requirements)
         [PreserveSig]
         new int GetReaderForFile(IntPtr importer,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
-                                 [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                  [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                                  [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
+                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
         [PreserveSig]
         new int GetReaderFromStream(IntPtr importer,
-                                    IStream stream,
-                                    [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                        IStream stream,
+                                        [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
         // ISymUnmanagedBinder2 methods 
         [PreserveSig]
         int GetReaderForFile2(IntPtr importer,
-                              [MarshalAs(UnmanagedType.LPWStr)] String fileName,
-                              [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
-                              int searchPolicy,
-                              [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
+                                  [MarshalAs(UnmanagedType.LPWStr)] String fileName,
+                                  [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
+                                  int searchPolicy,
+                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
     }
 
     [
@@ -80,50 +82,67 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         // ISymUnmanagedBinder methods (need to define the base interface methods also, per COM interop requirements)
         [PreserveSig]
         new int GetReaderForFile(IntPtr importer,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
-                                 [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                  [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                                  [MarshalAs(UnmanagedType.LPWStr)] String SearchPath,
+                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
         [PreserveSig]
         new int GetReaderFromStream(IntPtr importer,
-                                    IStream stream,
-                                    [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
+                                        IStream stream,
+                                        [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
         // ISymUnmanagedBinder2 methods (need to define the base interface methods also, per COM interop requirements)
         [PreserveSig]
         new int GetReaderForFile2(IntPtr importer,
-                                  [MarshalAs(UnmanagedType.LPWStr)] String fileName,
-                                  [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
-                                  int searchPolicy,
-                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
+                   [MarshalAs(UnmanagedType.LPWStr)] String fileName,
+                   [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
+                   int searchPolicy,
+                   [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
 
         // ISymUnmanagedBinder3 methods 
         [PreserveSig]
         int GetReaderFromCallback(IntPtr importer,
-                                  [MarshalAs(UnmanagedType.LPWStr)] String fileName,
-                                  [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
-                                  int searchPolicy,
-                                  IntPtr callback,
-                                  [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
+                                   [MarshalAs(UnmanagedType.LPWStr)] String fileName,
+                                   [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
+                                   int searchPolicy,
+                                   [MarshalAs(UnmanagedType.IUnknown)] object callback,
+                                   [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
     }
 
     /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder"]/*' />
+
     public class SymbolBinder : ISymbolBinder1, ISymbolBinder2
     {
-        private readonly ISymUnmanagedBinder m_binder;
+        ISymUnmanagedBinder m_binder;
+
+        protected static readonly Guid CLSID_CorSymBinder = new Guid("0A29FF9E-7F9C-4437-8B11-F424491E3931");
 
         /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder.SymbolBinder"]/*' />
         public SymbolBinder()
         {
-            var CLSID_CorSymBinder = new Guid("0A29FF9E-7F9C-4437-8B11-F424491E3931");
-            m_binder = (ISymUnmanagedBinder3) Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_CorSymBinder));
+            Type binderType = Type.GetTypeFromCLSID(CLSID_CorSymBinder);
+            object comBinder = (ISymUnmanagedBinder)Activator.CreateInstance(binderType);
+            m_binder = (ISymUnmanagedBinder)comBinder;
         }
 
-        #region ISymbolBinder1 Members
+        /// <summary>
+        /// Create a SymbolBinder given the underling COM object for ISymUnmanagedBinder
+        /// </summary>
+        /// <param name="comBinderObject"></param>
+        /// <remarks>Note that this could be protected, but C# doesn't have a way to express "internal AND 
+        /// protected", just "internal OR protected"</remarks>
+        internal SymbolBinder(ISymUnmanagedBinder comBinderObject)
+        {
+            // We should not wrap null instances
+            if (comBinderObject == null)
+                throw new ArgumentNullException("comBinderObject");
+
+            m_binder = comBinderObject;
+        }
 
         /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder.GetReader"]/*' />
         public ISymbolReader GetReader(IntPtr importer, String filename,
-                                       String searchPath)
+                                          String searchPath)
         {
             ISymUnmanagedReader reader = null;
             int hr = m_binder.GetReaderForFile(importer, filename, searchPath, out reader);
@@ -135,13 +154,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             return new SymReader(reader);
         }
 
-        #endregion
-
-        #region ISymbolBinder2 Members
-
         /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder.GetReaderForFile"]/*' />
         public ISymbolReader GetReaderForFile(Object importer, String filename,
-                                              String searchPath)
+                                           String searchPath)
         {
             ISymUnmanagedReader reader = null;
             IntPtr uImporter = IntPtr.Zero;
@@ -165,15 +180,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder.GetReaderForFile1"]/*' />
         public ISymbolReader GetReaderForFile(Object importer, String fileName,
-                                              String searchPath, SymSearchPolicies searchPolicy)
+                                           String searchPath, SymSearchPolicies searchPolicy)
         {
             ISymUnmanagedReader symReader = null;
             IntPtr uImporter = IntPtr.Zero;
             try
             {
                 uImporter = Marshal.GetIUnknownForObject(importer);
-                int hr = ((ISymUnmanagedBinder2) m_binder).GetReaderForFile2(uImporter, fileName, searchPath,
-                                                                             (int) searchPolicy, out symReader);
+                int hr = ((ISymUnmanagedBinder2)m_binder).GetReaderForFile2(uImporter, fileName, searchPath, (int)searchPolicy, out symReader);
                 if (IsFailingResultNormal(hr))
                 {
                     return null;
@@ -190,17 +204,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\symbinder.uex' path='docs/doc[@for="SymbolBinder.GetReaderForFile2"]/*' />
         public ISymbolReader GetReaderForFile(Object importer, String fileName,
-                                              String searchPath, SymSearchPolicies searchPolicy,
-                                              IntPtr callback)
+                                           String searchPath, SymSearchPolicies searchPolicy,
+                                           object callback)
         {
             ISymUnmanagedReader reader = null;
             IntPtr uImporter = IntPtr.Zero;
             try
             {
                 uImporter = Marshal.GetIUnknownForObject(importer);
-                int hr = ((ISymUnmanagedBinder3) m_binder).GetReaderFromCallback(uImporter, fileName, searchPath,
-                                                                                 (int) searchPolicy, callback,
-                                                                                 out reader);
+                int hr = ((ISymUnmanagedBinder3)m_binder).GetReaderFromCallback(uImporter, fileName, searchPath, (int)searchPolicy, callback, out reader);
                 if (IsFailingResultNormal(hr))
                 {
                     return null;
@@ -223,7 +235,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             try
             {
                 uImporter = Marshal.GetIUnknownForObject(importer);
-                int hr = ((ISymUnmanagedBinder2) m_binder).GetReaderFromStream(uImporter, stream, out reader);
+                int hr = ((ISymUnmanagedBinder2)m_binder).GetReaderFromStream(uImporter, stream, out reader);
                 if (IsFailingResultNormal(hr))
                 {
                     return null;
@@ -238,12 +250,24 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             return new SymReader(reader);
         }
 
-        #endregion
+        /// <summary>
+        /// Get an ISymbolReader interface given a raw COM symbol reader object.
+        /// </summary>
+        /// <param name="reader">A COM object implementing ISymUnmanagedReader</param>
+        /// <returns>The ISybmolReader interface wrapping the provided COM object</returns>
+        /// <remarks>This method is on SymbolBinder because it's conceptually similar to the
+        /// other methods for creating a reader.  It does not, however, actually need to use the underlying
+        /// Binder, so it could be on SymReader instead (but we'd have to make it a public class instead of
+        /// internal).</remarks>
+        public static ISymbolReader GetReaderFromCOM(Object reader)
+        {
+            return new SymReader((ISymUnmanagedReader)reader);
+        }
 
         private static bool IsFailingResultNormal(int hr)
         {
             // If a pdb is not found, that's a pretty common thing.
-            if (hr == unchecked((int) 0x806D0005)) // E_PDB_NOT_FOUND
+            if (hr == unchecked((int)0x806D0005))   // E_PDB_NOT_FOUND
             {
                 return true;
             }

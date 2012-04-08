@@ -3,53 +3,59 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
+using System.Collections;
 using System.Diagnostics;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.Native;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     // This code needs to be kept in sync with CorDebug.idl
     public enum CorCorDebugRegister
     {
-        Eip = 0, // REGISTER_X86_EIP = 0,
-        Esp, // REGISTER_X86_ESP,
-        Ebp, // REGISTER_X86_EBP,
+        Eip = 0,                           // REGISTER_X86_EIP = 0,
+        Esp,                               // REGISTER_X86_ESP,
+        Ebp,                               // REGISTER_X86_EBP,
 
-        Eax, // REGISTER_X86_EAX,
-        Ecx, // REGISTER_X86_ECX,
-        Edx, // REGISTER_X86_EDX,
-        Ebx, // REGISTER_X86_EBX,
+        Eax,                               // REGISTER_X86_EAX,
+        Ecx,                               // REGISTER_X86_ECX,
+        Edx,                               // REGISTER_X86_EDX,
+        Ebx,                               // REGISTER_X86_EBX,
 
-        Esi, // REGISTER_X86_ESI,
-        Edi, // REGISTER_X86_EDI,
+        Esi,                               // REGISTER_X86_ESI,
+        Edi,                               // REGISTER_X86_EDI,
 
-        FPstack0, // REGISTER_X86_FPSTACK_0,
-        FPstack1, // REGISTER_X86_FPSTACK_1,
-        FPstack2, // REGISTER_X86_FPSTACK_2,
-        FPstack3, // REGISTER_X86_FPSTACK_3,
-        FPstack4, // REGISTER_X86_FPSTACK_4,
-        FPstack5, // REGISTER_X86_FPSTACK_5,
-        FPstack6, // REGISTER_X86_FPSTACK_6,
-        FPstack7, // REGISTER_X86_FPSTACK_7,
+        FPstack0,                          // REGISTER_X86_FPSTACK_0,
+        FPstack1,                          // REGISTER_X86_FPSTACK_1,
+        FPstack2,                          // REGISTER_X86_FPSTACK_2,
+        FPstack3,                          // REGISTER_X86_FPSTACK_3,
+        FPstack4,                          // REGISTER_X86_FPSTACK_4,
+        FPstack5,                          // REGISTER_X86_FPSTACK_5,
+        FPstack6,                          // REGISTER_X86_FPSTACK_6,
+        FPstack7,                          // REGISTER_X86_FPSTACK_7,
 
         RegisterMax // this needs to be last enum!
-    } ;
+    };
 
 
     public sealed class CorRegisterSet : WrapperBase
     {
-        private readonly ICorDebugRegisterSet m_rs;
-
         internal CorRegisterSet(ICorDebugRegisterSet registerSet)
             : base(registerSet)
         {
             m_rs = registerSet;
         }
 
+        [CLSCompliant(false)]
+        public ICorDebugRegisterSet Raw
+        {
+            get 
+            { 
+                return m_rs;
+            }
+        }
 
         /*
          * GetRegistersAvailable returns a mask indicating which registers
@@ -100,8 +106,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                 if ((m & 1) != 0)
                     regsToGet++;
 
-            var regs = new UInt64[regsToGet];
-            m_rs.GetRegisters(mask, (uint) regs.Length, regs);
+            UInt64[] regs = new UInt64[regsToGet];
+            m_rs.GetRegisters(mask, (uint)regs.Length, regs);
             return regs;
         }
 
@@ -109,7 +115,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public UInt64 GetRegister(CorCorDebugRegister register)
         {
             UInt64 mask = 1;
-            mask <<= (int) register;
+            mask <<= (int)register;
             UInt64[] regs = GetRegisters(mask);
             Debug.Assert(regs != null && regs.Length == 1);
             return regs[0];
@@ -149,26 +155,48 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         [CLSCompliant(false)]
         public void SetRegisters(UInt64 mask, UInt64[] registerValues)
         {
-            m_rs.SetRegisters(mask, (uint) registerValues.Length, registerValues);
+            m_rs.SetRegisters(mask, (uint)registerValues.Length, registerValues);
         }
 
         [CLSCompliant(false)]
         public void SetRegister(CorCorDebugRegister register, UInt64 value)
         {
             UInt64 mask = 1;
-            mask <<= (int) register;
-            SetRegisters(mask, new[] {value});
+            mask <<= (int)register;
+            SetRegisters(mask, new UInt64[] { value });
         }
-
-
+   
         public void GetThreadContext(IntPtr contextPtr, int contextSize)
         {
-            m_rs.GetThreadContext((uint) contextSize, contextPtr);
+            m_rs.GetThreadContext((uint)contextSize, contextPtr);
         }
 
+        /// <summary>
+        /// Helper to get a self-descibing wrapper around a native OS context for the register set.
+        /// Throws if unavailable or if NativeContextAllocator is not set.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] // Too expensive to eagerly browse in debugger.
+        public INativeContext GetContext
+        {
+            get
+            {
+                // Note:  We're using the non-Wow mode GenerateContext() since we don't have the PID
+                INativeContext c = ContextAllocator.GenerateContext();
+
+                using (IContextDirectAccessor w = c.OpenForDirectAccess())
+                {
+                    GetThreadContext(w.RawBuffer, w.Size);
+                }
+                return c;
+            }
+        }
         public void SetThreadContext(IntPtr contextPtr, int contextSize)
         {
-            m_rs.SetThreadContext((uint) contextSize, contextPtr);
+            m_rs.SetThreadContext((uint)contextSize, contextPtr);
         }
+
+        private ICorDebugRegisterSet m_rs;
     }
 }
+
+

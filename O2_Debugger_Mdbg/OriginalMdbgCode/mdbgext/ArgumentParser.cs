@@ -6,10 +6,10 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Globalization;
 using System.Text;
+using System.Globalization;
 
-namespace O2.Debugger.Mdbg.Tools.Mdbg
+namespace Microsoft.Samples.Tools.Mdbg
 {
     //////////////////////////////////////////////////////////////////////////////////
     //
@@ -22,8 +22,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public class ArgParser
     {
-        private ArrayList m_args;
-        private Hashtable m_options;
 
         /// <summary>
         /// Creates a new ArgParser using the given arguments.
@@ -40,19 +38,22 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// </summary>
         /// <param name="arguments">The arguments to parse.</param>
         /// <param name="optionSpec">The Option Specification to use.</param>
-        public ArgParser(string arguments, string optionSpec)
+        public ArgParser(string arguments,string optionSpec)
         {
             Init(arguments);
             ParseOptions(optionSpec);
         }
-
+        
         /// <summary>
         /// Gets how many arguments there are.
         /// </summary>
         /// <value>The number of arguments.</value>
-        public int Count
+        public int Count 
         {
-            get { return m_args.Count; }
+            get
+            {
+                return m_args.Count;
+            }
         }
 
         /// <summary>
@@ -62,12 +63,12 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>If there is an argument at that index.</returns>
         public bool Exists(int index)
         {
-            if (index < 0)
+            if(index<0)
             {
                 throw new ArgumentException();
             }
-
-            return (index < m_args.Count);
+            
+            return (index<m_args.Count);
         }
 
         /// <summary>
@@ -77,11 +78,11 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>The argument at he given index.</returns>
         public ArgToken GetArgument(int index)
         {
-            if (!Exists(index))
+            if(!Exists(index))
             {
-                throw new MDbgShellException("Missing argument " + index);
+               throw new MDbgShellException("Missing argument "+index);
             }
-            return new ArgToken((string) m_args[index]);
+            return new ArgToken((string)m_args[index]);
         }
 
         /// <summary>
@@ -91,12 +92,12 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>Was that argument passed.</returns>
         public bool OptionPassed(string name)
         {
-            if (name == null)
+            if(name==null)
             {
                 throw new ArgumentException();
             }
-
-            if (m_options == null)
+            
+            if(m_options==null)
             {
                 throw new InvalidOperationException
                     ("Option specifier were not specified during construction of ArgParser");
@@ -104,7 +105,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
 
             return m_options.Contains(String.Intern(name));
         }
-
+        
         /// <summary>
         /// Gets an Option's value if it was supplied.
         /// </summary>
@@ -112,29 +113,26 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>An ArgToken for that option.</returns>
         public ArgToken GetOption(string name)
         {
-            if (name == null)
+            if(name==null)
             {
                 throw new ArgumentException();
             }
-
-            if (m_options == null)
+            
+            if(m_options==null)
             {
-                throw new InvalidOperationException(
-                    "Option specifier was not specified during construction of ArgParser");
+                throw new InvalidOperationException("Option specifier was not specified during construction of ArgParser");
             }
 
             string optName = String.Intern(name);
-            if (!m_options.Contains(optName))
+            if(!m_options.Contains(optName))
             {
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture,
-                                                                  "Option {0} not specified", new Object[] {name}));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "Option {0} not specified",new Object[]{name}));
             }
-
-            var optVal = (string) m_options[optName];
-            if (optVal == null)
+            
+            string optVal = (string)m_options[optName];
+            if(optVal==null)
             {
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture,
-                                                                  "Option {0} is flag only", new Object[] {name}));
+                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "Option {0} is flag only",new Object[]{name}));
             }
 
             return new ArgToken(optVal);
@@ -194,119 +192,115 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         private void Init(string arguments)
         {
             m_args = new ArrayList();
-            var sb = new StringBuilder();
-            bool isInString = false;
-            char stringStart = ' ';
-            foreach (char c in arguments)
+            StringBuilder sb = new StringBuilder();
+            bool isInString=false;
+            char stringStart=' ';
+            foreach(char c in arguments)
             {
-                if (isInString)
+                if(isInString) 
                 {
-                    if (c == stringStart)
+                    if(c==stringStart)
                     {
-                        // m_args.Add(sb.ToString()); // DC, original code
-                        m_args.Add("\"" + sb + "\"");
-
-                        // DC  - lack of these "s was preventing the  DefaultExpressionParser.ParseExpression2 to reconize this as a string
-                        // DC - _note that this might have some other side effects :)
-                        sb.Length = 0;
-                        isInString = false;
+                        m_args.Add(sb.ToString());
+                        sb.Length=0;
+                        isInString=false;
                         continue;
                     }
-                }
+                } 
                 else
                 {
-                    switch (c)
+                    switch(c)
                     {
-                        case ' ':
-                        case '\t':
-                            if (sb.Length > 0)
-                            {
-                                m_args.Add(sb.ToString());
-                                sb.Length = 0;
-                            }
-                            continue;
-                        case '"':
-                        case '\'':
-                            isInString = true;
-                            stringStart = c;
-                            continue;
-
-                            break;
+                    case ' ':
+                    case '\t':
+                        if(sb.Length>0)
+                        {
+                            m_args.Add(sb.ToString());
+                            sb.Length=0;
+                        }
+                        continue;
+                    case '"':
+                    case '\'':
+                        isInString = true;
+                        stringStart=c;
+                        continue;
                     }
                 }
                 sb.Append(c);
             }
-            if (isInString)
+            if(isInString)
             {
                 throw new MDbgShellException("Arguments contain an unterminated string");
             }
 
-            if (sb.Length > 0)
+            if(sb.Length>0)
             {
                 m_args.Add(sb.ToString());
             }
         }
-
+        
         //private class OptionArg
         private void ParseOptions(string optionSpec)
         {
             //optionName:?;optionName:?...
-            var availOptions = new Hashtable();
-            foreach (string opt in optionSpec.Split(';'))
+            Hashtable availOptions = new Hashtable();
+            foreach(string opt in optionSpec.Split(';'))
             {
-                if (opt.EndsWith(":1"))
+                if(opt.EndsWith(":1"))
                 {
-                    availOptions.Add(opt.Substring(0, opt.Length - 2), true);
+                    availOptions.Add(opt.Substring(0,opt.Length-2),true);
                 }
                 else
                 {
-                    availOptions.Add(opt, false);
+                    availOptions.Add(opt,false);
                 }
             }
 
-            Debug.Assert(m_args != null);
+            Debug.Assert(m_args!=null);
             m_options = new Hashtable();
 
             // do the parsing
             int i;
-            for (i = 0; i < m_args.Count; i++)
+            for(i=0; i<m_args.Count;i++)
             {
-                if ((m_args[i] as String) == "--")
+                if((m_args[i] as String)=="--")
                 {
                     break;
                 }
 
-                if ((m_args[i] as String).StartsWith("-"))
+                if((m_args[i] as String).StartsWith("-"))
                 {
                     string optName = String.Intern((m_args[i] as String).Substring(1));
-                    if (availOptions.Contains(optName))
+                    if(availOptions.Contains(optName))
                     {
-                        if ((bool) availOptions[optName])
+                        if((bool)availOptions[optName])
                         {
                             // we have an argument
-                            if (i == m_args.Count - 1)
+                            if(i==m_args.Count-1)
                             {
-                                throw new Exception(String.Format(CultureInfo.InvariantCulture,
-                                                                  "option {0} needs argument", new Object[] {optName}));
+                                throw new Exception(String.Format(CultureInfo.InvariantCulture, "option {0} needs argument",new Object[]{optName}));
                             }
-                            m_options.Add(optName, m_args[++i]);
+                            m_options.Add(optName,m_args[++i]);
                         }
                         else
                         {
-                            m_options.Add(optName, null);
+                            m_options.Add(optName,null);
                         }
                     }
                     else
-                        throw new MDbgShellException(string.Format("Invalid option '{0}' specified.", m_args[i]));
-                }
+                        throw new MDbgShellException(string.Format("Invalid option '{0}' specified.",m_args[i]));
+                 }
                 else
                 {
                     break;
                 }
             }
             // now when we are done with parsing i will contain # of args that were discarded; let's delete them
-            m_args.RemoveRange(0, i);
+            m_args.RemoveRange(0,i);
         }
+
+        private ArrayList m_args;
+        private Hashtable m_options;
     }
 
     /// <summary>
@@ -314,17 +308,15 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public class CommandArgument
     {
-        private readonly ArrayList m_commands = new ArrayList();
-
         /// <summary>
         /// Creates a new instance of the CommandArgument class with the given array of command names.
         /// </summary>
         /// <param name="commandNames">Which command names to use for the new CommandArgument</param>
-        public CommandArgument(params string[] commandNames)
+        public CommandArgument( params string[] commandNames)
         {
             AddCommand(commandNames);
         }
-
+        
         /// <summary>
         /// Adds the given command name.
         /// </summary>
@@ -340,7 +332,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="commandNames">Which command names to add.</param>
         public void AddCommand(string[] commandNames)
         {
-            foreach (string c in commandNames)
+            foreach(string c in commandNames)
             {
                 AddCommand(c);
             }
@@ -353,37 +345,39 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns></returns>
         public string Lookup(string input)
         {
-            var al = new ArrayList();
-            foreach (string cmdName in m_commands)
+            ArrayList al = new ArrayList();
+            foreach(string cmdName in m_commands)
             {
-                if (String.Compare(input, 0, cmdName, 0, input.Length, false, CultureInfo.InvariantCulture) == 0)
+                if(String.Compare(input,0,cmdName,0,input.Length,false,System.Globalization.CultureInfo.InvariantCulture)==0)
                 {
-                    if (input.Length == cmdName.Length)
+                    if(input.Length==cmdName.Length)
                     {
-                        return input; // fully qualified command
+                        return input;                   // fully qualified command
                     }
                     al.Add(cmdName);
                 }
             }
 
-            if (al.Count == 0)
+            if(al.Count==0)
             {
-                throw new MDbgShellException("Invalid command '" + input + "'.");
+                throw new MDbgShellException("Invalid command '"+input+"'.");
             }
-            else if (al.Count == 1)
+            else if(al.Count==1)
             {
-                return (string) al[0];
+                return (string)al[0];
             }
             else
             {
-                var s = new StringBuilder("Command prefix too short. \nPossible completitions:");
-                foreach (string c in al)
+                StringBuilder s=new StringBuilder("Command prefix too short. \nPossible completitions:");
+                foreach(string c in al)
                 {
                     s.Append("\n").Append(c);
                 }
                 throw new MDbgShellException(s.ToString());
             }
         }
+
+        private ArrayList m_commands=new ArrayList();
     }
 
     /// <summary>
@@ -391,11 +385,9 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public struct ArgToken
     {
-        private readonly string m_token;
-
         internal ArgToken(string valueToken)
         {
-            Debug.Assert(valueToken != null);
+            Debug.Assert(valueToken!=null);
             m_token = valueToken;
         }
 
@@ -405,7 +397,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The Boolean that the token represents.</value>
         public bool AsBool
         {
-            get { return Boolean.Parse(m_token); }
+            get
+            {
+                return Boolean.Parse(m_token);
+            }
         }
 
         /// <summary>
@@ -414,7 +409,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The int that the token represents.</value>
         public int AsInt
         {
-            get { return Int32.Parse(m_token, CultureInfo.CurrentUICulture); }
+            get
+            {
+                return Int32.Parse(m_token,System.Globalization.CultureInfo.CurrentUICulture);
+            }
         }
 
         /// <summary>
@@ -425,27 +423,27 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         {
             get
             {
-                if (m_token.StartsWith("0x", true, CultureInfo.CurrentUICulture))
+                if( m_token.StartsWith( "0x", true, System.Globalization.CultureInfo.CurrentUICulture ) )
                 {
                     // parse as hex - strip off leading 0x
-                    UInt32 valHex = UInt32.Parse(
-                        m_token.Substring(2),
-                        NumberStyles.HexNumber,
-                        CultureInfo.CurrentUICulture);
+                    UInt32 valHex = UInt32.Parse( 
+                        m_token.Substring( 2 ), 
+                        NumberStyles.HexNumber, 
+                        System.Globalization.CultureInfo.CurrentUICulture );
 
                     // we use signed integer types everywhere (for CLS compliance), 
                     // but we sometimes expect >31 bit hex values (eg. Win9x PIDs) as 
                     // negative numbers, so cast from UInt32 to Int32
-                    return (Int32) valHex;
+                    return (Int32)valHex;
                 }
                 else
                 {
                     // treat as decimal
-                    return AsInt;
+                    return this.AsInt;
                 }
             }
         }
-
+       
 
         /// <summary>
         /// Parses the token as an address entered as hex or decimal number.
@@ -455,10 +453,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         {
             get
             {
-                if (m_token.StartsWith("0x"))
-                    return Int64.Parse(m_token.Substring(2), NumberStyles.HexNumber, CultureInfo.CurrentUICulture);
+                if( m_token.StartsWith("0x") )
+                    return Int64.Parse(m_token.Substring(2), NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentUICulture);
                 else
-                    return Int64.Parse(m_token, CultureInfo.CurrentUICulture);
+                    return Int64.Parse(m_token, System.Globalization.CultureInfo.CurrentUICulture);
             }
         }
 
@@ -469,7 +467,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The string that the token represents.</value>
         public string AsString
         {
-            get { return m_token; }
+            get
+            {
+                return m_token;
+            }
         }
 
         /// <summary>
@@ -478,7 +479,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The double that the token represents.</value>
         public double AsDouble
         {
-            get { return Int32.Parse(m_token, CultureInfo.CurrentUICulture); }
+            get
+            {
+                return Int32.Parse(m_token,System.Globalization.CultureInfo.CurrentUICulture);
+            }
         }
 
         /// <summary>
@@ -497,18 +501,18 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="operand">First Operand.</param>
         /// <param name="operand2">Second Operand.</param>
         /// <returns>true if not equal, else false.</returns>
-        public static bool operator !=(ArgToken operand, ArgToken operand2)
+        public static bool operator !=( ArgToken operand, ArgToken operand2)
         {
             return operand.m_token != operand2.m_token;
         }
-
+        
         /// <summary>
         /// Equality testing.  Allows for things like "if(thing1 == thing2)" to work properly.
         /// </summary>
         /// <param name="operand">First Operand.</param>
         /// <param name="operand2">Second Operand.</param>
         /// <returns>true if equal, else false.</returns>
-        public static bool operator ==(ArgToken operand, ArgToken operand2)
+        public static bool operator ==( ArgToken operand, ArgToken operand2)
         {
             return operand.m_token == operand2.m_token;
         }
@@ -517,11 +521,11 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Required to override Equals.
         /// </summary>
         /// <returns>Hash Code.</returns>
-        public override int GetHashCode()
+        public override int GetHashCode() 
         {
             return m_token.GetHashCode();
         }
-
+        
         /// <summary>
         /// Determines if the value is equal to another.
         /// </summary>
@@ -529,7 +533,9 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>true if equal, else false.</returns>
         public override bool Equals(Object value)
         {
-            return (ArgToken) value == this;
+            return (ArgToken)value == this;
         }
+
+        private string m_token;
     }
 }

@@ -6,12 +6,15 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System.Diagnostics.SymbolStore;
+
     // Interface does not need to be marked with the serializable attribute
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComImport,
@@ -26,8 +29,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         void GetParent([MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedScope pRetVal);
 
         void GetChildren(int cChildren,
-                         out int pcChildren,
-                         [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedScope[] children);
+                            out int pcChildren,
+                            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedScope[] children);
 
         void GetStartOffset(out int pRetVal);
 
@@ -36,14 +39,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         void GetLocalCount(out int pRetVal);
 
         void GetLocals(int cLocals,
-                       out int pcLocals,
-                       [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] locals);
+                          out int pcLocals,
+                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] locals);
 
         void GetNamespaces(int cNameSpaces,
-                           out int pcNameSpaces,
-                           [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[]
-                               namespaces);
-    } ;
+                              out int pcNameSpaces,
+                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[] namespaces);
+    };
 
     [
         ComImport,
@@ -59,9 +61,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void GetParent([MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedScope pRetVal);
 
         new void GetChildren(int cChildren,
-                             out int pcChildren,
-                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedScope[]
-                                 children);
+                            out int pcChildren,
+                            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedScope[] children);
 
         new void GetStartOffset(out int pRetVal);
 
@@ -70,35 +71,34 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void GetLocalCount(out int pRetVal);
 
         new void GetLocals(int cLocals,
-                           out int pcLocals,
-                           [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[]
-                               locals);
+                          out int pcLocals,
+                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] locals);
 
         new void GetNamespaces(int cNameSpaces,
-                               out int pcNameSpaces,
-                               [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[]
-                                   namespaces);
+                              out int pcNameSpaces,
+                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[] namespaces);
 
         // ISymUnmanagedScope2 methods
         void GetConstantCount(out int pRetVal);
 
         void GetConstants(int cConstants,
-                          out int pcConstants,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedConstant[]
-                              constants);
+                             out int pcConstants,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedConstant[] constants);
     }
 
 
     internal class SymScope : ISymbolScope, ISymbolScope2
     {
-        private readonly ISymUnmanagedScope m_target;
+        ISymUnmanagedScope m_target;
 
         internal SymScope(ISymUnmanagedScope target)
         {
+            // We should not wrap null instances
+            if (target == null)
+                throw new ArgumentNullException("target");
+
             m_target = target;
         }
-
-        #region ISymbolScope Members
 
         public ISymbolMethod Method
         {
@@ -106,6 +106,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             {
                 ISymUnmanagedMethod uMethod = null;
                 m_target.GetMethod(out uMethod);
+                if (uMethod == null)
+                    return null;
                 return new SymMethod(uMethod);
             }
         }
@@ -116,6 +118,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             {
                 ISymUnmanagedScope uScope = null;
                 m_target.GetParent(out uScope);
+                if (uScope == null)
+                    return null;
                 return new SymScope(uScope);
             }
         }
@@ -124,11 +128,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             int count;
             m_target.GetChildren(0, out count, null);
-            var uScopes = new ISymUnmanagedScope[count];
+            ISymUnmanagedScope[] uScopes = new ISymUnmanagedScope[count];
             m_target.GetChildren(count, out count, uScopes);
 
             int i;
-            var scopes = new ISymbolScope[count];
+            ISymbolScope[] scopes = new ISymbolScope[count];
             for (i = 0; i < count; i++)
             {
                 scopes[i] = new SymScope(uScopes[i]);
@@ -161,11 +165,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             int count;
             m_target.GetLocals(0, out count, null);
-            var uVariables = new ISymUnmanagedVariable[count];
+            ISymUnmanagedVariable[] uVariables = new ISymUnmanagedVariable[count];
             m_target.GetLocals(count, out count, uVariables);
 
             int i;
-            var variables = new ISymbolVariable[count];
+            ISymbolVariable[] variables = new ISymbolVariable[count];
             for (i = 0; i < count; i++)
             {
                 variables[i] = new SymVariable(uVariables[i]);
@@ -177,21 +181,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             int count;
             m_target.GetNamespaces(0, out count, null);
-            var uNamespaces = new ISymUnmanagedNamespace[count];
+            ISymUnmanagedNamespace[] uNamespaces = new ISymUnmanagedNamespace[count];
             m_target.GetNamespaces(count, out count, uNamespaces);
 
             int i;
-            var namespaces = new ISymbolNamespace[count];
+            ISymbolNamespace[] namespaces = new ISymbolNamespace[count];
             for (i = 0; i < count; i++)
             {
                 namespaces[i] = new SymNamespace(uNamespaces[i]);
             }
             return namespaces;
         }
-
-        #endregion
-
-        #region ISymbolScope2 Members
 
         public int LocalCount
         {
@@ -208,7 +208,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             get
             {
                 int count;
-                ((ISymUnmanagedScope2) m_target).GetConstantCount(out count);
+                ((ISymUnmanagedScope2)m_target).GetConstantCount(out count);
                 return count;
             }
         }
@@ -216,12 +216,12 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         public ISymbolConstant[] GetConstants()
         {
             int count;
-            ((ISymUnmanagedScope2) m_target).GetConstants(0, out count, null);
-            var uConstants = new ISymUnmanagedConstant[count];
-            ((ISymUnmanagedScope2) m_target).GetConstants(count, out count, uConstants);
+            ((ISymUnmanagedScope2)m_target).GetConstants(0, out count, null);
+            ISymUnmanagedConstant[] uConstants = new ISymUnmanagedConstant[count];
+            ((ISymUnmanagedScope2)m_target).GetConstants(count, out count, uConstants);
 
             int i;
-            var Constants = new ISymbolConstant[count];
+            ISymbolConstant[] Constants = new ISymbolConstant[count];
             for (i = 0; i < count; i++)
             {
                 Constants[i] = new SymConstant(uConstants[i]);
@@ -229,6 +229,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             return Constants;
         }
 
-        #endregion
+
     }
 }

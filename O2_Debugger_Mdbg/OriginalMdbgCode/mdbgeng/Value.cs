@@ -4,51 +4,25 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
+using System.Diagnostics;
+using System.Text;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata;
-using O2.Debugger.Mdbg.Debugging.CorMetadata;
-using O2.Debugger.Mdbg.Debugging.CorMetadata;
-using CorArrayValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorArrayValue;
-using CorBoxValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorBoxValue;
-using CorClass=O2.Debugger.Mdbg.Debugging.CorDebug.CorClass;
-using CorEval=O2.Debugger.Mdbg.Debugging.CorDebug.CorEval;
-using CorFrame=O2.Debugger.Mdbg.Debugging.CorDebug.CorFrame;
-using CorGenericValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorGenericValue;
-using CorHandleValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorHandleValue;
-using CorHeapValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorHeapValue;
-using CorObjectValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorObjectValue;
-using CorReferenceValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorReferenceValue;
-using CorStringValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorStringValue;
-using CorType=O2.Debugger.Mdbg.Debugging.CorDebug.CorType;
-using CorValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorValue;
-using HResult=O2.Debugger.Mdbg.Debugging.CorDebug.HResult;
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.CorMetadata;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// MDbg Value class.
     /// </summary>
     public sealed class MDbgValue : MarshalByRefObject
     {
-        private MDbgValue[] m_cachedFields;
-        private CorDebug.CorValue m_corValue;
-        private string m_name;
-        private MDbgProcess m_process;
-
         /// <summary>
         /// Creates a new instance of the MDbgValue Object.
         /// This constructor is public so that applications can use this class to print values (CorValue).
@@ -56,7 +30,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         /// <param name="process">The Process that will own the Value.</param>
         /// <param name="value">The CorValue that this MDbgValue will start with.</param>
-        public MDbgValue(MDbgProcess process, CorDebug.CorValue value)
+        public MDbgValue(MDbgProcess process, CorValue value)
         {
             // value can be null, but we should always know what process we are
             // looking at.
@@ -72,20 +46,30 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="process">The Process that will own the Value.</param>
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The CorValue that this MDbgValue will start with.</param>
-        public MDbgValue(MDbgProcess process, string name, CorDebug.CorValue value)
+        public MDbgValue(MDbgProcess process, string name, CorValue value)
         {
             Debug.Assert(process != null && name != null);
             // corValue can be null for native variables in MC++
             Initialize(process, name, value);
         }
 
+        private void Initialize(MDbgProcess process, string name, CorValue value)
+        {
+            m_process = process;
+            m_name = name;
+            m_corValue = value;
+        }
+
         /// <summary>
         /// The CorValue stored in the MDbgValue.
         /// </summary>
         /// <value>The CorValue.</value>
-        public CorDebug.CorValue CorValue
+        public CorValue CorValue
         {
-            get { return m_corValue; }
+            get
+            {
+                return m_corValue;
+            }
         }
 
         /// <summary>
@@ -94,7 +78,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Process.</value>
         public MDbgProcess Process
         {
-            get { return m_process; }
+            get
+            {
+                return m_process;
+            }
         }
 
         /// <summary>
@@ -103,7 +90,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Name.</value>
         public string Name
         {
-            get { return m_name; }
+            get
+            {
+                return m_name;
+            }
         }
 
         /// <summary>
@@ -120,7 +110,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 }
 
                 // Every Value should have a non-null type associated with it.
-                CorDebug.CorType t = CorValue.ExactType;
+                CorType t = CorValue.ExactType;
                 return InternalUtil.PrintCorType(m_process, t);
             }
         }
@@ -135,14 +125,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 if (CorValue == null)
                     return false;
-                CorDebug.CorValue value;
+                CorValue value;
                 try
                 {
-                    value = Dereference(CorValue);
+                    value = Dereference(CorValue, null);
                 }
                 catch (COMException ce)
                 {
-                    if (ce.ErrorCode == (int) CorDebug.HResult.CORDBG_E_BAD_REFERENCE_VALUE)
+                    if (ce.ErrorCode == (int)HResult.CORDBG_E_BAD_REFERENCE_VALUE)
                         return false;
                     throw;
                 }
@@ -163,14 +153,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 if (CorValue == null)
                     return false;
-                CorDebug.CorValue value;
+                CorValue value;
                 try
                 {
-                    value = Dereference(CorValue);
+                    value = Dereference(CorValue, null);
                 }
                 catch (COMException ce)
                 {
-                    if (ce.ErrorCode == (int) CorDebug.HResult.CORDBG_E_BAD_REFERENCE_VALUE)
+                    if (ce.ErrorCode == (int)HResult.CORDBG_E_BAD_REFERENCE_VALUE)
                         return false;
                     throw;
                 }
@@ -193,68 +183,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 if (CorValue == null)
                     return true;
-                CorDebug.CorValue value;
+                CorValue value;
                 try
                 {
-                    value = Dereference(CorValue);
+                    value = Dereference(CorValue, null);
                 }
                 catch (COMException ce)
                 {
-                    if (ce.ErrorCode == (int) CorDebug.HResult.CORDBG_E_BAD_REFERENCE_VALUE)
+                    if (ce.ErrorCode == (int)HResult.CORDBG_E_BAD_REFERENCE_VALUE)
                         return false;
                     throw;
                 }
                 return (value == null);
             }
-        }
-
-        /// <summary>
-        /// Gets or Sets the Value of the MDbgValue to the given value.
-        /// </summary>
-        /// <value>This is exposed as an Object but can a primitive type, CorReferenceValue, or CorGenericValue.</value>
-        public Object Value
-        {
-            get { throw new NotImplementedException(); }
-            set
-            {
-                Debug.Assert(value != null);
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-
-                if (value is CorDebug.CorReferenceValue)
-                {
-                    CorDebug.CorReferenceValue lsValRef = CorValue.CastToReferenceValue();
-                    if (lsValRef == null)
-                    {
-                        throw new MDbgValueWrongTypeException("cannot assign reference value to non-reference value");
-                    }
-                    lsValRef.Value = ((CorDebug.CorReferenceValue) value).Value;
-                }
-                else if (value is CorDebug.CorGenericValue)
-                {
-                    CorDebug.CorGenericValue lsValGen = GetGenericValue();
-                    lsValGen.SetValue(((CorDebug.CorGenericValue) value).GetValue());
-                }
-                else if (value.GetType().IsPrimitive)
-                {
-                    // trying to set a primitive generic value, let the corapi layer attempt to convert the type                
-                    CorDebug.CorGenericValue gv = GetGenericValue();
-                    gv.SetValue(value);
-                }
-                else
-                {
-                    throw new MDbgValueWrongTypeException("Value is of unsupported type.");
-                }
-            }
-        }
-
-        private void Initialize(MDbgProcess process, string name, CorDebug.CorValue value)
-        {
-            m_process = process;
-            m_name = name;
-            m_corValue = value;
         }
 
         /// <summary>
@@ -306,7 +247,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     break;
                 }
             if (ret == null)
-                DI.log.error("from MDbgEngine: Field '" + name + "' not found.");
+                throw new MDbgValueException("Field '" + name + "' not found.");
             return ret;
         }
 
@@ -334,20 +275,20 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             if (!IsArrayType)
                 throw new MDbgValueException("Type is not array type");
 
-            CorDebug.CorValue value = Dereference(CorValue);
+            CorValue value = Dereference(CorValue, null);
 
-            CorDebug.CorArrayValue av = value.CastToArrayValue();
+            CorArrayValue av = value.CastToArrayValue();
             int[] dims = av.GetDimensions();
             Debug.Assert(dims != null);
 
-            var al = new ArrayList();
+            ArrayList al = new ArrayList();
             Debug.Assert(av.Rank == 1);
             for (int i = 0; i < dims[0]; i++)
             {
-                var v = new MDbgValue(Process, "[" + i + "]", av.GetElementAtPosition(i));
+                MDbgValue v = new MDbgValue(Process, "[" + i + "]", av.GetElementAtPosition(i));
                 al.Add(v);
             }
-            return (MDbgValue[]) al.ToArray(typeof (MDbgValue));
+            return (MDbgValue[])al.ToArray(typeof(MDbgValue));
         }
 
         /// <summary>
@@ -360,13 +301,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             if (!IsArrayType)
                 throw new MDbgValueException("Type is not array type");
 
-            CorDebug.CorValue value = Dereference(CorValue);
-            CorDebug.CorArrayValue av = value.CastToArrayValue();
+            CorValue value = Dereference(CorValue, null);
+            CorArrayValue av = value.CastToArrayValue();
             Debug.Assert(av != null);
             if (av.Rank != indexes.Length)
                 throw new MDbgValueException("Invalid number of dimensions.");
 
-            var sb = new StringBuilder("[");
+            StringBuilder sb = new StringBuilder("[");
             for (int i = 0; i < indexes.Length; ++i)
             {
                 if (i != 0)
@@ -375,8 +316,53 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
             sb.Append("]");
 
-            var v = new MDbgValue(Process, sb.ToString(), av.GetElement(indexes));
+            MDbgValue v = new MDbgValue(Process, sb.ToString(), av.GetElement(indexes));
             return v;
+        }
+
+        /// <summary>
+        /// Gets or Sets the Value of the MDbgValue to the given value.
+        /// </summary>
+        /// <value>This is exposed as an Object but can a primitive type, CorReferenceValue, or CorGenericValue.</value>
+        public Object Value
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                Debug.Assert(value != null);
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                if (value is CorReferenceValue)
+                {
+                    CorReferenceValue lsValRef = CorValue.CastToReferenceValue();
+                    if (lsValRef == null)
+                    {
+                        throw new MDbgValueWrongTypeException("cannot assign reference value to non-reference value");
+                    }
+                    lsValRef.Value = ((CorReferenceValue)value).Value;
+                }
+                else if (value is CorGenericValue)
+                {
+                    CorGenericValue lsValGen = GetGenericValue();
+                    lsValGen.SetValue(((CorGenericValue)value).GetValue());
+                }
+                else if (value.GetType().IsPrimitive)
+                {
+                    // trying to set a primitive generic value, let the corapi layer attempt to convert the type                
+                    CorGenericValue gv = GetGenericValue();
+                    gv.SetValue(value);
+                }
+                else
+                {
+                    throw new MDbgValueWrongTypeException("Value is of unsupported type.");
+                }
+            }
         }
 
         internal void InternalSetName(string variableName)
@@ -384,18 +370,35 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             Debug.Assert(variableName != null);
             m_name = variableName;
         }
-
         //////////////////////////////////////////////////////////////////////////////////
         //
         // Implementation Part
         //
         //////////////////////////////////////////////////////////////////////////////////
 
+        /// <summary>
+        /// Small helper used by InternalGetValue to put parens around the
+        /// ptrstring generated by Dereference()
+        /// </summary>
+        /// <param name="ptrStrBuilder">ptrstring generated by Dereference()</param>
+        /// <returns>String with parens around the input string</returns>
+        private string MakePrefixFromPtrStringBuilder(StringBuilder ptrStrBuilder)
+        {
+            if (ptrStrBuilder == null)
+                return String.Empty;
+
+            string ptrStr = ptrStrBuilder.ToString();
+            if (String.IsNullOrEmpty(ptrStr))
+                return String.Empty;
+
+            return "(" + ptrStr + ") ";
+        }
+
         private string InternalGetValue(int indentLevel, int expandDepth, bool canDoFunceval)
         {
             Debug.Assert(expandDepth >= 0);
 
-            CorDebug.CorValue value = CorValue;
+            CorValue value = this.CorValue;
             if (value == null)
             {
                 return "<N/A>";
@@ -403,27 +406,26 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
             // Record the memory addresses if displaying them is enabled
             string prefix = String.Empty;
+            StringBuilder ptrStrBuilder = null;
             if (m_process.m_engine.Options.ShowAddresses)
             {
-                string ptrStr = MakePtrString(value);
-                if (! String.IsNullOrEmpty(ptrStr))
-                {
-                    prefix = "(" + ptrStr + ") ";
-                }
+                ptrStrBuilder = new StringBuilder();
             }
 
             try
             {
-                value = Dereference(value);
+                value = Dereference(value, ptrStrBuilder);
             }
             catch (COMException ce)
             {
-                if (ce.ErrorCode == (int) CorDebug.HResult.CORDBG_E_BAD_REFERENCE_VALUE)
+                if (ce.ErrorCode == (int)HResult.CORDBG_E_BAD_REFERENCE_VALUE)
                 {
-                    return prefix + "<invalid reference value>";
+                    return MakePrefixFromPtrStringBuilder(ptrStrBuilder) + "<invalid reference value>";
                 }
                 throw;
             }
+
+            prefix = MakePrefixFromPtrStringBuilder(ptrStrBuilder);
 
             if (value == null)
             {
@@ -452,9 +454,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                         object v = value.CastToGenericValue().GetValue();
                         string result;
 
-                        var vFormattable = v as IFormattable;
+                        IFormattable vFormattable = v as IFormattable;
                         if (vFormattable != null)
-                            result = vFormattable.ToString(null, CultureInfo.CurrentUICulture);
+                            result = vFormattable.ToString(null, System.Globalization.CultureInfo.CurrentUICulture);
                         else
                             result = v.ToString();
 
@@ -467,20 +469,23 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
                 case CorElementType.ELEMENT_TYPE_CLASS:
                 case CorElementType.ELEMENT_TYPE_VALUETYPE:
-                    CorDebug.CorObjectValue ov = value.CastToObjectValue();
+                    CorObjectValue ov = value.CastToObjectValue();
                     return prefix + PrintObject(indentLevel, ov, expandDepth, canDoFunceval);
 
                 case CorElementType.ELEMENT_TYPE_STRING:
-                    CorDebug.CorStringValue sv = value.CastToStringValue();
+                    CorStringValue sv = value.CastToStringValue();
                     return prefix + '"' + sv.String + '"';
 
                 case CorElementType.ELEMENT_TYPE_SZARRAY:
                 case CorElementType.ELEMENT_TYPE_ARRAY:
-                    CorDebug.CorArrayValue av = value.CastToArrayValue();
+                    CorArrayValue av = value.CastToArrayValue();
                     return prefix + PrintArray(indentLevel, av, expandDepth, canDoFunceval);
 
                 case CorElementType.ELEMENT_TYPE_PTR:
                     return prefix + "<non-null pointer>";
+
+                case CorElementType.ELEMENT_TYPE_FNPTR:
+                    return prefix + "0x" + value.CastToReferenceValue().Value.ToString("X");
 
                 case CorElementType.ELEMENT_TYPE_BYREF:
                 case CorElementType.ELEMENT_TYPE_TYPEDBYREF:
@@ -490,65 +495,60 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
         }
 
-        private void Unbox(ref CorDebug.CorValue value)
+        private void Unbox(ref CorValue value)
         {
-            CorDebug.CorBoxValue boxVal = value.CastToBoxValue();
+            CorBoxValue boxVal = value.CastToBoxValue();
             if (boxVal != null)
                 value = boxVal.GetObject();
         }
 
-        private string MakePtrString(CorDebug.CorValue value)
+        /// <summary>
+        /// Recursively dereference the input value until we finally find a non-dereferenceable
+        /// value.  Along the way, optionally build up a "ptr string" that shows the addresses
+        /// we dereference, separated by "->".
+        /// </summary>
+        /// <param name="value">Value to dereference</param>
+        /// <param name="ptrStringBuilder">StringBuilder if caller wants us to generate
+        /// a "ptr string" (in which case we'll stick it there).  If caller doesn't want
+        /// a ptr string, this can be null</param>
+        /// <returns>CorValue we arrive at after dereferencing as many times as we can</returns>
+        private CorValue Dereference(CorValue value, StringBuilder ptrStringBuilder)
         {
-            var sb = new StringBuilder();
-
             while (true)
             {
-                CorDebug.CorReferenceValue rv = value.CastToReferenceValue();
+                CorReferenceValue rv = value.CastToReferenceValue();
                 if (rv == null)
                     break; // not a reference
 
-                if (sb.Length > 0)
+                if (ptrStringBuilder != null)
                 {
-                    sb.Append("->");
+                    if (ptrStringBuilder.Length > 0)
+                    {
+                        ptrStringBuilder.Append("->");
+                    }
+                    ptrStringBuilder.Append("0x" + rv.Value.ToString("X", System.Globalization.CultureInfo.CurrentUICulture));
                 }
-                sb.Append("0x" + rv.Value.ToString("X", CultureInfo.CurrentUICulture));
 
-                CorDebug.CorValue newValue = null;
+                // Bail as soon as we hit a reference to NULL
+                if (rv.IsNull)
+                    return null;    // reference to null
+
+                CorValue newValue = null;
                 try
                 {
                     newValue = rv.Dereference();
                 }
                 catch (COMException ce)
                 {
-                    if (ce.ErrorCode != (int) CorDebug.HResult.CORDBG_E_BAD_REFERENCE_VALUE)
+                    // Check for any errors that are expected
+                    if (ce.ErrorCode != (int)HResult.CORDBG_E_VALUE_POINTS_TO_FUNCTION)
                     {
-                        throw; // some other error
+                        throw;  // some other error
                     }
                 }
 
                 if (newValue == null)
-                    break; // couldn't dereference the reference (eg. void* or invalid ref)
-
-                value = newValue;
-            }
-
-            return sb.ToString();
-        }
-
-        private CorDebug.CorValue Dereference(CorDebug.CorValue value)
-        {
-            while (true)
-            {
-                CorDebug.CorReferenceValue rv = value.CastToReferenceValue();
-                if (rv == null)
-                    break; // not a reference
-
-                if (rv.IsNull)
-                    return null; // reference to null
-
-                CorDebug.CorValue newValue = rv.Dereference();
-                if (newValue == null)
-                    break; // couldn't dereference the reference (eg. void*)
+                    break;  // couldn't dereference the reference (eg. void*)
 
                 value = newValue;
             }
@@ -556,26 +556,25 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         // Builds the friendly string for an enum value
-        private string InternalGetEnumString(CorDebug.CorObjectValue ov, MetadataType type)
+        private string InternalGetEnumString(CorObjectValue ov, MetadataType type)
         {
             Debug.Assert(type != null); // Enums should always have a type
 
             IList<KeyValuePair<string, ulong>> values = type.EnumValues;
 
             // Get the underlying value
-            ulong value = Convert.ToUInt64(ov.CastToGenericValue().UnsafeGetValueAsType(type.EnumUnderlyingType),
-                                           CultureInfo.InvariantCulture);
+            ulong value = Convert.ToUInt64(ov.CastToGenericValue().UnsafeGetValueAsType(type.EnumUnderlyingType), CultureInfo.InvariantCulture);
 
             // Find a reasonable value to display
-            var result = new StringBuilder();
+            StringBuilder result = new StringBuilder();
             ulong remainingValue = value;
             bool firstTime = true;
             for (int i = values.Count - 1; i >= 0; i--)
             {
                 if ((values[i].Value == value) ||
-                    (type.ReallyIsFlagsEnum && (values[i].Value != 0) && ((values[i].Value & value) == values[i].Value)))
+                         (type.ReallyIsFlagsEnum && (values[i].Value != 0) && ((values[i].Value & value) == values[i].Value)))
                 {
-                    remainingValue &= ~(values[i].Value); // Remove the flags from the total needed for flags enums
+                    remainingValue &= ~(values[i].Value);    // Remove the flags from the total needed for flags enums
 
                     if (!firstTime)
                     {
@@ -609,14 +608,28 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return result.ToString();
         }
 
-        private string PrintObject(int indentLevel, CorDebug.CorObjectValue ov, int expandDepth, bool canDoFunceval)
+        bool IsNullableType(CorType ct)
+        {
+            if (ct.Type != CorElementType.ELEMENT_TYPE_VALUETYPE)
+                return false;
+
+            MDbgModule m = m_process.Modules.Lookup(ct.Class.Module);
+            String name = m.Importer.GetType(ct.Class.Token).FullName;
+
+            return name.Equals("System.Nullable`1");
+        }
+
+
+        private string PrintObject(int indentLevel, CorObjectValue ov, int expandDepth, bool canDoFunceval)
         {
             Debug.Assert(expandDepth >= 0);
 
-            // Print generics-aware type.
-            string name = InternalUtil.PrintCorType(m_process, ov.ExactType);
+            bool fNeedToResumeThreads = true;
 
-            var txt = new StringBuilder();
+            // Print generics-aware type.
+            string name = InternalUtil.PrintCorType(this.m_process, ov.ExactType);
+
+            StringBuilder txt = new StringBuilder();
             txt.Append(name);
 
             if (expandDepth > 0)
@@ -624,24 +637,36 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 // we gather the field info of the class before we do
                 // funceval since funceval requires running the debugger process
                 // and this in turn can cause GC and invalidate our references.
-                var expandedDescription = new StringBuilder();
+                StringBuilder expandedDescription = new StringBuilder();
                 if (IsComplexType)
                 {
                     foreach (MDbgValue v in GetFields())
                     {
                         expandedDescription.Append("\n").Append(IndentedString(indentLevel + 1, v.Name)).
                             Append("=").Append(IndentedBlock(indentLevel + 2,
-                                                             v.GetStringValue(expandDepth - 1, false)));
+                                   v.GetStringValue(expandDepth - 1, false)));
                     }
                 }
 
-                if (ov.IsValueClass && canDoFunceval)
-                    // we could display even values for real Objects, but we will just show 
-                    // "description" for valueclasses.
+                // if the value we're printing is a nullable type that has no value (is null), we can't do a func eval
+                // to get its value, since it will be boxed as a null pointer. We already have the information we need, so 
+                // we'll just take care of it now. Note that ToString() for null-valued nullable types just prints the 
+                // empty string. 
+
+                // bool hasValue = (bool)(GetField("hasValue").CorValue.CastToGenericValue().GetValue());
+
+                if (IsNullableType(ov.ExactType) && !(bool)(GetField("hasValue").CorValue.CastToGenericValue().GetValue()))
                 {
-                    CorDebug.CorClass cls = ov.ExactType.Class;
+                    txt.Append(" < >");
+                }
+
+                else if (ov.IsValueClass && canDoFunceval)
+                // we could display even values for real Objects, but we will just show 
+                // "description" for valueclasses.
+                {
+                    CorClass cls = ov.ExactType.Class;
                     CorMetadataImport importer = m_process.Modules.Lookup(cls.Module).Importer;
-                    var mdType = importer.GetType(cls.Token) as MetadataType;
+                    MetadataType mdType = importer.GetType(cls.Token) as MetadataType;
 
                     if (mdType.ReallyIsEnum)
                     {
@@ -653,12 +678,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     {
                         MDbgThread activeThread = m_process.Threads.Active;
 
-                        CorDebug.CorValue thisValue;
-                        CorDebug.CorHeapValue hv = ov.CastToHeapValue();
+                        CorValue thisValue;
+                        CorHeapValue hv = ov.CastToHeapValue();
                         if (hv != null)
                         {
                             // we need to pass reference value.
-                            CorDebug.CorHandleValue handle = hv.CreateHandle(CorDebugHandleType.HANDLE_WEAK_TRACK_RESURRECTION);
+                            CorHandleValue handle = hv.CreateHandle(CorDebugHandleType.HANDLE_WEAK_TRACK_RESURRECTION);
                             thisValue = handle;
                         }
                         else
@@ -666,26 +691,25 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
                         try
                         {
-                            CorDebug.CorEval eval = m_process.Threads.Active.CorThread.CreateEval();
+                            CorEval eval = m_process.Threads.Active.CorThread.CreateEval();
                             m_process.CorProcess.SetAllThreadsDebugState(CorDebugThreadState.THREAD_SUSPEND,
                                                                          activeThread.CorThread);
 
-                            MDbgFunction toStringFunc =
-                                m_process.ResolveFunctionName(null, "System.Object", "ToString"
-                                                              , thisValue.ExactType.Class.Module.Assembly.AppDomain);
-                            Debug.Assert(toStringFunc != null);
-                            // we should be always able to resolve ToString function.
+                            MDbgFunction toStringFunc = m_process.ResolveFunctionName(null, "System.Object", "ToString",
+                                                                             thisValue.ExactType.Class.Module.Assembly.AppDomain);
 
-                            eval.CallFunction(toStringFunc.CorFunction, new[] {thisValue});
+                            Debug.Assert(toStringFunc != null); // we should be always able to resolve ToString function.
+
+                            eval.CallFunction(toStringFunc.CorFunction, new CorValue[] { thisValue });
                             m_process.Go();
                             do
                             {
                                 m_process.StopEvent.WaitOne();
                                 if (m_process.StopReason is EvalCompleteStopReason)
                                 {
-                                    CorDebug.CorValue cv = eval.Result;
+                                    CorValue cv = eval.Result;
                                     Debug.Assert(cv != null);
-                                    var mv = new MDbgValue(m_process, cv);
+                                    MDbgValue mv = new MDbgValue(m_process, cv);
                                     string valName = mv.GetStringValue(0);
 
                                     // just purely for esthetical reasons we 'discard' "
@@ -703,19 +727,29 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                                 }
                                 // hitting bp or whatever should not matter -- we need to ignore it
                                 m_process.Go();
-                            } while (true);
+                            }
+                            while (true);
                         }
                         catch (COMException e)
                         {
-                            // Ignore canot copy a VC class error - Can't copy a VC with object refs in it.
-                            if (e.ErrorCode != (int) CorDebug.HResult.CORDBG_E_OBJECT_IS_NOT_COPYABLE_VALUE_CLASS)
+                            // Ignore cannot copy a VC class error - Can't copy a VC with object refs in it.
+                            if (e.ErrorCode != (int)HResult.CORDBG_E_OBJECT_IS_NOT_COPYABLE_VALUE_CLASS)
+                            {
                                 throw;
+                            }
+                        }
+                        catch (System.NotImplementedException)
+                        {
+                            fNeedToResumeThreads = false;
                         }
                         finally
                         {
-                            // we need to resume all the threads that we have suspended no matter what.
-                            m_process.CorProcess.SetAllThreadsDebugState(CorDebugThreadState.THREAD_RUN,
-                                                                         activeThread.CorThread);
+                            if (fNeedToResumeThreads)
+                            {
+                                // we need to resume all the threads that we have suspended no matter what.
+                                m_process.CorProcess.SetAllThreadsDebugState(CorDebugThreadState.THREAD_RUN,
+                                                                             activeThread.CorThread);
+                            }
                         }
                     }
                 }
@@ -724,11 +758,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return txt.ToString();
         }
 
-        private string PrintArray(int indentLevel, CorDebug.CorArrayValue av, int expandDepth, bool canDoFunceval)
+        private string PrintArray(int indentLevel, CorArrayValue av, int expandDepth, bool canDoFunceval)
         {
             Debug.Assert(expandDepth >= 0);
 
-            var txt = new StringBuilder();
+            StringBuilder txt = new StringBuilder();
             txt.Append("array [");
             int[] dims = av.GetDimensions();
             Debug.Assert(dims != null);
@@ -745,53 +779,59 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 for (int i = 0; i < dims[0]; i++)
                 {
-                    // Arrays not starting with 0 are not implemented
-                    var v = new MDbgValue(Process, av.GetElementAtPosition(i));
+                    MDbgValue v = new MDbgValue(Process, av.GetElementAtPosition(i));
                     txt.Append("\n").Append(IndentedString(indentLevel + 1, "[" + i + "] = ")).
-                        Append(IndentedBlock(indentLevel + 2,
-                                             v.GetStringValue(expandDepth - 1, canDoFunceval)));
+            Append(IndentedBlock(indentLevel + 2,
+                           v.GetStringValue(expandDepth - 1, canDoFunceval)));
                 }
             }
             return txt.ToString();
         }
 
+        // Helper to get all the fields, including static fields and base types. 
         private MDbgValue[] InternalGetFields()
         {
-            var al = new ArrayList();
+            List<MDbgValue> al = new List<MDbgValue>();
 
             //dereference && (unbox);
-            CorDebug.CorValue value = Dereference(CorValue);
+            CorValue value = Dereference(CorValue, null);
             if (value == null)
+            {
                 throw new MDbgValueException("null value");
+            }
             Unbox(ref value);
-            CorDebug.CorObjectValue ov = value.CastToObjectValue();
+            CorObjectValue ov = value.CastToObjectValue();
 
-            CorDebug.CorType cType = ov.ExactType;
+            CorType cType = ov.ExactType;
 
-            CorDebug.CorFrame cFrame = null;
+            CorFrame cFrame = null;
             if (Process.Threads.HaveActive)
             {
                 // we need a current frame to display thread local static values
                 if (Process.Threads.Active.HaveCurrentFrame)
-                    cFrame = Process.Threads.Active.CurrentFrame.CorFrame;
+                {
+                    MDbgFrame temp = Process.Threads.Active.CurrentFrame;
+                    while (temp != null && !temp.IsManaged)
+                    {
+                        temp = temp.NextUp;
+                    }
+                    if (temp != null)
+                    {
+                        cFrame = temp.CorFrame;
+                    }
+                }
             }
-
 
             MDbgModule classModule;
 
             // initialization
-            CorDebug.CorClass corClass = ov.Class;
+            CorClass corClass = ov.Class;
             classModule = Process.Modules.Lookup(corClass.Module);
 
             // iteration through class hierarchy
-            do
+            while (true)
             {
-                Type classType;
-                //int parentToken;
-
-                classType = classModule.Importer.GetType(corClass.Token);
-                //classModule.Importer.GetTypeNameFromDef(classToken,out parentToken);
-
+                Type classType = classModule.Importer.GetType(corClass.Token);
                 foreach (MetadataFieldInfo fi in classType.GetFields())
                 {
                     CorValue fieldValue = null;
@@ -804,16 +844,25 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                             continue;
                         }
                         else if (fi.IsStatic)
+                        {
+                            if (cFrame == null)
+                            {
+                                // Without a frame, we won't be able to find static values.  So
+                                // just skip this guy
+                                continue;
+                            }
+
                             fieldValue = cType.GetStaticFieldValue(fi.MetadataToken, cFrame);
-                        else // we are asuming normal field value
-                            // GetFieldValueForTYpe Supersedes GetFieldValue
-                            // Will replace when all issues are resolved.
-                            //fieldValue = ov.GetFieldValueForType(cType, (uint)fi.Token);
+                        }
+                        else
+                        {
+                            // we are asuming normal field value
                             fieldValue = ov.GetFieldValue(corClass, fi.MetadataToken);
+                        }
                     }
                     catch (COMException)
                     {
-                        // we won't report any problems. 
+                        // we won't report any problems.
                     }
                     al.Add(new MDbgValue(Process, fi.Name, fieldValue));
                 }
@@ -822,14 +871,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     break;
                 corClass = cType.Class;
                 classModule = Process.Modules.Lookup(corClass.Module);
-            } while (true);
+            }
 
-            return (MDbgValue[]) al.ToArray(typeof (MDbgValue));
+            return al.ToArray();
         }
 
         private string IndentedString(int indent, string txt)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append('\t', indent)
                 .Append(txt);
             return sb.ToString();
@@ -840,7 +889,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             Debug.Assert(text != null);
 
             string[] lines = text.Split('\n');
-            var result = new StringBuilder();
+            StringBuilder result = new StringBuilder();
 
             result.Append(lines[0]); // 1 line is always there since text is not null.
             for (int i = 1; i < lines.Length; ++i)
@@ -849,12 +898,17 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return result.ToString();
         }
 
-        private CorDebug.CorGenericValue GetGenericValue()
+        private CorGenericValue GetGenericValue()
         {
             CorGenericValue gv = CorValue.CastToGenericValue();
             if (gv == null)
                 throw new MDbgValueWrongTypeException();
             return gv;
         }
+
+        private string m_name;
+        private CorValue m_corValue;
+        private MDbgValue[] m_cachedFields;
+        private MDbgProcess m_process;
     }
 }

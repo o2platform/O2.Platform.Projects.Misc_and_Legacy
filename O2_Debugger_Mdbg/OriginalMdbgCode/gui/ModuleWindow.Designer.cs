@@ -1,4 +1,4 @@
-namespace O2.Debugger.Mdbg.gui
+﻿namespace gui
 {
     partial class ModuleWindow
     {

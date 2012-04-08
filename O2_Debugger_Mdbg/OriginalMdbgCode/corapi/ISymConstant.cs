@@ -6,11 +6,15 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Runtime.InteropServices;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
+    using System.Diagnostics.SymbolStore;
+
+    
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    
     // Interface does not need to be marked with the serializable attribute
     // Interface is returned by ISymbolScope2.GetConstants() so must be public
     [

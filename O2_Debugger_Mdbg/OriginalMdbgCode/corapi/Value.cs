@@ -3,30 +3,36 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
-using System.Diagnostics;
 using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
+using System.Diagnostics;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using System.Collections.Generic;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
-    /** A value in the remote process. */
 
+
+    /** A value in the remote process. */
     public class CorValue : WrapperBase
     {
-        internal ICorDebugValue m_val;
-
-        internal CorValue(ICorDebugValue value)
+        public CorValue(ICorDebugValue value)
             : base(value)
         {
             m_val = value;
         }
 
-        /** The simple type of the value. */
+        [CLSCompliant(false)]
+        public ICorDebugValue Raw
+        {
+            get 
+            { 
+                return m_val;
+            }
+        }
 
+        /** The simple type of the value. */
         public CorElementType Type
         {
             get
@@ -38,12 +44,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** Full runtime type of the object . */
-
         public CorType ExactType
         {
             get
             {
-                var v2 = (ICorDebugValue2) m_val;
+                ICorDebugValue2 v2 = (ICorDebugValue2)m_val;
                 ICorDebugType dt;
                 v2.GetExactType(out dt);
                 return new CorType(dt);
@@ -51,31 +56,28 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         }
 
         /** size of the value (in bytes). */
-
         public int Size
         {
             get
             {
                 uint s = 0;
                 m_val.GetSize(out s);
-                return (int) s;
+                return (int)s;
             }
         }
 
         /** Address of the value in the debuggee process. */
-
         public long Address
         {
             get
             {
                 ulong addr = 0;
                 m_val.GetAddress(out addr);
-                return (long) addr;
+                return (long)addr;
             }
         }
 
         /** Breakpoint triggered when the value is modified. */
-
         public CorValueBreakpoint CreateBreakpoint()
         {
             ICorDebugValueBreakpoint bp = null;
@@ -87,7 +89,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public CorReferenceValue CastToReferenceValue()
         {
             if (m_val is ICorDebugReferenceValue)
-                return new CorReferenceValue((ICorDebugReferenceValue) m_val);
+                return new CorReferenceValue((ICorDebugReferenceValue)m_val);
             else
                 return null;
         }
@@ -95,25 +97,25 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public CorHandleValue CastToHandleValue()
         {
             if (m_val is ICorDebugHandleValue)
-                return new CorHandleValue((ICorDebugHandleValue) m_val);
+                return new CorHandleValue((ICorDebugHandleValue)m_val);
             else
                 return null;
         }
 
         public CorStringValue CastToStringValue()
         {
-            return new CorStringValue((ICorDebugStringValue) m_val);
+            return new CorStringValue((ICorDebugStringValue)m_val);
         }
 
         public CorObjectValue CastToObjectValue()
         {
-            return new CorObjectValue((ICorDebugObjectValue) m_val);
+            return new CorObjectValue((ICorDebugObjectValue)m_val);
         }
 
         public CorGenericValue CastToGenericValue()
         {
             if (m_val is ICorDebugGenericValue)
-                return new CorGenericValue((ICorDebugGenericValue) m_val);
+                return new CorGenericValue((ICorDebugGenericValue)m_val);
             else
                 return null;
         }
@@ -121,7 +123,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public CorBoxValue CastToBoxValue()
         {
             if (m_val is ICorDebugBoxValue)
-                return new CorBoxValue((ICorDebugBoxValue) m_val);
+                return new CorBoxValue((ICorDebugBoxValue)m_val);
             else
                 return null;
         }
@@ -129,7 +131,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public CorArrayValue CastToArrayValue()
         {
             if (m_val is ICorDebugArrayValue)
-                return new CorArrayValue((ICorDebugArrayValue) m_val);
+                return new CorArrayValue((ICorDebugArrayValue)m_val);
             else
                 return null;
         }
@@ -137,18 +139,21 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public CorHeapValue CastToHeapValue()
         {
             if (m_val is ICorDebugHeapValue)
-                return new CorHeapValue((ICorDebugHeapValue) m_val);
+                return new CorHeapValue((ICorDebugHeapValue)m_val);
             else
                 return null;
         }
+
+        internal ICorDebugValue m_val = null;
+
     } /* class Value */
 
 
     public class CorReferenceValue : CorValue
     {
-        private readonly ICorDebugReferenceValue m_refVal;
 
-        internal CorReferenceValue(ICorDebugReferenceValue referenceValue) : base(referenceValue)
+        internal CorReferenceValue(ICorDebugReferenceValue referenceValue)
+            : base(referenceValue)
         {
             m_refVal = referenceValue;
         }
@@ -159,11 +164,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 UInt64 v;
                 m_refVal.GetValue(out v);
-                return (Int64) v;
+                return (Int64)v;
             }
             set
             {
-                var v = (UInt64) value;
+                UInt64 v = (UInt64)value;
                 m_refVal.SetValue(v);
             }
         }
@@ -184,30 +189,19 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             m_refVal.Dereference(out v);
             return (v == null ? null : new CorValue(v));
         }
+
+        private ICorDebugReferenceValue m_refVal = null;
     }
 
 
-    public sealed class CorHandleValue : CorReferenceValue, IDisposable
+    public sealed class CorHandleValue : CorReferenceValue, System.IDisposable
     {
-        private readonly ICorDebugHandleValue m_handleVal;
 
-        internal CorHandleValue(ICorDebugHandleValue handleValue) : base(handleValue)
+        internal CorHandleValue(ICorDebugHandleValue handleValue)
+            : base(handleValue)
         {
             m_handleVal = handleValue;
         }
-
-        [CLSCompliant(false)]
-        public CorDebugHandleType HandleType
-        {
-            get
-            {
-                CorDebugHandleType ht;
-                m_handleVal.GetHandleType(out ht);
-                return ht;
-            }
-        }
-
-        #region IDisposable Members
 
         public void Dispose()
         {
@@ -228,14 +222,24 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        #endregion
+        [CLSCompliant(false)]
+        public CorDebugHandleType HandleType
+        {
+            get
+            {
+                CorDebugHandleType ht;
+                m_handleVal.GetHandleType(out ht);
+                return ht;
+            }
+        }
+        private ICorDebugHandleValue m_handleVal = null;
     }
 
     public sealed class CorStringValue : CorValue
     {
-        private readonly ICorDebugStringValue m_strVal;
 
-        internal CorStringValue(ICorDebugStringValue stringValue) : base(stringValue)
+        internal CorStringValue(ICorDebugStringValue stringValue)
+            : base(stringValue)
         {
             m_strVal = stringValue;
         }
@@ -255,8 +259,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             get
             {
                 uint stringSize;
-                var sb = new StringBuilder(Length + 1); // we need one extra char for null
-                m_strVal.GetString((uint) sb.Capacity, out stringSize, sb);
+                StringBuilder sb = new StringBuilder(Length + 1); // we need one extra char for null
+                m_strVal.GetString((uint)sb.Capacity, out stringSize, sb);
                 return sb.ToString();
             }
         }
@@ -267,17 +271,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 uint stringSize;
                 m_strVal.GetLength(out stringSize);
-                return (int) stringSize;
+                return (int)stringSize;
             }
         }
+
+        private ICorDebugStringValue m_strVal = null;
     }
 
 
     public sealed class CorObjectValue : CorValue
     {
-        private readonly ICorDebugObjectValue m_objVal;
-
-        internal CorObjectValue(ICorDebugObjectValue objectValue) : base(objectValue)
+        internal CorObjectValue(ICorDebugObjectValue objectValue)
+            : base(objectValue)
         {
             m_objVal = objectValue;
         }
@@ -292,6 +297,26 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
+        public CorValue GetFieldValue(CorClass managedClass, int fieldToken)
+        {
+            ICorDebugValue val;
+            m_objVal.GetFieldValue(managedClass.m_class, (uint)fieldToken, out val);
+            return new CorValue(val);
+        }
+
+        public CorType GetVirtualMethodAndType(int memberToken, out CorFunction managedFunction)
+        {
+            ICorDebugType dt = null;
+            ICorDebugFunction pfunc = null;
+            (m_objVal as ICorDebugObjectValue2).GetVirtualMethodAndType((uint)memberToken, out pfunc, out dt);
+            if (pfunc == null)
+                managedFunction = null;
+            else
+                managedFunction = new CorFunction(pfunc);
+            return dt == null ? null : new CorType(dt);
+        }
+
+
         public bool IsValueClass
         {
             get
@@ -302,31 +327,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        public CorValue GetFieldValue(CorClass managedClass, int fieldToken)
-        {
-            ICorDebugValue val;
-            m_objVal.GetFieldValue(managedClass.m_class, (uint) fieldToken, out val);
-            return new CorValue(val);
-        }
-
-        public CorType GetVirtualMethodAndType(int memberToken, out CorFunction managedFunction)
-        {
-            ICorDebugType dt = null;
-            ICorDebugFunction pfunc = null;
-            (m_objVal as ICorDebugObjectValue2).GetVirtualMethodAndType((uint) memberToken, out pfunc, out dt);
-            if (pfunc == null)
-                managedFunction = null;
-            else
-                managedFunction = new CorFunction(pfunc);
-            return dt == null ? null : new CorType(dt);
-        }
+        // public Object GetManagedCopy() -- deprecated, therefore we won't make it available at all.
+        private ICorDebugObjectValue m_objVal = null;
     }
 
     public sealed class CorGenericValue : CorValue
     {
-        private readonly ICorDebugGenericValue m_genVal;
-
-        internal CorGenericValue(ICorDebugGenericValue genericValue) : base(genericValue)
+        internal CorGenericValue(ICorDebugGenericValue genericValue)
+            : base(genericValue)
         {
             m_genVal = genericValue;
         }
@@ -339,7 +347,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         {
             try
             {
-                switch (Type)
+                switch (this.Type)
                 {
                     case CorElementType.ELEMENT_TYPE_BOOLEAN:
                         bool v = Convert.ToBoolean(value);
@@ -407,7 +415,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
                     case CorElementType.ELEMENT_TYPE_I:
                         Int64 ip64v = Convert.ToInt64(value);
-                        var ipv = new IntPtr(ip64v);
+                        IntPtr ipv = new IntPtr(ip64v);
                         unsafe
                         {
                             SetValueInternal(new IntPtr(&ipv));
@@ -416,7 +424,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
                     case CorElementType.ELEMENT_TYPE_U:
                         UInt64 ipu64v = Convert.ToUInt64(value);
-                        var uipv = new UIntPtr(ipu64v);
+                        UIntPtr uipv = new UIntPtr(ipu64v);
                         unsafe
                         {
                             SetValueInternal(new IntPtr(&uipv));
@@ -456,12 +464,12 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                         break;
 
                     case CorElementType.ELEMENT_TYPE_VALUETYPE:
-                        var bav = (byte[]) value;
+                        byte[] bav = (byte[])value;
                         unsafe
                         {
                             fixed (byte* bufferPtr = &bav[0])
                             {
-                                Debug.Assert(Size == bav.Length);
+                                Debug.Assert(this.Size == bav.Length);
                                 m_genVal.SetValue(new IntPtr(bufferPtr));
                             }
                         }
@@ -479,7 +487,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
         public object GetValue()
         {
-            return UnsafeGetValueAsType(Type);
+            return UnsafeGetValueAsType(this.Type);
         }
 
         /// <summary>
@@ -488,14 +496,28 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public IntPtr[] GetValueAsIntPtrArray()
         {
             int ptrsize = IntPtr.Size;
-            int cElem = (Size + ptrsize - 1)/ptrsize;
-            var buffer = new IntPtr[cElem];
+            int cElem = (this.Size + ptrsize - 1) / ptrsize;
+            IntPtr[] buffer = new IntPtr[cElem];
 
             unsafe
             {
                 fixed (IntPtr* bufferPtr = &buffer[0])
                 {
-                    GetValueInternal(new IntPtr(bufferPtr));
+                    this.GetValueInternal(new IntPtr(bufferPtr));
+                }
+            }
+            return buffer;
+        }
+
+        public byte[] GetValueAsByteArray()
+        {
+            byte[] buffer = new Byte[this.Size];
+
+            unsafe
+            {
+                fixed (byte* bufferPtr = &buffer[0])
+                {
+                    this.GetValueInternal(new IntPtr(bufferPtr));
                 }
             }
             return buffer;
@@ -509,137 +531,137 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
                     byte bValue = 4; // just initialize to avoid compiler warnings
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (byte));
-                        GetValueInternal(new IntPtr(&bValue));
+                        Debug.Assert(this.Size == sizeof(byte));
+                        this.GetValueInternal(new IntPtr(&bValue));
                     }
-                    return (bValue != 0);
+                    return (object)(bValue != 0);
 
                 case CorElementType.ELEMENT_TYPE_CHAR:
                     char cValue = 'a'; // initialize to avoid compiler warnings
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (char));
-                        GetValueInternal(new IntPtr(&cValue));
+                        Debug.Assert(this.Size == sizeof(char));
+                        this.GetValueInternal(new IntPtr(&cValue));
                     }
-                    return cValue;
+                    return (object)cValue;
 
                 case CorElementType.ELEMENT_TYPE_I1:
                     SByte i1Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (SByte));
-                        GetValueInternal(new IntPtr(&i1Value));
+                        Debug.Assert(this.Size == sizeof(SByte));
+                        this.GetValueInternal(new IntPtr(&i1Value));
                     }
-                    return i1Value;
+                    return (object)i1Value;
 
                 case CorElementType.ELEMENT_TYPE_U1:
                     Byte u1Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Byte));
-                        GetValueInternal(new IntPtr(&u1Value));
+                        Debug.Assert(this.Size == sizeof(Byte));
+                        this.GetValueInternal(new IntPtr(&u1Value));
                     }
-                    return u1Value;
+                    return (object)u1Value;
 
                 case CorElementType.ELEMENT_TYPE_I2:
                     Int16 i2Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Int16));
-                        GetValueInternal(new IntPtr(&i2Value));
+                        Debug.Assert(this.Size == sizeof(Int16));
+                        this.GetValueInternal(new IntPtr(&i2Value));
                     }
-                    return i2Value;
+                    return (object)i2Value;
 
                 case CorElementType.ELEMENT_TYPE_U2:
                     UInt16 u2Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (UInt16));
-                        GetValueInternal(new IntPtr(&u2Value));
+                        Debug.Assert(this.Size == sizeof(UInt16));
+                        this.GetValueInternal(new IntPtr(&u2Value));
                     }
-                    return u2Value;
+                    return (object)u2Value;
 
                 case CorElementType.ELEMENT_TYPE_I:
                     IntPtr ipValue = IntPtr.Zero;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (IntPtr));
-                        GetValueInternal(new IntPtr(&ipValue));
+                        Debug.Assert(this.Size == sizeof(IntPtr));
+                        this.GetValueInternal(new IntPtr(&ipValue));
                     }
-                    return ipValue;
+                    return (object)ipValue;
 
                 case CorElementType.ELEMENT_TYPE_U:
                     UIntPtr uipValue = UIntPtr.Zero;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (UIntPtr));
-                        GetValueInternal(new IntPtr(&uipValue));
+                        Debug.Assert(this.Size == sizeof(UIntPtr));
+                        this.GetValueInternal(new IntPtr(&uipValue));
                     }
-                    return uipValue;
+                    return (object)uipValue;
 
                 case CorElementType.ELEMENT_TYPE_I4:
                     Int32 i4Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Int32));
-                        GetValueInternal(new IntPtr(&i4Value));
+                        Debug.Assert(this.Size == sizeof(Int32));
+                        this.GetValueInternal(new IntPtr(&i4Value));
                     }
-                    return i4Value;
+                    return (object)i4Value;
 
                 case CorElementType.ELEMENT_TYPE_U4:
                     UInt32 u4Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (UInt32));
-                        GetValueInternal(new IntPtr(&u4Value));
+                        Debug.Assert(this.Size == sizeof(UInt32));
+                        this.GetValueInternal(new IntPtr(&u4Value));
                     }
-                    return u4Value;
+                    return (object)u4Value;
 
                 case CorElementType.ELEMENT_TYPE_I8:
                     Int64 i8Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Int64));
-                        GetValueInternal(new IntPtr(&i8Value));
+                        Debug.Assert(this.Size == sizeof(Int64));
+                        this.GetValueInternal(new IntPtr(&i8Value));
                     }
-                    return i8Value;
+                    return (object)i8Value;
 
                 case CorElementType.ELEMENT_TYPE_U8:
                     UInt64 u8Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (UInt64));
-                        GetValueInternal(new IntPtr(&u8Value));
+                        Debug.Assert(this.Size == sizeof(UInt64));
+                        this.GetValueInternal(new IntPtr(&u8Value));
                     }
-                    return u8Value;
+                    return (object)u8Value;
 
                 case CorElementType.ELEMENT_TYPE_R4:
                     Single r4Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Single));
-                        GetValueInternal(new IntPtr(&r4Value));
+                        Debug.Assert(this.Size == sizeof(Single));
+                        this.GetValueInternal(new IntPtr(&r4Value));
                     }
-                    return r4Value;
+                    return (object)r4Value;
 
                 case CorElementType.ELEMENT_TYPE_R8:
                     Double r8Value = 4;
                     unsafe
                     {
-                        Debug.Assert(Size == sizeof (Double));
-                        GetValueInternal(new IntPtr(&r8Value));
+                        Debug.Assert(this.Size == sizeof(Double));
+                        this.GetValueInternal(new IntPtr(&r8Value));
                     }
-                    return r8Value;
+                    return (object)r8Value;
 
 
                 case CorElementType.ELEMENT_TYPE_VALUETYPE:
-                    var buffer = new byte[Size];
+                    byte[] buffer = new byte[this.Size];
                     unsafe
                     {
                         fixed (byte* bufferPtr = &buffer[0])
                         {
-                            Debug.Assert(Size == buffer.Length);
-                            GetValueInternal(new IntPtr(bufferPtr));
+                            Debug.Assert(this.Size == buffer.Length);
+                            this.GetValueInternal(new IntPtr(bufferPtr));
                         }
                     }
                     return buffer;
@@ -660,13 +682,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         {
             m_genVal.GetValue(valPtr);
         }
+
+        private ICorDebugGenericValue m_genVal = null;
     }
 
     public sealed class CorBoxValue : CorValue
     {
-        private readonly ICorDebugBoxValue m_boxVal;
-
-        internal CorBoxValue(ICorDebugBoxValue boxedValue) : base(boxedValue)
+        internal CorBoxValue(ICorDebugBoxValue boxedValue)
+            : base(boxedValue)
         {
             m_boxVal = boxedValue;
         }
@@ -677,13 +700,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             m_boxVal.GetObject(out ov);
             return (ov == null) ? null : new CorObjectValue(ov);
         }
+
+        private ICorDebugBoxValue m_boxVal = null;
     }
 
     public sealed class CorArrayValue : CorValue
     {
-        private readonly ICorDebugArrayValue m_arrayVal;
-
-        internal CorArrayValue(ICorDebugArrayValue arrayValue) : base(arrayValue)
+        internal CorArrayValue(ICorDebugArrayValue arrayValue)
+            : base(arrayValue)
         {
             m_arrayVal = arrayValue;
         }
@@ -697,7 +721,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 uint pnCount;
                 m_arrayVal.GetCount(out pnCount);
-                return (int) pnCount;
+                return (int)pnCount;
             }
         }
 
@@ -718,7 +742,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 uint pnRank;
                 m_arrayVal.GetRank(out pnRank);
-                return (int) pnRank;
+                return (int)pnRank;
             }
         }
 
@@ -745,10 +769,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         public int[] GetDimensions()
         {
             Debug.Assert(Rank != 0);
-            var dims = new uint[Rank];
-            m_arrayVal.GetDimensions((uint) dims.Length, dims);
+            uint[] dims = new uint[Rank];
+            m_arrayVal.GetDimensions((uint)dims.Length, dims);
 
-            int[] sdims = Array.ConvertAll(dims, delegate(uint u) { return (int) u; });
+            int[] sdims = Array.ConvertAll<uint, int>(dims, delegate(uint u) { return (int)u; });
             return sdims;
         }
 
@@ -756,28 +780,34 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         {
             Debug.Assert(indices != null);
             ICorDebugValue ppValue;
-            m_arrayVal.GetElement((uint) indices.Length, indices, out ppValue);
+            m_arrayVal.GetElement((uint)indices.Length, indices, out ppValue);
             return ppValue == null ? null : new CorValue(ppValue);
         }
 
         public CorValue GetElementAtPosition(int position)
         {
             ICorDebugValue ppValue;
-            m_arrayVal.GetElementAtPosition((uint) position, out ppValue);
+            m_arrayVal.GetElementAtPosition((uint)position, out ppValue);
             return ppValue == null ? null : new CorValue(ppValue);
         }
+        private ICorDebugArrayValue m_arrayVal = null;
     }
 
     public sealed class CorHeapValue : CorValue
     {
-        private readonly ICorDebugHeapValue m_heapVal;
-
-        internal CorHeapValue(ICorDebugHeapValue heapValue) : base(heapValue)
+        internal CorHeapValue(ICorDebugHeapValue heapValue)
+            : base(heapValue)
         {
             m_heapVal = heapValue;
         }
 
         //void CreateRelocBreakpoint(ref Microsoft.Samples.Debugging.CorDebug.NativeApi.ICorDebugValueBreakpoint ppBreakpoint);
+        public CorValueBreakpoint CreateRelocBreakpoint()
+        {
+            ICorDebugValueBreakpoint bp = null;
+            m_heapVal.CreateRelocBreakpoint(out bp);
+            return new CorValueBreakpoint(bp);
+        }
 
         //void IsValid(ref Int32 pbValid);
         public bool IsValid
@@ -790,13 +820,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             }
         }
 
-        public CorValueBreakpoint CreateRelocBreakpoint()
-        {
-            ICorDebugValueBreakpoint bp = null;
-            m_heapVal.CreateRelocBreakpoint(out bp);
-            return new CorValueBreakpoint(bp);
-        }
-
         [CLSCompliant(false)]
         public CorHandleValue CreateHandle(CorDebugHandleType type)
         {
@@ -804,5 +827,60 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             (m_heapVal as ICorDebugHeapValue2).CreateHandle(type, out handle);
             return handle == null ? null : new CorHandleValue(handle);
         }
+
+        /// <summary>
+        /// Returns the thread which owns the monitor lock or null if no thread owns it
+        /// </summary>
+        public CorThread GetThreadOwningMonitorLock()
+        {
+            if (m_heapVal as ICorDebugHeapValue3 == null)
+                throw new NotSupportedException();
+            ICorDebugThread owner;
+            int acquisitionCount;
+            (m_heapVal as ICorDebugHeapValue3).GetThreadOwningMonitorLock(out owner, out acquisitionCount);
+            return owner == null ? null : new CorThread(owner);
+        }
+
+        /// <summary>
+        /// Returns the number of times this lock would need to be released in order for it to
+        /// be unowned
+        /// </summary>
+        public int GetMonitorAcquisitionCount()
+        {
+            if (m_heapVal as ICorDebugHeapValue3 == null)
+                throw new NotSupportedException();
+            ICorDebugThread owner;
+            int acquisitionCount;
+            (m_heapVal as ICorDebugHeapValue3).GetThreadOwningMonitorLock(out owner, out acquisitionCount);
+            return acquisitionCount;
+        }
+
+        /// <summary>
+        /// Returns a list of threads waiting for the monitor event associated with this object
+        /// </summary>
+        /// <returns>The list of waiting threads. The first thread in the list will be released on the
+        /// next call to Monitor.Pulse, and each succesive call will release the next thread in the list</returns>
+        public CorThread[] GetMonitorEventWaitList()
+        {
+            if (m_heapVal as ICorDebugHeapValue3 == null)
+                throw new NotSupportedException();
+            ICorDebugThreadEnum rawThreadEnum;
+            (m_heapVal as ICorDebugHeapValue3).GetMonitorEventWaitList(out rawThreadEnum);
+            uint threadCount;
+            rawThreadEnum.GetCount(out threadCount);
+            ICorDebugThread[] rawThreads = new ICorDebugThread[threadCount];
+            uint countReceived;
+            rawThreadEnum.Next(threadCount, rawThreads, out countReceived);
+            Debug.Assert(countReceived == threadCount);
+            CorThread[] threads = new CorThread[threadCount];
+            for (int i = 0; i < threadCount; i++)
+            {
+                threads[i] = new CorThread(rawThreads[i]);
+            }
+            return threads;
+        }
+
+        private ICorDebugHeapValue m_heapVal = null;
     }
+
 } /* namespace  */

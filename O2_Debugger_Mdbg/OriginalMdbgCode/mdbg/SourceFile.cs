@@ -6,28 +6,22 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Text;
-using O2.Debugger.Mdbg.Tools.Mdbg;
-using O2.Debugger.Mdbg.Tools.Mdbg;
-using O2.Debugger.Mdbg.Tools.Mdbg;
 
-namespace O2.Debugger.Mdbg.mdbg
+using Microsoft.Samples.Debugging.MdbgEngine;
+
+namespace Microsoft.Samples.Tools.Mdbg
 {
-    internal class MDbgSourceFileMgr : IMDbgSourceFileMgr
+    class MDbgSourceFileMgr : IMDbgSourceFileMgr
     {
-        private readonly Hashtable m_sourceCache = new Hashtable();
-
-        #region IMDbgSourceFileMgr Members
-
         public IMDbgSourceFile GetSourceFile(string path)
         {
             String s = String.Intern(path);
-            var source = (MDbgSourceFile) m_sourceCache[s];
+            MDbgSourceFile source = (MDbgSourceFile) m_sourceCache[s];
 
-            if (source == null)
+            if ( source == null )
             {
                 source = new MDbgSourceFile(s);
-                m_sourceCache.Add(s, source);
+                m_sourceCache.Add(s,source);
             }
             return source;
         }
@@ -37,14 +31,11 @@ namespace O2.Debugger.Mdbg.mdbg
             m_sourceCache.Clear();
         }
 
-        #endregion
+        private Hashtable m_sourceCache = new Hashtable();
     }
 
-    internal class MDbgSourceFile : IMDbgSourceFile
+    class MDbgSourceFile : IMDbgSourceFile
     {
-        private readonly string m_path;
-        private ArrayList m_lines;
-
         public MDbgSourceFile(string path)
         {
             m_path = path;
@@ -52,40 +43,41 @@ namespace O2.Debugger.Mdbg.mdbg
             {
                 Initialize();
             }
-            catch (FileNotFoundException)
+            catch(FileNotFoundException)
             {
-                throw new MDbgShellException("Could not find source: " + m_path);
+                throw new MDbgShellException("Could not find source: "+m_path);
             }
         }
-
-        #region IMDbgSourceFile Members
-
+        
         public string Path
-        {
-            get { return m_path; }
+        { 
+            get
+            {
+                return m_path;
+            }
         }
-
-        public string this[int lineNumber]
+        
+        public string this[ int lineNumber ]
         {
             get
             {
-                if (m_lines == null)
+                if( m_lines == null )
                 {
                     Initialize();
                 }
-                if ((lineNumber < 1) || (lineNumber > m_lines.Count))
+                if( (lineNumber<1) || (lineNumber>m_lines.Count) )
                     throw new MDbgShellException(string.Format("Could not retrieve line {0} from file {1}.",
-                                                               lineNumber, Path));
+                                                               lineNumber, this.Path));
 
-                return (string) m_lines[lineNumber - 1];
+                return (string) m_lines[lineNumber-1];
             }
         }
-
+        
         public int Count
         {
             get
             {
-                if (m_lines == null)
+                if( m_lines == null )
                 {
                     Initialize();
                 }
@@ -93,19 +85,17 @@ namespace O2.Debugger.Mdbg.mdbg
             }
         }
 
-        #endregion
-
-        protected void Initialize()
+        protected  void Initialize()
         {
             StreamReader sr = null;
             try
-            {
-                // Encoding.Default doesnï¿½t port between machines, but it's used just in case the source isnï¿½t Unicode
-                sr = new StreamReader(m_path, Encoding.Default, true);
+            {                
+                // Encoding.Default doesn’t port between machines, but it's used just in case the source isn’t Unicode
+                sr = new StreamReader(m_path, System.Text.Encoding.Default, true);
                 m_lines = new ArrayList();
-
+                
                 string s = sr.ReadLine();
-                while (s != null)
+                while(s!=null)
                 {
                     m_lines.Add(s);
                     s = sr.ReadLine();
@@ -113,9 +103,13 @@ namespace O2.Debugger.Mdbg.mdbg
             }
             finally
             {
-                if (sr != null)
+                if( sr!=null )
                     sr.Close(); // free resources in advance
             }
         }
+
+        private ArrayList m_lines;
+        private string m_path;
+
     }
 }

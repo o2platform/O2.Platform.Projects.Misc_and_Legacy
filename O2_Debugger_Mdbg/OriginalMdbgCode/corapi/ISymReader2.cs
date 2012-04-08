@@ -6,19 +6,19 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
+    using System.Diagnostics.SymbolStore;
+
     // Interface does not need to be marked with the serializable attribute
+    using System;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComVisible(false)
     ]
-    public interface ISymbolReader2 : ISymbolReader
+    public interface ISymbolReader2 : ISymbolReader, IDisposable
     {
         // Initialize the symbol reader with the metadata importer interface
         // that this reader will be associated with, along with the filename
@@ -29,7 +29,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         // not both. The searchPath parameter is optional.
         //
         void Initialize(Object importer, String filename,
-                        String searchPath, IStream stream);
+                       String searchPath, IStream stream);
 
         // Update the existing symbol reader with a delta symbol store. This
         // is used in EnC scenarios as a way to update the symbol store to
@@ -56,20 +56,20 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         // Provides the on disk filename of the symbol store.
         //
         String GetSymbolStoreFileName();
-
+        
         // Given a position in a document, return the ISymUnmanagedMethods that
         // contains that position.
         //
         ISymbolMethod[] GetMethodsFromDocumentPosition(
-            ISymbolDocument document, int line, int column);
-
+                ISymbolDocument document, int line, int column);
+        
         // The document version starts at 1 and is incremented each time
         // the document is updated via UpdateSymbols.
         // bCurrent is true is this is the latest version of the document.
         //
         int GetDocumentVersion(ISymbolDocument document,
-                               out Boolean isCurrent);
-
+                                     out Boolean isCurrent);
+        
         // The method version starts at 1 and is incremented each time
         // the method is recompiled.  (This can happen  changes to the method.)
         //
@@ -84,7 +84,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     public interface ISymbolReaderSymbolSearchInfo
     {
         int GetSymbolSearchInfoCount();
-
+    
         ISymbolSearchInfo[] GetSymbolSearchInfo();
     }
+   
 }

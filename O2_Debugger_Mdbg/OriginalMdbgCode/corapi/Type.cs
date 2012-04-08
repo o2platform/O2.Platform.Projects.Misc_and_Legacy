@@ -3,56 +3,67 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
+using System;
 using System.Collections;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     public sealed class CorType : WrapperBase
     {
         internal ICorDebugType m_type;
-
-        internal CorType(ICorDebugType type)
+        
+        internal CorType (ICorDebugType type)
             : base(type)
         {
             m_type = type;
         }
 
 
-        /** Element type of the type. */
+        internal ICorDebugType GetInterface ()
+        {
+            return m_type;
+        }
 
+        [CLSCompliant(false)]
+        public ICorDebugType Raw
+        {
+            get 
+            { 
+                return m_type;
+            }
+        }
+
+        /** Element type of the type. */
         public CorElementType Type
         {
-            get
+            get 
             {
                 CorElementType type;
-                m_type.GetType(out type);
+                m_type.GetType (out type);
                 return type;
             }
         }
 
         /** Class of the type */
-
         public CorClass Class
         {
-            get
+            get 
             {
                 ICorDebugClass c = null;
                 m_type.GetClass(out c);
-                return c == null ? null : new CorClass(c);
+                return c==null?null:new CorClass (c);
             }
         }
 
         public int Rank
         {
-            get
+            get 
             {
-                uint pRank = 0;
-                m_type.GetRank(out pRank);
-                return (int) pRank;
+                uint pRank= 0;
+                m_type.GetRank (out pRank);
+                return (int)pRank;
             }
         }
 
@@ -64,7 +75,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 ICorDebugType dt = null;
                 m_type.GetFirstTypeParameter(out dt);
-                return dt == null ? null : new CorType(dt);
+                return dt==null?null:new CorType (dt);
             }
         }
 
@@ -74,8 +85,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             {
                 ICorDebugType dt = null;
                 m_type.GetBase(out dt);
-                return dt == null ? null : new CorType(dt);
+                return dt==null?null:new CorType (dt);
             }
+        }
+
+        public CorValue GetStaticFieldValue(int fieldToken, CorFrame frame)
+        {
+            ICorDebugValue dv = null;
+            m_type.GetStaticFieldValue((uint)fieldToken, frame.m_frame, out dv);
+            return dv==null?null:new CorValue (dv);
         }
 
         // Expose IEnumerable, which can be used with for-each constructs.
@@ -85,22 +103,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             get
             {
                 ICorDebugTypeEnum etp = null;
-                m_type.EnumerateTypeParameters(out etp);
-                if (etp == null) return null;
-                return new CorTypeEnumerator(etp);
+                m_type.EnumerateTypeParameters (out etp);
+                if (etp==null) return null;
+                return new CorTypeEnumerator (etp);
             }
-        }
-
-        internal ICorDebugType GetInterface()
-        {
-            return m_type;
-        }
-
-        public CorValue GetStaticFieldValue(int fieldToken, CorFrame frame)
-        {
-            ICorDebugValue dv = null;
-            m_type.GetStaticFieldValue((uint) fieldToken, frame.m_frame, out dv);
-            return dv == null ? null : new CorValue(dv);
         }
     } /* class Type */
 } /* namespace */

@@ -3,29 +3,28 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
+using System;
 
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     public sealed class CorValueBreakpoint : CorBreakpoint
     {
-        private readonly ICorDebugValueBreakpoint m_br;
-
-        internal CorValueBreakpoint(ICorDebugValueBreakpoint breakpoint) : base(breakpoint)
+        private ICorDebugValueBreakpoint m_br;
+        
+        internal CorValueBreakpoint (ICorDebugValueBreakpoint breakpoint) : base(breakpoint)
         {
             m_br = breakpoint;
         }
 
         public CorValue Value
         {
-            get
+            get 
             {
                 ICorDebugValue m = null;
-                m_br.GetValue(out m);
-                return new CorValue(m);
+                m_br.GetValue (out m);
+                return new CorValue (m);
             }
         }
     } /* class ValueBreakpoint */

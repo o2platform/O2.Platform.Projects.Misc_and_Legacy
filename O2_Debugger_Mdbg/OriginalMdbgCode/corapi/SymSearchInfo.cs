@@ -6,13 +6,15 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Runtime.InteropServices;
-using System.Text;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
+    using System.Diagnostics.SymbolStore;
+
     // Interface does not need to be marked with the serializable attribute
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComImport,
@@ -20,31 +22,29 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComVisible(false)
     ]
-    internal interface ISymUnmanagedSymbolSearchInfo
+    internal interface ISymUnmanagedSymbolSearchInfo 
     {
         void GetSearchPathLength(out int pcchPath);
 
         void GetSearchPath(int cchPath,
-                           out int pcchPath,
-                           [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szPath);
+                              out int pcchPath,
+                              [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szPath);
 
         void GetHRESULT(out int hr);
     }
 
     internal class SymSymbolSearchInfo : ISymbolSearchInfo
     {
-        private readonly ISymUnmanagedSymbolSearchInfo m_target;
+        ISymUnmanagedSymbolSearchInfo m_target;
 
         public SymSymbolSearchInfo(ISymUnmanagedSymbolSearchInfo target)
         {
             m_target = target;
         }
-
-        #region ISymbolSearchInfo Members
-
+        
         public int SearchPathLength
         {
-            get
+            get 
             {
                 int length;
                 m_target.GetSearchPathLength(out length);
@@ -54,11 +54,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         public String SearchPath
         {
-            get
+            get 
             {
                 int length;
                 m_target.GetSearchPath(0, out length, null);
-                var path = new StringBuilder(length);
+                StringBuilder path = new StringBuilder(length);
                 m_target.GetSearchPath(length, out length, path);
                 return path.ToString();
             }
@@ -66,14 +66,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         public int HResult
         {
-            get
+            get 
             {
                 int hr;
                 m_target.GetHRESULT(out hr);
                 return hr;
             }
-        }
+         }
+      }
 
-        #endregion
-    }
 }

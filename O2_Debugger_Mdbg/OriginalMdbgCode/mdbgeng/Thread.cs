@@ -3,47 +3,28 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using CorThread=O2.Debugger.Mdbg.Debugging.CorDebug.CorThread;
-using CorValue=O2.Debugger.Mdbg.Debugging.CorDebug.CorValue;
-using HResult=O2.Debugger.Mdbg.Debugging.CorDebug.HResult;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+
+
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// MDbg Thread class.
     /// </summary>
     public sealed class MDbgThread : MarshalByRefObject, IComparable
     {
-        private readonly CorDebug.CorThread m_corThread;
-        private readonly int m_threadNumber;
-
-        private int m_currentFrameIndex; // 0-based index of the current frame counted from the leafmost frame
-        // have value -1, when there is no current frame.
-
-        // Stackwalker builds on ICorDebug stackwalking APIs to produce a MDbgFrame collection.
-        // This abstracts which APIs to use (V2 or V3, etc) and which policy to use (eg, what to do 
-        // about unmanaged frames + native stackwalking, funclets, etc)
-        // Create a new instance each time we want to walk the stack. A given stackWalker instance
-        // caches the frames of the current stack.
-        internal IMDbgStackWalker m_stackWalker;
-        internal MDbgThreadCollection m_threadMgr;
-
-        internal MDbgThread(MDbgThreadCollection threadCollection, CorDebug.CorThread thread, int threadNumber)
+        internal MDbgThread(MDbgThreadCollection threadCollection, CorThread thread, int threadNumber)
         {
             m_corThread = thread;
             m_threadNumber = threadNumber;
@@ -56,8 +37,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>NotImplementedException.</value>
         public bool Suspended
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -66,7 +53,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Thread Number.</value>
         public int Number
         {
-            get { return m_threadNumber; }
+            get
+            {
+                return m_threadNumber;
+            }
         }
 
         /// <summary>
@@ -75,16 +65,22 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>Gets the Thread Id.</value>
         public int Id
         {
-            get { return m_corThread.Id; }
+            get
+            {
+                return m_corThread.Id;
+            }
         }
 
         /// <summary>
         /// Gets the CorThread.
         /// </summary>
         /// <value>The CorThread.</value>
-        public CorDebug.CorThread CorThread
+        public CorThread CorThread
         {
-            get { return m_corThread; }
+            get
+            {
+                return m_corThread;
+            }
         }
 
         /// <summary>
@@ -95,14 +91,38 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                CorDebug.CorValue cv;
+                CorValue cv;
                 try
                 {
                     cv = CorThread.CurrentException;
                 }
                 catch (COMException e)
                 {
-                    if (e.ErrorCode == (int) CorDebug.HResult.E_FAIL)
+                    if (e.ErrorCode == (int)HResult.E_FAIL)
+                        cv = null;
+                    else
+                        throw;
+                }
+                return new MDbgValue(m_threadMgr.m_process, cv);
+            }
+        }
+
+        /// <summary>
+        /// Returns current notification on the thread or MDbgValue representing N/A if there is no exception on the thread.
+        /// </summary>
+        /// <value>The current notification.</value>
+        public MDbgValue CurrentNotification
+        {
+            get
+            {
+                CorValue cv;
+                try
+                {
+                    cv = CorThread.CurrentNotification;
+                }
+                catch (COMException e)
+                {
+                    if (e.ErrorCode == (int)HResult.E_FAIL)
                         cv = null;
                     else
                         throw;
@@ -119,8 +139,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                EnsureCurrentStackWalker();
-                return m_stackWalker.GetFrame(0);
+                lock (m_stackLock)
+                {
+                    EnsureCurrentStackWalker();
+                    return m_stackWalker.GetFrame(0);
+                }
             }
         }
 
@@ -128,10 +151,20 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// Returns all the frames for the thread.
         /// </summary>
         /// <value>The frames.</value>
-        public IEnumerable Frames
+        public System.Collections.Generic.IEnumerable<MDbgFrame> Frames
         {
-            get { return new MDbgFrameEnumerable(BottomFrame); }
+            get
+            {
+                lock (m_stackLock)
+                {
+                    // Explicitly return an enumeration from the cached frames so that we're using the same instances
+                    // as the other enumerators. This lets callers use MDbgFrame operator ==.
+                    EnsureCurrentStackWalker();
+                    return m_stackWalker.EnumerateCachedFrames();
+                }
+            }
         }
+
 
         /// <summary>
         /// Gets or Sets the Current Logical Frame
@@ -141,37 +174,50 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                EnsureCurrentStackWalker();
-                if (m_currentFrameIndex == -1)
+                lock (m_stackLock)
                 {
-                    throw new MDbgNoCurrentFrameException();
-                }
+                    try
+                    {
+                        EnsureCurrentStackWalker();
+                    }
+                    catch (COMException e)
+                    {
+                        throw new MDbgNoCurrentFrameException(e);
+                    }
+                    if (m_currentFrameIndex == -1)
+                    {
+                        throw new MDbgNoCurrentFrameException();
+                    }
 
-                MDbgFrame frame = m_stackWalker.GetFrame(m_currentFrameIndex);
-                if (frame == null)
-                {
-                    throw new MDbgNoCurrentFrameException();
-                }
+                    MDbgFrame frame = m_stackWalker.GetFrame(m_currentFrameIndex);
+                    if (frame == null)
+                    {
+                        throw new MDbgNoCurrentFrameException();
+                    }
 
-                Debug.Assert(!frame.IsInfoOnly);
-                return frame;
+                    Debug.Assert(!frame.IsInfoOnly);
+                    return frame;
+                }
             }
             set
             {
-                EnsureCurrentStackWalker();
+                lock (m_stackLock)
+                {
+                    EnsureCurrentStackWalker();
 
-                if (value == null ||
-                    value.Thread != this)
-                    throw new ArgumentException();
+                    if (value == null ||
+                        value.Thread != this)
+                        throw new ArgumentException();
 
-                if (value.IsInfoOnly)
-                    throw new InvalidOperationException("virtual frames cannot be set as current frames");
+                    if (value.IsInfoOnly)
+                        throw new InvalidOperationException("virtual frames cannot be set as current frames");
 
-                int frameIndex = m_stackWalker.GetFrameIndex(value);
-                if (frameIndex < 0)
-                    throw new InvalidOperationException("Cannot set a foreign frame to the thread as a current frame");
+                    int frameIndex = m_stackWalker.GetFrameIndex(value);
+                    if (frameIndex < 0)
+                        throw new InvalidOperationException("Cannot set a foreign frame to the thread as a current frame");
 
-                m_currentFrameIndex = frameIndex;
+                    m_currentFrameIndex = frameIndex;
+                }
             }
         }
 
@@ -183,8 +229,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                EnsureCurrentStackWalker();
-                return m_currentFrameIndex != -1;
+                lock (m_stackLock)
+                {
+                    EnsureCurrentStackWalker();
+                    return m_currentFrameIndex != -1;
+                }
             }
         }
 
@@ -194,17 +243,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Source Ponition.</value>
         public MDbgSourcePosition CurrentSourcePosition
         {
-            get { return CurrentFrame.SourcePosition; }
+            get
+            {
+                return CurrentFrame.SourcePosition;
+            }
         }
-
-        #region IComparable Members
-
-        int IComparable.CompareTo(object obj)
-        {
-            return Number - (obj as MDbgThread).Number;
-        }
-
-        #endregion
 
         /// <summary>
         /// Moves the Current Frame up or down.
@@ -212,34 +255,38 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="down">Moves frame down if true, else up.</param>
         public void MoveCurrentFrame(bool down)
         {
-            MDbgFrame f = CurrentFrame;
-            Debug.Assert(!f.IsInfoOnly);
+            lock (m_stackLock)
+            {
+                MDbgFrame f = CurrentFrame;
+                Debug.Assert(!f.IsInfoOnly);
 
-            bool frameCanBeMoved;
-            int idx = m_currentFrameIndex;
-            if (down)
-            {
-                do
+                bool frameCanBeMoved;
+                int idx = m_currentFrameIndex;
+                if (down)
                 {
-                    --idx;
-                } while (idx >= 0 && m_stackWalker.GetFrame(idx).IsInfoOnly);
-                frameCanBeMoved = (idx >= 0);
-            }
-            else
-            {
-                do
+                    do
+                    {
+                        --idx;
+                    }
+                    while (idx >= 0 && m_stackWalker.GetFrame(idx).IsInfoOnly);
+                    frameCanBeMoved = (idx >= 0);
+                }
+                else
                 {
-                    ++idx;
-                    f = m_stackWalker.GetFrame(idx);
-                } while (f != null && f.IsInfoOnly);
-                frameCanBeMoved = f != null;
-            }
-            if (!frameCanBeMoved)
-            {
-                throw new MDbgException("Operation hit " + (down ? "bottom" : "top") + " of the stack.");
-            }
+                    do
+                    {
+                        ++idx;
+                        f = m_stackWalker.GetFrame(idx);
+                    } while (f != null && f.IsInfoOnly);
+                    frameCanBeMoved = f != null;
+                }
+                if (!frameCanBeMoved)
+                {
+                    throw new MDbgException("Operation hit " + (down ? "bottom" : "top") + " of the stack.");
+                }
 
-            m_currentFrameIndex = idx;
+                m_currentFrameIndex = idx;
+            }
         }
 
 
@@ -249,10 +296,70 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         /// <param name="f">The CorFrame to look up.</param>
         /// <returns>The coresponding MDbgFrame.</returns>
-        public MDbgFrame LookupFrame(CorDebug.CorFrame f)
+        public MDbgFrame LookupFrame(CorFrame f)
         {
             Debug.Assert(f != null);
             return new MDbgILFrame(this, f);
+        }
+
+        int IComparable.CompareTo(object obj)
+        {
+            return this.Number - (obj as MDbgThread).Number;
+        }
+
+        /// <summary>
+        /// Clears the stack walker's frame cache, which will force the stack
+        /// to be walked again with the next call that depends on the stack.
+        /// </summary>
+        public void InvalidateStackWalker()
+        {
+            lock (m_stackLock)
+            {
+                if (m_stackWalker != null)
+                {
+                    m_stackWalker.Invalidate();
+                }
+                m_stackWalker = null;
+            }
+        }
+
+        /// <summary>
+        /// Runs some heuristics to determine whether the OS thread for this thread is
+        /// present in the dump.  Since the EE notifies us of EE Threads which may still
+        /// exist, but for which the OS thread has exited, it is quite possible
+        /// to encounter dumps with an EE Thread, but no corresponding OS thread.
+        /// </summary>
+        /// <returns>Boolean indicating whether the OS thread for this thread is
+        /// present in the dump</returns>
+        private bool IsOSThreadPresentInDump()
+        {
+            // Don't call if we're not dump debugging
+            Debug.Assert(m_threadMgr.m_process.DumpReader != null);
+
+            try
+            {
+                // Since we're debugging a dump, the CLR must be new enough
+                // to support ICorDebugThread2 (and then some).
+                ICorDebugThread2 th2 = m_corThread.Raw as ICorDebugThread2;
+                Debug.Assert(th2 != null);
+
+                uint osThreadID;
+                th2.GetVolatileOSThreadID(out osThreadID);
+                if (osThreadID == 0)
+                    return false;
+
+                if (m_threadMgr.m_process.DumpReader.GetThread((int)osThreadID) == null)
+                    return false;
+            }
+            catch
+            {
+                // It's reasonable for the above to throw exceptions simply
+                // because the OS thread is not present in the dump.  For example, some
+                // of the above calls go through mscordbi, and then back into our
+                // DumpReader, which returns errors if it can't find the requested data.
+                return false;
+            }
+            return true;
         }
 
         // The function verifies that the stackwalker for this thread is "current". The stack-walker will become
@@ -265,131 +372,123 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         // 
         private void EnsureCurrentStackWalker()
         {
-            if (m_stackWalker != null && m_stackWalker.IsUsable)
+            lock (m_stackLock)
             {
-                return;
-            }
-
-            m_stackWalker = m_threadMgr.FrameFactory.CreateStackWalker(this);
-
-            // initialize the frame index to be the invalid index
-            m_currentFrameIndex = -1;
-
-            // set m_currentFrame to first non-virtual frame
-            MDbgFrame f = m_stackWalker.GetFrame(0);
-            if (f == null)
-            {
-                return;
-            }
-
-            // we have at least one frame, so set the frame index to 0
-            m_currentFrameIndex = 0;
-            while (f != null
-                   && f.IsInfoOnly)
-            {
-                f = f.NextUp;
-                if (f != null)
+                if (m_stackWalker != null)
                 {
-                    ++m_currentFrameIndex;
+                    return;
+                }
+
+                m_stackWalker = new FrameCache(m_threadMgr.FrameFactory.EnumerateFrames(this), this);
+
+                // initialize the frame index to be the invalid index. -1 is a special value here.
+                m_currentFrameIndex = -1;
+
+                int idx = 0;
+
+                try
+                {
+                    while (true)
+                    {
+                        MDbgFrame f = null;
+                        try
+                        {
+                            // set m_currentFrame to first non-Internal frame
+                            f = m_stackWalker.GetFrame(idx);
+                        }
+                        catch
+                        {
+                            // It is acceptable that the above might throw an exception, if the
+                            // reason is that the OS thread is not in the dump.  This
+                            // can happen because the CLR debugging API can notify us of managed
+                            // threads whose OS counterpart has already been destroyed, and is thus
+                            // no longer in the dump.  In such a case, just fall through and return
+                            // without having found a current frame for this thread's stack walk.
+                            // Otherwise, propagate the exception.
+
+                            if (m_threadMgr.m_process.DumpReader == null)
+                            {
+                                // Not debugging a dump, so we wouldn't expect an exception here.
+                                // Don't swallow
+                                throw;
+                            }
+
+                            if (IsOSThreadPresentInDump())
+                            {
+                                // Looks like we're trying to get a stackwalk of a valid thread in the dump,
+                                // meaning the exception that was thrown was a bad one.  Rethrow it.
+                                throw;
+                            }
+                        }
+
+                        if (f == null)
+                        {
+                            // Hit the end of the stack without finding a frame that we can set as the
+                            // current frame. Should still be set to "no current frame"
+                            Debug.Assert(m_currentFrameIndex == -1);
+                            return;
+                        }
+
+                        // Skip InfoOnly frames.
+                        if (!f.IsInfoOnly)
+                        {
+                            m_currentFrameIndex = idx;
+                            return;
+                        }
+                        idx++;
+                    }
+                }
+                catch (NotImplementedException)
+                {
+                    // If any of the stackwalking APIs are not implemented, then we have no
+                    // stackwalker, and act like there's no current frame.
                 }
             }
         }
-
-        #region Nested type: MDbgFrameEnumerable
-
-        private class MDbgFrameEnumerable : IEnumerable
-        {
-            private readonly MDbgFrame m_bottomFrame;
-
-            public MDbgFrameEnumerable(MDbgFrame bottomFrame)
-            {
-                m_bottomFrame = bottomFrame;
-            }
-
-            #region IEnumerable Members
-
-            public IEnumerator GetEnumerator()
-            {
-                return new MDbgFrameEnumerator(m_bottomFrame);
-            }
-
-            #endregion
-        }
-
-        #endregion
-
         //////////////////////////////////////////////////////////////////////////////////
         //
         // Local variables
         //
         //////////////////////////////////////////////////////////////////////////////////
+
+        internal MDbgThreadCollection m_threadMgr;
+
+        private CorThread m_corThread;
+        private int m_threadNumber;
+
+        private int m_currentFrameIndex;                    // 0-based index of the current frame counted from the leafmost frame
+        // have value -1, when there is no current frame.
+
+        // Stackwalker builds on ICorDebug stackwalking APIs to produce a MDbgFrame collection.
+        // This abstracts:
+        //  - which APIs to use
+        //  - and which policy to use (eg, what to do about unmanaged frames + native stackwalking, funclets, etc)
+        //  - any other filtering (eg, special language-specific stack massaging)
+        // Create a new instance each time we want to walk the stack. A given stackWalker instance
+        // caches the frames of the current stack.
+        internal FrameCache m_stackWalker;
+        // Synchronizes all access to the thread stack
+        object m_stackLock = new object();
     }
 
-
-    internal class MDbgFrameEnumerator : IEnumerator
-    {
-        private readonly MDbgFrame m_bottomFrame;
-        private MDbgFrame m_currentFrame;
-
-        internal MDbgFrameEnumerator(MDbgFrame bottomFrame)
-        {
-            m_bottomFrame = bottomFrame;
-        }
-
-        #region IEnumerator Members
-
-        void IEnumerator.Reset()
-        {
-            m_currentFrame = null;
-        }
-
-        bool IEnumerator.MoveNext()
-        {
-            if (m_currentFrame == null)
-            {
-                if (m_bottomFrame == null)
-                    return false;
-
-                m_currentFrame = m_bottomFrame;
-            }
-            else
-            {
-                MDbgFrame f = m_currentFrame.NextUp;
-                if (f == null)
-                    return false;
-                m_currentFrame = f;
-            }
-            return true;
-        }
-
-        Object IEnumerator.Current
-        {
-            get
-            {
-                if (m_currentFrame == null)
-                    throw new InvalidOperationException();
-                return m_currentFrame;
-            }
-        }
-
-        #endregion
-    }
 
     /// <summary>
     /// MDbg Thread Collection class.
     /// </summary>
     public sealed class MDbgThreadCollection : MarshalByRefObject, IEnumerable
     {
-        private readonly Hashtable m_items = new Hashtable();
-        private MDbgThread m_active;
-        private IMDbgFrameFactory m_frameFactory;
-        private int m_freeThreadNumber;
-        internal MDbgProcess m_process;
-
         internal MDbgThreadCollection(MDbgProcess process)
         {
             m_process = process;
             m_freeThreadNumber = 0;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            MDbgThread[] ret = new MDbgThread[m_items.Count];
+            m_items.Values.CopyTo(ret, 0);
+            Array.Sort(ret);
+            return ret.GetEnumerator();
         }
 
         /// <summary>
@@ -398,7 +497,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>How many threads.</value>
         public int Count
         {
-            get { return m_items.Count; }
+            get
+            {
+                return m_items.Count;
+            }
         }
 
         /// <summary>
@@ -408,7 +510,20 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <returns>The MDbgThread at that number.</returns>
         public MDbgThread this[int threadNumber]
         {
-            get { return GetThreadFromThreadNumber(threadNumber); }
+            get
+            {
+                return GetThreadFromThreadNumber(threadNumber);
+            }
+        }
+
+        /// <summary>
+        /// Lookup a MDbgThread using a CorThread.
+        /// </summary>
+        /// <param name="thread">The CorThread to use.</param>
+        /// <returns>The rusulting MDbgThread with the same ID.</returns>
+        public MDbgThread Lookup(CorThread thread)
+        {
+            return GetThreadFromThreadId(thread.Id);
         }
 
         /// <summary>
@@ -439,7 +554,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>true if it has an Active Thread, else false.</value>
         public bool HaveActive
         {
-            get { return m_active != null; }
+            get
+            {
+                return m_active != null;
+            }
         }
 
         /// <summary>
@@ -461,55 +579,30 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     // the provider returns null
                     if (m_frameFactory == null)
                     {
-                        m_frameFactory = new MDbgV2FrameFactory();
+                        m_frameFactory = new MDbgLatestFrameFactory();
                     }
                 }
                 return m_frameFactory;
             }
             set
             {
-                if (m_frameFactory != null)
-                {
-                    m_frameFactory.InvalidateStackWalkers();
-                }
+                InvalidateAllStacks();
                 m_frameFactory = value;
             }
-        }
-
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            var ret = new MDbgThread[m_items.Count];
-            m_items.Values.CopyTo(ret, 0);
-            Array.Sort(ret);
-            return ret.GetEnumerator();
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Lookup a MDbgThread using a CorThread.
-        /// </summary>
-        /// <param name="thread">The CorThread to use.</param>
-        /// <returns>The rusulting MDbgThread with the same ID.</returns>
-        public MDbgThread Lookup(CorDebug.CorThread thread)
-        {
-            return GetThreadFromThreadId(thread.Id);
         }
 
         /// <summary>
         /// This function needs to be called when we do "setip" so that callstack will get refreshed.
         /// </summary>
+        [Obsolete("Use InvalidateAllStacks() which has identical functionality and is more accurately named")]
         public void RefreshStack()
         {
-            lock (m_process)
-            {
-                FrameFactory.InvalidateStackWalkers();
-            }
+            InvalidateAllStacks();
         }
 
-        internal void Register(CorDebug.CorThread t)
+
+
+        internal void Register(CorThread t)
         {
             // Prevent double-registration. This may happen if we pick up a CorThread 
             // via enumeration before the CreateThread callback.
@@ -519,7 +612,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
         }
 
-        internal void UnRegister(CorDebug.CorThread t)
+        internal void UnRegister(CorThread t)
         {
             m_items.Remove(t.Id);
             if (m_active != null &&
@@ -537,7 +630,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
 
-        internal void SetActiveThread(CorDebug.CorThread thread)
+        internal void SetActiveThread(CorThread thread)
         {
             if (thread == null)
             {
@@ -547,9 +640,17 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 m_active = GetThreadFromThreadId(thread.Id);
             }
-            lock (m_process)
+            InvalidateAllStacks();
+        }
+
+        /// <summary>
+        /// Invalidates all stackwalkers
+        /// </summary>
+        public void InvalidateAllStacks()
+        {
+            foreach (MDbgThread thread in m_items.Values)
             {
-                m_frameFactory.InvalidateStackWalkers(); // @TODO can this line be removed???
+                thread.InvalidateStackWalker();
             }
         }
 
@@ -562,14 +663,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             // This sometimes fails because we're looking for a thread don't recognize.
             // Need to offer lazy create semantics here.
-            var te = (MDbgThread) m_items[threadId];
+            MDbgThread te = (MDbgThread)m_items[threadId];
             if (te == null)
             {
-                CorDebug.CorThread t = m_process.CorProcess.GetThread(threadId);
+                CorThread t = m_process.CorProcess.GetThread(threadId);
                 if (t != null)
                 {
                     Register(t);
-                    te = (MDbgThread) m_items[threadId];
+                    te = (MDbgThread)m_items[threadId];
                 }
             }
             return te;
@@ -586,6 +687,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
             return null;
         }
+
+        private Hashtable m_items = new Hashtable();
+        private int m_freeThreadNumber;
+        private MDbgThread m_active;
+
+        internal MDbgProcess m_process;
+        private IMDbgFrameFactory m_frameFactory;
     }
 
     /// <summary>
@@ -601,49 +709,73 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// Returns cor-wrapper for frame or throws an exception if N/A.
         /// </summary>
         /// <value>The cor-wrapper for the frame.</value>
-        public abstract CorFrame CorFrame { get; }
+        public abstract CorFrame CorFrame
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns thread owning this frame.
         /// </summary>
         /// <value>The Thread.</value>
-        public abstract MDbgThread Thread { get; }
+        public abstract MDbgThread Thread
+        {
+            get;
+        }
 
         /// <summary>
         /// Return true if frame has a managed IL code behind it.
         /// </summary>
         /// <value>true if frame is managed, else false.</value>
-        public abstract bool IsManaged { get; }
+        public abstract bool IsManaged
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns true if the frame is informational (i.e. informative/internal).
         /// </summary>
         /// <value>true if frame is informational, else false.</value>
-        public abstract bool IsInfoOnly { get; }
+        public abstract bool IsInfoOnly
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns source position for the frame or null if not available.
         /// </summary>
         /// <value>The Source Position.</value>
-        public abstract MDbgSourcePosition SourcePosition { get; }
+        public abstract MDbgSourcePosition SourcePosition
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns function whose code is executed in this frame.
         /// </summary>
         /// <value>The Function.</value>
-        public abstract MDbgFunction Function { get; }
+        public abstract MDbgFunction Function
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns next frame up the stack or null if topmost frame.
         /// </summary>
         /// <value>The next frame up.</value>
-        public abstract MDbgFrame NextUp { get; }
+        public abstract MDbgFrame NextUp
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns next frame down the stack or null if bottom frame.
         /// </summary>
         /// <value>The next frame up.</value>
-        public abstract MDbgFrame NextDown { get; }
+        public abstract MDbgFrame NextDown
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns a string that represents current frame
@@ -663,8 +795,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <returns>true if equal, else false.</returns>
         public static bool operator ==(MDbgFrame operand, MDbgFrame operand2)
         {
-            if (ReferenceEquals(operand, operand2))
+            if (Object.ReferenceEquals(operand, operand2))
                 return true;
+
+            // If both are null, then ReferenceEqual would return true.
+            // We still need to check if one is null and the other is non-null.
+            if (((object)operand == null) || ((object)operand2 == null))
+                return false;
+
             return operand.Equals(operand2);
         }
 
@@ -697,8 +835,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public abstract class MDbgFrameBase : MDbgFrame
     {
-        private readonly MDbgThread m_thread;
-
         /// <summary>
         /// Creates an instance of class MDbgFramebase.
         /// </summary>
@@ -715,7 +851,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Thread.</value>
         public override MDbgThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
 
         /// <summary>
@@ -724,7 +863,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The next frame up.</value>
         public override MDbgFrame NextUp
         {
-            get { return m_thread.m_stackWalker.GetFrame(m_thread.m_stackWalker.GetFrameIndex(this) + 1); }
+            get
+            {
+                return m_thread.m_stackWalker.GetFrame(m_thread.m_stackWalker.GetFrameIndex(this) + 1);
+            }
         }
 
         /// <summary>
@@ -733,7 +875,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The next frame up.</value>
         public override MDbgFrame NextDown
         {
-            get { return m_thread.m_stackWalker.GetFrame(m_thread.m_stackWalker.GetFrameIndex(this) - 1); }
+            get
+            {
+                return m_thread.m_stackWalker.GetFrame(m_thread.m_stackWalker.GetFrameIndex(this) - 1);
+            }
         }
 
         /// <summary>
@@ -746,6 +891,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         // Type parameter information.
+        private MDbgThread m_thread;
     }
 
     /// <summary>
@@ -753,9 +899,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public sealed class MDbgILFrame : MDbgFrameBase
     {
-        // @TODO - comment this
-        private readonly CorFrame m_frame;
-
         internal MDbgILFrame(MDbgThread thread, CorFrame frame)
             : base(thread)
         {
@@ -764,12 +907,36 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         /// <summary>
+        /// Determines if the wrapped object is equal to another.
+        /// </summary>
+        /// <param name="value">The object to compare to.</param>
+        /// <returns>true if equal, else false.</returns>
+        public override bool Equals(Object value)
+        {
+            if (!(value is MDbgILFrame))
+                return false;
+            return ((value as MDbgILFrame).m_frame == this.m_frame);
+        }
+
+        /// <summary>
+        /// Required to implement MarshalByRefObject.
+        /// </summary>
+        /// <returns>Hash Code.</returns>
+        public override int GetHashCode()
+        {
+            return m_frame.GetHashCode();
+        }
+
+        /// <summary>
         /// Returns cor-wrapper for frame or throws an exception if N/A.
         /// </summary>
         /// <value>The cor-wrapper for the frame.</value>
         public override CorFrame CorFrame
         {
-            get { return m_frame; }
+            get
+            {
+                return m_frame;
+            }
         }
 
         /// <summary>
@@ -778,7 +945,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>true if frame is managed, else false.</value>
         public override bool IsManaged
         {
-            get { return (m_frame.FrameType == CorFrameType.ILFrame); }
+            get
+            {
+                return (m_frame.FrameType == CorFrameType.ILFrame);
+            }
         }
 
         /// <summary>
@@ -795,7 +965,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 // However, once we implement debugging support for dynamic languages, 
                 // we should definitely consider unmarking them.
                 return ((m_frame.FrameType == CorFrameType.InternalFrame) ||
-                        (m_frame.FrameType == CorFrameType.NativeFrame));
+                         (m_frame.FrameType == CorFrameType.NativeFrame));
             }
         }
 
@@ -823,7 +993,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Function.</value>
         public override MDbgFunction Function
         {
-            get { return Thread.m_threadMgr.m_process.Modules.LookupFunction(m_frame.Function); }
+            get
+            {
+                return Thread.m_threadMgr.m_process.Modules.LookupFunction(m_frame.Function);
+            }
         }
 
         /// <summary>
@@ -840,32 +1013,26 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                MDbgFunction f = Function;
+                MDbgFunction f = this.Function;
                 CorClass c = f.CorFunction.Class;
 
                 Debug.Assert(TokenUtils.TypeFromToken(c.Token) == CorTokenType.mdtTypeDef);
 
                 // Check if we're the "global" class, in which case this is a global method, so return null.
-
-                //  global type should return NULL token,
-                // currently they are returning either 1 or 0 RID.
                 if (TokenUtils.RidFromToken(c.Token) == 1
-                    || TokenUtils.RidFromToken(c.Token) == 0)
+                     || TokenUtils.RidFromToken(c.Token) == 0)
                     return null;
-
 
                 // ICorDebug API lets us always pass ET_Class
                 CorElementType et = CorElementType.ELEMENT_TYPE_CLASS;
 
                 // Get type parameters.
                 IEnumerable typars = m_frame.TypeParameters;
-                //IEnumerator tyenum = typars.GetEnumerator();
 
-                MDbgModule module = Function.Module;
+                MDbgModule module = this.Function.Module;
                 int cNumTyParamsOnClass = module.Importer.CountGenericParams(c.Token);
 
-
-                var args = new CorType[cNumTyParamsOnClass];
+                CorType[] args = new CorType[cNumTyParamsOnClass];
                 int i = 0;
                 foreach (CorType arg in typars)
                 {
@@ -890,32 +1057,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                MDbgModule module = Function.Module;
-                CorClass c = Function.CorFunction.Class;
+                MDbgModule module = this.Function.Module;
+                CorClass c = this.Function.CorFunction.Class;
                 int cNumTyParamsOnClass = module.Importer.CountGenericParams(c.Token);
                 return m_frame.GetTypeParamEnumWithSkip(cNumTyParamsOnClass);
             }
-        }
-
-        /// <summary>
-        /// Determines if the wrapped object is equal to another.
-        /// </summary>
-        /// <param name="value">The object to compare to.</param>
-        /// <returns>true if equal, else false.</returns>
-        public override bool Equals(Object value)
-        {
-            if (!(value is MDbgILFrame))
-                return false;
-            return ((value as MDbgILFrame).m_frame == m_frame);
-        }
-
-        /// <summary>
-        /// Required to implement MarshalByRefObject.
-        /// </summary>
-        /// <returns>Hash Code.</returns>
-        public override int GetHashCode()
-        {
-            return m_frame.GetHashCode();
         }
 
         /// <summary>
@@ -941,19 +1087,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                         string filePath = sl.Path;
                         if (!Thread.m_threadMgr.m_process.m_engine.Options.ShowFullPaths)
                             filePath = Path.GetFileName(sl.Path);
-                        sp = " (" + filePath + ":" + sl.Line.ToString(CultureInfo.CurrentUICulture) + ")";
+                        sp = " (" + filePath + ":" + sl.Line.ToString(System.Globalization.CultureInfo.CurrentUICulture) + ")";
                     }
                     else
                         sp = " (source line information unavailable)";
 
-                    var sbFuncName = new StringBuilder();
+                    StringBuilder sbFuncName = new StringBuilder();
 
-                    MDbgModule module = Function.Module;
+                    MDbgModule module = this.Function.Module;
                     MDbgProcess proc = Thread.m_threadMgr.m_process;
 
 
                     // Get class name w/ generic args.
-                    CorType tClass = FunctionType;
+                    CorType tClass = this.FunctionType;
                     if (tClass != null)
                         InternalUtil.PrintCorType(sbFuncName, proc, tClass);
 
@@ -961,9 +1107,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
 
                     // Get method name w/ generic args.
-                    MethodInfo mi = Function.MethodInfo;
+                    MethodInfo mi = this.Function.MethodInfo;
                     sbFuncName.Append(mi.Name);
-                    InternalUtil.AddGenericArgs(sbFuncName, proc, FunctionTypeParameters);
+                    InternalUtil.AddGenericArgs(sbFuncName, proc, this.FunctionTypeParameters);
 
 
                     string stFuncName = sbFuncName.ToString();
@@ -973,14 +1119,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                         CorModule m = module.CorModule;
                         // verbose frame output
                         // in verbose output we'll print module name + arguments to the functions
-                        var sb = new StringBuilder();
+                        StringBuilder sb = new StringBuilder();
                         bool bFirst = true;
-                        foreach (MDbgValue v in Function.GetArguments(this))
+                        foreach (MDbgValue v in this.Function.GetArguments(this))
                         {
                             if (sb.Length != 0)
                                 sb.Append(", ");
                             // skip this references
-                            if (! (bFirst && v.Name == "this"))
+                            if (!(bFirst && v.Name == "this"))
                                 sb.Append(v.Name).Append("=").Append(v.GetStringValue(0));
                             bFirst = false;
                         }
@@ -991,12 +1137,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                         }
                         else
                         {
-                            fn = Path.GetFileName(m.Name);
+                            fn = System.IO.Path.GetFileName(m.Name);
                         }
 
-                        MDbgAppDomain ad = Thread.m_threadMgr.m_process.AppDomains.Lookup(m.Assembly.AppDomain);
+                        MDbgAppDomain ad = this.Thread.m_threadMgr.m_process.AppDomains.Lookup(m.Assembly.AppDomain);
                         fn += "#" + ad.Number
-                              + "!" + stFuncName + "(" + sb + ") " + sp;
+                            + "!" + stFuncName + "(" + sb.ToString() + ") " + sp;
                     }
                     else
                     {
@@ -1030,6 +1176,18 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                         case CorDebugInternalFrameType.STUBFRAME_INTERNALCALL:
                             fn = "InternalCall";
                             break;
+                case CorDebugInternalFrameType.STUBFRAME_CLASS_INIT:
+                    fn = "ClassInit";
+                    break;
+                case CorDebugInternalFrameType.STUBFRAME_EXCEPTION:
+                    fn = "Exception";
+                    break;
+                case CorDebugInternalFrameType.STUBFRAME_SECURITY:
+                    fn = "Security";
+                    break;
+                case CorDebugInternalFrameType.STUBFRAME_JIT_COMPILATION:
+                    fn = "JitCompilation";
+                    break;
                         default:
                             fn = "UNKNOWN";
                             break;
@@ -1044,5 +1202,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         // Type parameter information.
+        private CorFrame m_frame;
     }
 }

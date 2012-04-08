@@ -5,22 +5,10 @@
 //---------------------------------------------------------------------
 using System;
 using System.Diagnostics;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using CorAppDomain=O2.Debugger.Mdbg.Debugging.CorDebug.CorAppDomain;
-using CorAssembly=O2.Debugger.Mdbg.Debugging.CorDebug.CorAssembly;
-using CorClass=O2.Debugger.Mdbg.Debugging.CorDebug.CorClass;
-using CorEval=O2.Debugger.Mdbg.Debugging.CorDebug.CorEval;
-using CorFrame=O2.Debugger.Mdbg.Debugging.CorDebug.CorFrame;
-using CorFunction=O2.Debugger.Mdbg.Debugging.CorDebug.CorFunction;
-using CorStepper=O2.Debugger.Mdbg.Debugging.CorDebug.CorStepper;
-using CorThread=O2.Debugger.Mdbg.Debugging.CorDebug.CorThread;
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// Abstract Builtin Stop Reason class to make additional stop reasons.
@@ -61,16 +49,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class StepCompleteStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorStepper m_stepper;
-        private readonly CorDebugStepReason m_stepReason;
-
         /// <summary>
         /// Create a new instance of the StepCompleteStopReason class.
         /// </summary>
         /// <param name="stepper">The stepper that has stepped.</param>
         /// <param name="stepReason">The reason that the stepper stepped.</param>
         [CLSCompliant(false)]
-        public StepCompleteStopReason(CorDebug.CorStepper stepper, CorDebugStepReason stepReason)
+        public StepCompleteStopReason(CorStepper stepper, CorDebugStepReason stepReason)
         {
             Debug.Assert(stepper != null);
             m_stepReason = stepReason;
@@ -84,17 +69,26 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         [CLSCompliant(false)]
         public CorDebugStepReason StepReason
         {
-            get { return m_stepReason; }
+            get
+            {
+                return m_stepReason;
+            }
         }
 
         /// <summary>
         /// The stepper that stepped.
         /// </summary>
         /// <value>The stepper.</value>
-        public CorDebug.CorStepper Stepper
+        public CorStepper Stepper
         {
-            get { return m_stepper; }
+            get
+            {
+                return m_stepper;
+            }
         }
+
+        private CorDebugStepReason m_stepReason;
+        private CorStepper m_stepper;
     }
 
     /// <summary>
@@ -109,8 +103,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class ThreadCreatedStopReason : BuiltInStopReason
     {
-        private readonly MDbgThread m_thread;
-
         /// <summary>
         /// Create a new instance of the ThreadCreatedStopReason class.
         /// </summary>
@@ -120,15 +112,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             Debug.Assert(thread != null);
             m_thread = thread;
         }
-
         /// <summary>
         /// The thread that got created.
         /// </summary>
         /// <value>The thread.</value>
         public MDbgThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
+
+        private MDbgThread m_thread;
     }
 
     /// <summary>
@@ -136,8 +132,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class BreakpointHitStopReason : BuiltInStopReason
     {
-        private readonly MDbgBreakpoint m_breakpoint;
-
         /// <summary>
         /// Create a new instance of the BreakpointHitStopReason class.
         /// </summary>
@@ -154,8 +148,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Breakpoint.</value>
         public MDbgBreakpoint Breakpoint
         {
-            get { return m_breakpoint; }
+            get
+            {
+                return m_breakpoint;
+            }
         }
+
+        private MDbgBreakpoint m_breakpoint;
     }
 
     /// <summary>
@@ -163,8 +162,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class ModuleLoadedStopReason : BuiltInStopReason
     {
-        private readonly MDbgModule m_module;
-
         /// <summary>
         /// Create a new instance of the ModuleLoadedStopReason class.
         /// </summary>
@@ -174,15 +171,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             Debug.Assert(managedModule != null);
             m_module = managedModule;
         }
-
         /// <summary>
         /// The Module that got loaded.
         /// </summary>
         /// <value>The Module.</value>
         public MDbgModule Module
         {
-            get { return m_module; }
+            get
+            {
+                return m_module;
+            }
         }
+
+        private MDbgModule m_module;
     }
 
     /// <summary>
@@ -190,13 +191,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class ClassLoadedStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorClass m_class;
-
         /// <summary>
         /// Create a new instance of the ClassLoadedStopReason class.
         /// </summary>
         /// <param name="managedClass">The class that has been loaded.</param>
-        public ClassLoadedStopReason(CorDebug.CorClass managedClass)
+        public ClassLoadedStopReason(CorClass managedClass)
         {
             Debug.Assert(managedClass != null);
             m_class = managedClass;
@@ -206,10 +205,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// The Class that got loaded.
         /// </summary>
         /// <value>The Class.</value>
-        public CorDebug.CorClass Class
+        public CorClass Class
         {
-            get { return m_class; }
+            get
+            {
+                return m_class;
+            }
         }
+
+        private CorClass m_class;
     }
 
     /// <summary>
@@ -224,13 +228,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class AssemblyLoadedStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorAssembly m_assembly;
-
         /// <summary>
         /// Create a new instance of the AssemblyLoadedStopReason class.
         /// </summary>
         /// <param name="assembly">The assembly that has been loaded.</param>
-        public AssemblyLoadedStopReason(CorDebug.CorAssembly assembly)
+        public AssemblyLoadedStopReason(CorAssembly assembly)
         {
             Debug.Assert(assembly != null);
             m_assembly = assembly;
@@ -240,10 +242,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// The Assembly that has been loaded.
         /// </summary>
         /// <value>The Assembly.</value>
-        public CorDebug.CorAssembly Assembly
+        public CorAssembly Assembly
         {
-            get { return m_assembly; }
+            get
+            {
+                return m_assembly;
+            }
         }
+
+        private CorAssembly m_assembly;
     }
 
     /// <summary>
@@ -265,10 +272,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class ExceptionUnwindStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorAppDomain m_appDomain;
-        private readonly CorDebugExceptionUnwindCallbackType m_eventtype;
-        private readonly int m_flags;
-        private readonly CorDebug.CorThread m_thread;
 
         /// <summary>
         /// Create a new instance of the ExceptionUnwindStopReason class.
@@ -278,9 +281,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="eventType">Reason for the notification.</param>
         /// <param name="flags">Flags passed to the exception callback.</param>
         [CLSCompliant(false)]
-        public ExceptionUnwindStopReason(CorDebug.CorAppDomain appDomain, CorDebug.CorThread thread,
-                                         CorDebugExceptionUnwindCallbackType eventType, int flags)
-
+        public ExceptionUnwindStopReason(CorAppDomain appDomain, CorThread thread,
+                                           CorDebugExceptionUnwindCallbackType eventType, int flags)
         {
             m_appDomain = appDomain;
             m_thread = thread;
@@ -292,18 +294,24 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// AppDomain where exception occured.
         /// </summary>
         /// <value></value>
-        public CorDebug.CorAppDomain AppDomain
+        public CorAppDomain AppDomain
         {
-            get { return m_appDomain; }
+            get
+            {
+                return m_appDomain;
+            }
         }
 
         /// <summary>
         /// Thread where exception occured.
         /// </summary>
         /// <value></value>
-        public CorDebug.CorThread Thread
+        public CorThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
 
         /// <summary>
@@ -313,7 +321,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         [CLSCompliant(false)]
         public CorDebugExceptionUnwindCallbackType EventType
         {
-            get { return m_eventtype; }
+            get
+            {
+                return m_eventtype;
+            }
         }
 
         /// <summary>
@@ -322,8 +333,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value></value>
         public int Flags
         {
-            get { return m_flags; }
+            get
+            {
+                return m_flags;
+            }
         }
+        private CorAppDomain m_appDomain;
+        private CorThread m_thread;
+        private CorDebugExceptionUnwindCallbackType m_eventtype;
+        private int m_flags;
     }
 
     /// <summary>
@@ -331,14 +349,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class ExceptionThrownStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorAppDomain m_appDomain;
-        private readonly CorDebugExceptionCallbackType m_eventtype;
-        private readonly bool m_exceptionEnhancedOn;
-        private readonly int m_flags;
-        private readonly CorDebug.CorFrame m_frame;
-        private readonly int m_offset;
-        private readonly CorDebug.CorThread m_thread;
-
         /// <summary>
         /// Create a new instance of the ExceptionThrownStopReason class.
         /// </summary>
@@ -349,8 +359,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="eventType">Reason for the notification.</param>
         /// <param name="flags">Flags passed to the exception callback.</param>
         [CLSCompliant(false)]
-        public ExceptionThrownStopReason(CorDebug.CorAppDomain appDomain, CorDebug.CorThread thread, CorDebug.CorFrame frame,
-                                         int offset, CorDebugExceptionCallbackType eventType, int flags)
+        public ExceptionThrownStopReason(CorAppDomain appDomain, CorThread thread, CorFrame frame,
+                                           int offset, CorDebugExceptionCallbackType eventType, int flags)
         {
             m_appDomain = appDomain;
             m_thread = thread;
@@ -372,9 +382,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="exceptionEnhancedOn">Whether or not Exception Enhanced has been turned
         /// on by the user for this exception.</param>
         [CLSCompliant(false)]
-        public ExceptionThrownStopReason(CorDebug.CorAppDomain appDomain, CorDebug.CorThread thread, CorDebug.CorFrame frame,
-                                         int offset, CorDebugExceptionCallbackType eventType, int flags,
-                                         bool exceptionEnhancedOn)
+        public ExceptionThrownStopReason(CorAppDomain appDomain, CorThread thread, CorFrame frame,
+                                           int offset, CorDebugExceptionCallbackType eventType, int flags,
+                                           bool exceptionEnhancedOn)
         {
             m_appDomain = appDomain;
             m_thread = thread;
@@ -389,27 +399,36 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// AppDomain where exception occured.
         /// </summary>
         /// <value></value>
-        public CorDebug.CorAppDomain AppDomain
+        public CorAppDomain AppDomain
         {
-            get { return m_appDomain; }
+            get
+            {
+                return m_appDomain;
+            }
         }
 
         /// <summary>
         /// Thread where exception occured.
         /// </summary>
         /// <value></value>
-        public CorDebug.CorThread Thread
+        public CorThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
 
         /// <summary>
         ///  The Frame where the exception was thrown.
         /// </summary>
         /// <value>The Frame.</value>
-        public CorDebug.CorFrame Frame
+        public CorFrame Frame
         {
-            get { return m_frame; }
+            get
+            {
+                return m_frame;
+            }
         }
 
         /// <summary>
@@ -418,7 +437,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Offset.</value>
         public int Offset
         {
-            get { return m_offset; }
+            get
+            {
+                return m_offset;
+            }
         }
 
         /// <summary>
@@ -428,7 +450,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         [CLSCompliant(false)]
         public CorDebugExceptionCallbackType EventType
         {
-            get { return m_eventtype; }
+            get
+            {
+                return m_eventtype;
+            }
         }
 
         /// <summary>
@@ -437,7 +462,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Flags.</value>
         public int Flags
         {
-            get { return m_flags; }
+            get
+            {
+                return m_flags;
+            }
         }
 
         /// <summary>
@@ -446,8 +474,19 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         public bool ExceptionEnhancedOn
         {
-            get { return m_exceptionEnhancedOn; }
+            get
+            {
+                return m_exceptionEnhancedOn;
+            }
         }
+
+        private CorAppDomain m_appDomain;
+        private CorThread m_thread;
+        private CorFrame m_frame;
+        private int m_offset;
+        private CorDebugExceptionCallbackType m_eventtype;
+        private int m_flags;
+        private bool m_exceptionEnhancedOn;
     }
 
     /// <summary>
@@ -465,8 +504,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="eventType">Reason for the notification.</param>
         /// <param name="flags">Flags passed to the exception callback.</param>
         [CLSCompliant(false)]
-        public UnhandledExceptionThrownStopReason(CorDebug.CorAppDomain appDomain, CorDebug.CorThread thread, CorDebug.CorFrame frame,
-                                                  int offset, CorDebugExceptionCallbackType eventType, int flags)
+        public UnhandledExceptionThrownStopReason(CorAppDomain appDomain, CorThread thread, CorFrame frame,
+                                                    int offset, CorDebugExceptionCallbackType eventType, int flags)
             : base(appDomain, thread, frame, offset, eventType, flags)
         {
         }
@@ -500,13 +539,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     {
         // extensions might want to use this command stop reason 
         // to signal finish of custom func-eval
-        private readonly CorDebug.CorEval m_eval;
-
         /// <summary>
         /// Creates a new instance of the EvalCompleteStopReason object.
         /// </summary>
         /// <param name="eval">The Function Evaluation that has completed.</param>
-        public EvalCompleteStopReason(CorDebug.CorEval eval)
+        public EvalCompleteStopReason(CorEval eval)
         {
             Debug.Assert(eval != null);
             m_eval = eval;
@@ -516,10 +553,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// The Function Evaluation that has completed.
         /// </summary>
         /// <value>The Function Evaluation.</value>
-        public CorDebug.CorEval Eval
+        public CorEval Eval
         {
-            get { return m_eval; }
+            get
+            {
+                return m_eval;
+            }
         }
+
+        private CorEval m_eval;
     }
 
     /// <summary>
@@ -533,7 +575,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// Creates a new instance of the EvalExceptionStopReason object.
         /// </summary>
         /// <param name="eval">The Function Evaluation that caused the exception.</param>
-        public EvalExceptionStopReason(CorDebug.CorEval eval)
+        public EvalExceptionStopReason(CorEval eval)
             : base(eval)
         {
         }
@@ -544,12 +586,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class RemapOpportunityReachedStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorAppDomain m_appDomain;
-        private readonly CorDebug.CorFunction m_newFunction;
-        private readonly CorDebug.CorFunction m_oldFunction;
-        private readonly int m_oldILOffset;
-        private readonly CorDebug.CorThread m_thread;
-
         /// <summary>
         /// Create a new instance of the RemapOpportunityReachedStopReason class.
         /// </summary>
@@ -559,10 +595,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="newFunction">The latest version of function we are remapping to.</param>
         /// <param name="oldILOffset">The IL-offset of location in old function we're remaping from.</param>
         [CLSCompliant(false)]
-        public RemapOpportunityReachedStopReason(CorDebug.CorAppDomain appDomain,
-                                                 CorDebug.CorThread thread,
-                                                 CorDebug.CorFunction oldFunction,
-                                                 CorDebug.CorFunction newFunction,
+        public RemapOpportunityReachedStopReason(CorAppDomain appDomain,
+                                                 CorThread thread,
+                                                 CorFunction oldFunction,
+                                                 CorFunction newFunction,
                                                  int oldILOffset)
         {
             Debug.Assert(appDomain != null);
@@ -580,36 +616,48 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// The AppDomain where the remap opportunity is.
         /// </summary>
         /// <value>The AppDomain.</value>
-        public CorDebug.CorAppDomain AppDomain
+        public CorAppDomain AppDomain
         {
-            get { return m_appDomain; }
+            get
+            {
+                return m_appDomain;
+            }
         }
 
         /// <summary>
         /// The Thread where the remap opportunity is.
         /// </summary>
         /// <value>The Thread.</value>
-        public CorDebug.CorThread Thread
+        public CorThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
 
         /// <summary>
         /// The Old Function before the remap.
         /// </summary>
         /// <value>The Old Function.</value>
-        public CorDebug.CorFunction OldFunction
+        public CorFunction OldFunction
         {
-            get { return m_oldFunction; }
+            get
+            {
+                return m_oldFunction;
+            }
         }
 
         /// <summary>
         /// The New Function after the remap.
         /// </summary>
         /// <value>The New Function.</value>
-        public CorDebug.CorFunction NewFunction
+        public CorFunction NewFunction
         {
-            get { return m_newFunction; }
+            get
+            {
+                return m_newFunction;
+            }
         }
 
         /// <summary>
@@ -618,8 +666,16 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Old IL Offset.</value>
         public int OldILOffset
         {
-            get { return m_oldILOffset; }
+            get
+            {
+                return m_oldILOffset;
+            }
         }
+
+        private CorAppDomain m_appDomain;
+        private CorThread m_thread;
+        private CorFunction m_oldFunction, m_newFunction;
+        private int m_oldILOffset;
     }
 
     /// <summary>
@@ -627,19 +683,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class FunctionRemapCompleteStopReason : BuiltInStopReason
     {
-        private readonly CorDebug.CorAppDomain m_appDomain;
-        private readonly CorDebug.CorFunction m_function;
-        private readonly CorDebug.CorThread m_thread;
-
         /// <summary>
         /// Create a new instance of the FunctionRemapCompleteStopReason class.
         /// </summary>
         /// <param name="appDomain">The appDomain where remapping is occuring.</param>
         /// <param name="thread">The thread on which the remapping is occuring.</param>
         /// <param name="managedFunction">The version of function the debugger remapped to.</param>
-        public FunctionRemapCompleteStopReason(CorDebug.CorAppDomain appDomain,
-                                               CorDebug.CorThread thread,
-                                               CorDebug.CorFunction managedFunction)
+        public FunctionRemapCompleteStopReason(CorAppDomain appDomain,
+                                                 CorThread thread,
+                                                 CorFunction managedFunction)
         {
             Debug.Assert(appDomain != null);
             Debug.Assert(thread != null);
@@ -653,28 +705,41 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// The AppDomain of the Function Remap.
         /// </summary>
         /// <value>The AppDomain.</value>
-        public CorDebug.CorAppDomain AppDomain
+        public CorAppDomain AppDomain
         {
-            get { return m_appDomain; }
+            get
+            {
+                return m_appDomain;
+            }
         }
 
         /// <summary>
         /// The Thread of the Function Remap.
         /// </summary>
         /// <value>The Thread.</value>
-        public CorDebug.CorThread Thread
+        public CorThread Thread
         {
-            get { return m_thread; }
+            get
+            {
+                return m_thread;
+            }
         }
 
         /// <summary>
         /// The Function that got remapped.
         /// </summary>
         /// <value>The Function.</value>
-        public CorDebug.CorFunction Function
+        public CorFunction Function
         {
-            get { return m_function; }
+            get
+            {
+                return m_function;
+            }
         }
+
+        private CorAppDomain m_appDomain;
+        private CorThread m_thread;
+        private CorFunction m_function;
     }
 
     /// <summary>
@@ -687,12 +752,18 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <summary>
         /// Get name for category of this message.
         /// </summary>        
-        public abstract string Name { get; }
+        public abstract string Name
+        {
+            get;
+        }
 
         /// <summary>
         /// Get detailed message string.
         /// </summary>
-        public abstract string Message { get; }
+        public abstract string Message
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns more detailed information about stop reason.
@@ -708,9 +779,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class LogMessageStopReason : MessageStopReason
     {
-        private readonly string m_message;
-        private readonly string m_switchName;
-
         /// <summary>
         /// Create a new instance of the LogMessageStopReason class.
         /// </summary>
@@ -730,7 +798,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Message.</value>
         public override string Message
         {
-            get { return m_message; }
+            get
+            {
+                return m_message;
+            }
         }
 
         /// <summary>
@@ -739,9 +810,14 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The SwitchName.</value>
         public string SwitchName
         {
-            get { return m_switchName; }
+            get
+            {
+                return m_switchName;
+            }
         }
 
+        private string m_switchName;
+        private string m_message;
         /// <summary>
         /// Get name for category of this message.
         /// </summary>        
@@ -749,6 +825,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get { return SwitchName; }
         }
+
     }
 
     /// <summary>
@@ -756,17 +833,16 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public class MDANotificationStopReason : MessageStopReason
     {
-        private readonly CorDebug.CorMDA m_mda;
-
         /// <summary>
         /// Create a new instance of the MDANotificationStopReason class.
         /// </summary>
         /// <param name="mda">Generated MDA notification.</param>
-        public MDANotificationStopReason(CorDebug.CorMDA mda)
+        public MDANotificationStopReason(CorMDA mda)
         {
             Debug.Assert(mda != null);
             m_mda = mda;
         }
+        CorMDA m_mda;
 
         /// <summary>
         /// The Message that got logged.
@@ -774,7 +850,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Message.</value>
         public override string Message
         {
-            get { return m_mda.Description; }
+            get
+            {
+                return m_mda.Description;
+            }
         }
 
         /// <summary>
@@ -794,16 +873,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
     }
 
-
     /// <summary>
     /// In Raw Mode, all stop reasons are the same and this is what they are called.
     /// You may then decide for yourself what to do about the stop event.
     /// </summary>
     public class RawModeStopReason : BuiltInStopReason
     {
-        private readonly CorEventArgs m_callbackArgs;
-        private readonly ManagedCallbackType m_callbackType;
-
         internal RawModeStopReason(ManagedCallbackType callbackType, CorEventArgs callbackArgs)
         {
             Debug.Assert(callbackArgs != null);
@@ -816,7 +891,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         public ManagedCallbackType Callback
         {
-            get { return m_callbackType; }
+            get
+            {
+                return m_callbackType;
+            }
         }
 
         /// <summary>
@@ -824,24 +902,49 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         public CorEventArgs Arguments
         {
-            get { return m_callbackArgs; }
+            get
+            {
+                return m_callbackArgs;
+            }
         }
+
+        private ManagedCallbackType m_callbackType;
+        private CorEventArgs m_callbackArgs;
     }
 
     /// <summary>
-    /// The Debugger has encountered an Error.
+    /// The Debugger has encountered an unrecoverable error, i.e. from a 
+    /// ICorDebugManagedCallback::DebuggerError callback.
     /// </summary>
     public class DebuggerErrorStopReason : BuiltInStopReason
     {
+        /// <summary>
+        /// Create a DebuggerErrorStopReason
+        /// </summary>
+        /// <param name="hresult">The hresult representing the reason for the error.</param>
+        public DebuggerErrorStopReason(int hresult)
+        {
+            m_hr = hresult;
+        }
+
+        /// <summary>
+        /// Create a string representation of the error, including any information available about the hresult
+        /// </summary>
+        /// <returns>The descriptive error message</returns>
+        public override string ToString()
+        {
+            string hrMsg = System.Runtime.InteropServices.Marshal.GetExceptionForHR(m_hr).Message;
+            return "Debugger Error: " + hrMsg;
+        }
+
+        private int m_hr;
     }
 
     /// <summary>
     /// Mdbg has encountered an Error.
     /// </summary>
-    public class MDbgErrorStopReason : DebuggerErrorStopReason
+    public class MDbgErrorStopReason : BuiltInStopReason
     {
-        private readonly Exception m_exception;
-
         /// <summary>
         /// Create a new instance of the MDbgErrorStopReason class.
         /// </summary>
@@ -858,7 +961,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The Exception.</value>
         public Exception ExceptionThrown
         {
-            get { return m_exception; }
+            get
+            {
+                return m_exception;
+            }
         }
+
+        Exception m_exception;
     }
+
 }

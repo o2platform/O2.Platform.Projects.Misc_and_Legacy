@@ -4,33 +4,39 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
+using System.IO;
 using System.Collections;
 using System.Diagnostics;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
+using System.Globalization;
+using System.Diagnostics.SymbolStore;
+using System.Runtime.InteropServices;
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata;
+
+
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
     /// <summary>
     /// Contains a collection of appdomains created in debugged program.
     /// </summary>
     public sealed class MDbgAppDomainCollection : MarshalByRefObject, IEnumerable
     {
-        private readonly Hashtable m_items = new Hashtable();
-        private readonly MDbgProcess m_process;
-        private int m_freeAppDomainNumber;
-
-        internal MDbgAppDomainCollection(MDbgProcess process)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            Debug.Assert(process != null);
-            m_process = process;
+            MDbgAppDomain[] ret = new MDbgAppDomain[m_items.Count];
+            m_items.Values.CopyTo(ret,0);
+            Array.Sort(ret);
+            return ret.GetEnumerator();
         }
-
+        
         /// <value>Number of appdomains in the collection</value>
         public int Count
         {
-            get { return m_items.Count; }
+            get
+            {
+                return m_items.Count;
+            }
         }
 
         /// <summary>
@@ -47,11 +53,11 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             get
             {
                 MDbgAppDomain appDomain = null;
-                foreach (MDbgAppDomain ad in m_items.Values)
+                foreach(MDbgAppDomain ad in m_items.Values)
                 {
-                    if (String.Compare(ad.CorAppDomain.Name, appDomainName) == 0)
+                    if(String.Compare(ad.CorAppDomain.Name,appDomainName)==0)
                     {
-                        if (appDomain == null)
+                        if(appDomain==null)
                             appDomain = ad;
                         else
                             throw new MDbgAmbiguousModuleNameException();
@@ -71,9 +77,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             get
             {
                 MDbgAppDomain appDomain = null;
-                foreach (MDbgAppDomain ad in m_items.Values)
+                foreach(MDbgAppDomain ad in m_items.Values)
                 {
-                    if (ad.Number == appDomainNumber)
+                    if( ad.Number == appDomainNumber )
                     {
                         appDomain = ad;
                         break;
@@ -83,33 +89,27 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             }
         }
 
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            var ret = new MDbgAppDomain[m_items.Count];
-            m_items.Values.CopyTo(ret, 0);
-            Array.Sort(ret);
-            return ret.GetEnumerator();
-        }
-
-        #endregion
-
         /// <summary>
         /// Locates MDbgAppDomain object from CorAppDomain object.
         /// </summary>
         /// <param name="appDomain">appDomain object from CorXXX layer.</param>
         /// <returns>MdbgAppDomain object</returns>
-        public MDbgAppDomain Lookup(CorDebug.CorAppDomain appDomain)
+        public MDbgAppDomain Lookup(CorAppDomain appDomain)
         {
-            return (MDbgAppDomain) m_items[appDomain];
+            return (MDbgAppDomain)m_items[appDomain];
         }
 
 
-        internal MDbgAppDomain Register(CorDebug.CorAppDomain appDomain)
+        internal MDbgAppDomainCollection(MDbgProcess process)
+        {
+            Debug.Assert(process!=null);
+            m_process = process;
+        }
+
+        internal MDbgAppDomain Register(CorAppDomain appDomain)
         {
             MDbgAppDomain mdbgAppDomain;
-
+            
             // appdomains may get registered mutliple times if we get a fake-attach event right before a real event.
             if (!m_items.Contains(appDomain))
             {
@@ -120,11 +120,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return (MDbgAppDomain) m_items[appDomain];
         }
 
-        internal void Unregister(CorDebug.CorAppDomain appDomain)
+        internal void Unregister(CorAppDomain appDomain)
         {
             Debug.Assert(m_items.ContainsKey(appDomain));
             m_items.Remove(appDomain);
         }
+
+        private Hashtable m_items = new Hashtable();
+        private MDbgProcess m_process;
+        private int m_freeAppDomainNumber=0;
     }
 
     /// <summary>
@@ -132,33 +136,26 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public sealed class MDbgAppDomain : MarshalByRefObject, IComparable
     {
-        private readonly CorDebug.CorAppDomain m_appDomain;
-        private readonly int m_number;
-        private readonly MDbgProcess m_process;
-
-        internal MDbgAppDomain(MDbgProcess process, CorDebug.CorAppDomain appDomain, int number)
-        {
-            Debug.Assert(process != null);
-            Debug.Assert(appDomain != null);
-            m_process = process;
-            m_appDomain = appDomain;
-            m_number = number;
-        }
-
         /// <value>
         ///     Process in which current appdomain exists.
         /// </value>
         public MDbgProcess Process
         {
-            get { return m_process; }
+            get
+            {
+                return m_process;
+            }
         }
-
+        
         /// <value>
         ///     CorXXX object for the AppDomain.
         /// </value>
         public CorAppDomain CorAppDomain
         {
-            get { return m_appDomain; }
+            get
+            {
+                return m_appDomain;
+            }
         }
 
         /// <summary>
@@ -173,16 +170,28 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </value>
         public int Number
         {
-            get { return m_number; }
+            get
+            {
+                return m_number;
+            }
         }
 
-        #region IComparable Members
+        internal MDbgAppDomain(MDbgProcess process,CorAppDomain appDomain,int number)
+        {
+            Debug.Assert(process!=null);
+            Debug.Assert(appDomain!=null);
+            m_process = process;
+            m_appDomain = appDomain;
+            m_number = number;
+        }
 
         int IComparable.CompareTo(object obj)
         {
-            return Number - (obj as MDbgAppDomain).Number;
+            return this.Number - (obj as MDbgAppDomain).Number;
         }
 
-        #endregion
+        private int m_number;
+        private MDbgProcess m_process;
+        private CorAppDomain m_appDomain;
     }
 }

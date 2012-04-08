@@ -6,15 +6,16 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics;
-using System.Diagnostics.SymbolStore;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System.Diagnostics.SymbolStore;
+
+
+    using System;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+
     [
         ComImport,
         Guid("ED14AA72-78E2-4884-84E2-334293AE5214"),
@@ -24,10 +25,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     internal interface ISymUnmanagedWriter
     {
         void DefineDocument([MarshalAs(UnmanagedType.LPWStr)] String url,
-                            ref Guid language,
-                            ref Guid languageVendor,
-                            ref Guid documentType,
-                            [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
+                                 ref Guid language,
+                                 ref Guid languageVendor,
+                                 ref Guid documentType,
+                                 [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
 
         void SetUserEntryPoint(SymbolToken entryMethod);
 
@@ -36,58 +37,58 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         void CloseMethod();
 
         void OpenScope(int startOffset,
-                       out int pRetVal);
+                           out int pRetVal);
 
         void CloseScope(int endOffset);
 
         void SetScopeRange(int scopeID,
-                           int startOffset,
-                           int endOffset);
+                                int startOffset,
+                                int endOffset);
 
         void DefineLocalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                 int attributes,
-                                 int cSig,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
-                                 int addressKind,
-                                 int addr1,
-                                 int addr2,
-                                 int addr3,
-                                 int startOffset,
-                                 int endOffset);
+                                    int attributes,
+                                    int cSig,
+                                    [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
+                                    int addressKind,
+                                    int addr1,
+                                    int addr2,
+                                    int addr3,
+                                    int startOffset,
+                                    int endOffset);
 
         void DefineParameter([MarshalAs(UnmanagedType.LPWStr)] String name,
-                             int attributes,
-                             int sequence,
-                             int addressKind,
-                             int addr1,
-                             int addr2,
-                             int addr3);
+                                int attributes,
+                                int sequence,
+                                int addressKind,
+                                int addr1,
+                                int addr2,
+                                int addr3);
 
         void DefineField(SymbolToken parent,
-                         [MarshalAs(UnmanagedType.LPWStr)] String name,
-                         int attributes,
-                         int cSig,
-                         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
-                         int addressKind,
-                         int addr1,
-                         int addr2,
-                         int addr3);
+                          [MarshalAs(UnmanagedType.LPWStr)] String name,
+                          int attributes,
+                          int cSig,
+                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
+                          int addressKind,
+                          int addr1,
+                          int addr2,
+                          int addr3);
 
         void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                  int attributes,
-                                  int cSig,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
-                                  int addressKind,
-                                  int addr1,
-                                  int addr2,
-                                  int addr3);
+                                     int attributes,
+                                     int cSig,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
+                                     int addressKind,
+                                     int addr1,
+                                     int addr2,
+                                     int addr3);
 
         void Close();
 
         void SetSymAttribute(SymbolToken parent,
-                             [MarshalAs(UnmanagedType.LPWStr)] String name,
-                             int cData,
-                             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
+                                [MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int cData,
+                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
 
         void OpenNamespace([MarshalAs(UnmanagedType.LPWStr)] String name);
 
@@ -96,45 +97,46 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         void UsingNamespace([MarshalAs(UnmanagedType.LPWStr)] String fullName);
 
         void SetMethodSourceRange(ISymUnmanagedDocumentWriter startDoc,
-                                  int startLine,
-                                  int startColumn,
-                                  ISymUnmanagedDocumentWriter endDoc,
-                                  int endLine,
-                                  int endColumn);
+                                     int startLine,
+                                     int startColumn,
+                                     ISymUnmanagedDocumentWriter endDoc,
+                                     int endLine,
+                                     int endColumn);
 
         void Initialize(IntPtr emitter,
-                        [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                        IStream stream,
-                        Boolean fullBuild);
+                       [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                       IStream stream,
+                       Boolean fullBuild);
 
         void GetDebugInfo(out ImageDebugDirectory iDD,
-                          int cData,
-                          out int pcData,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
+                             int cData,
+                             out int pcData,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
 
         void DefineSequencePoints(ISymUnmanagedDocumentWriter document,
-                                  int spCount,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
-                                  [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
+                                     int spCount,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
 
         void RemapToken(SymbolToken oldToken,
-                        SymbolToken newToken);
+                             SymbolToken newToken);
 
         void Initialize2(IntPtr emitter,
-                         [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
-                         IStream stream,
-                         Boolean fullBuild,
-                         [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
+                        [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
+                        IStream stream,
+                        Boolean fullBuild,
+                        [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
 
         void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
-                            Object value,
-                            int cSig,
-                            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
+                               Object value,
+                               int cSig,
+                               [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
 
         void Abort();
+
     }
 
 
@@ -148,10 +150,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     {
         // ISymUnmanagedWriter interfaces (need to define the base interface methods also, per COM interop requirements)
         new void DefineDocument([MarshalAs(UnmanagedType.LPWStr)] String url,
-                                ref Guid language,
-                                ref Guid languageVendor,
-                                ref Guid documentType,
-                                [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
+                                     ref Guid language,
+                                     ref Guid languageVendor,
+                                     ref Guid documentType,
+                                     [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
 
         new void SetUserEntryPoint(SymbolToken entryMethod);
 
@@ -165,53 +167,53 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void CloseScope(int endOffset);
 
         new void SetScopeRange(int scopeID,
-                               int startOffset,
-                               int endOffset);
+                                int startOffset,
+                                int endOffset);
 
         new void DefineLocalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
+                                    int attributes,
+                                    int cSig,
+                                    [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
+                                    int addressKind,
+                                    int addr1,
+                                    int addr2,
+                                    int addr3,
+                                    int startOffset,
+                                    int endOffset);
+
+        new void DefineParameter([MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int attributes,
+                                int sequence,
+                                int addressKind,
+                                int addr1,
+                                int addr2,
+                                int addr3);
+
+        new void DefineField(SymbolToken parent,
+                          [MarshalAs(UnmanagedType.LPWStr)] String name,
+                          int attributes,
+                          int cSig,
+                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
+                          int addressKind,
+                          int addr1,
+                          int addr2,
+                          int addr3);
+
+        new void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
                                      int attributes,
                                      int cSig,
                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
                                      int addressKind,
                                      int addr1,
                                      int addr2,
-                                     int addr3,
-                                     int startOffset,
-                                     int endOffset);
-
-        new void DefineParameter([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                 int attributes,
-                                 int sequence,
-                                 int addressKind,
-                                 int addr1,
-                                 int addr2,
-                                 int addr3);
-
-        new void DefineField(SymbolToken parent,
-                             [MarshalAs(UnmanagedType.LPWStr)] String name,
-                             int attributes,
-                             int cSig,
-                             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
-                             int addressKind,
-                             int addr1,
-                             int addr2,
-                             int addr3);
-
-        new void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                      int attributes,
-                                      int cSig,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
-                                      int addressKind,
-                                      int addr1,
-                                      int addr2,
-                                      int addr3);
+                                     int addr3);
 
         new void Close();
 
         new void SetSymAttribute(SymbolToken parent,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String name,
-                                 int cData,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
+                                [MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int cData,
+                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
 
         new void OpenNamespace([MarshalAs(UnmanagedType.LPWStr)] String name);
 
@@ -220,70 +222,70 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void UsingNamespace([MarshalAs(UnmanagedType.LPWStr)] String fullName);
 
         new void SetMethodSourceRange(ISymUnmanagedDocumentWriter startDoc,
-                                      int startLine,
-                                      int startColumn,
-                                      ISymUnmanagedDocumentWriter endDoc,
-                                      int endLine,
-                                      int endColumn);
+                                     int startLine,
+                                     int startColumn,
+                                     ISymUnmanagedDocumentWriter endDoc,
+                                     int endLine,
+                                     int endColumn);
 
         new void Initialize(IntPtr emitter,
-                            [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                            IStream stream,
-                            Boolean fullBuild);
+                       [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                       IStream stream,
+                       Boolean fullBuild);
 
         new void GetDebugInfo(out ImageDebugDirectory iDD,
-                              int cData,
-                              out int pcData,
-                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
+                             int cData,
+                             out int pcData,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
 
         new void DefineSequencePoints(ISymUnmanagedDocumentWriter document,
-                                      int spCount,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
+                                     int spCount,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
 
         new void RemapToken(SymbolToken oldToken,
-                            SymbolToken newToken);
+                             SymbolToken newToken);
 
         new void Initialize2(IntPtr emitter,
-                             [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
-                             IStream stream,
-                             Boolean fullBuild,
-                             [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
+                        [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
+                        IStream stream,
+                        Boolean fullBuild,
+                        [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
 
         new void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                Object value,
-                                int cSig,
-                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
+                               Object value,
+                               int cSig,
+                               [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
 
         new void Abort();
 
         // ISymUnmanagedWriter2 interfaces
         void DefineLocalVariable2([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                  int attributes,
-                                  SymbolToken sigToken,
-                                  int addressKind,
-                                  int addr1,
-                                  int addr2,
-                                  int addr3,
-                                  int startOffset,
-                                  int endOffset);
+                                      int attributes,
+                                      SymbolToken sigToken,
+                                      int addressKind,
+                                      int addr1,
+                                      int addr2,
+                                      int addr3,
+                                      int startOffset,
+                                      int endOffset);
 
         void DefineGlobalVariable2([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                   int attributes,
-                                   SymbolToken sigToken,
-                                   int addressKind,
-                                   int addr1,
-                                   int addr2,
-                                   int addr3);
+                                       int attributes,
+                                       SymbolToken sigToken,
+                                       int addressKind,
+                                       int addr1,
+                                       int addr2,
+                                       int addr3);
 
 
         void DefineConstant2([MarshalAs(UnmanagedType.LPWStr)] String name,
-                             Object value,
-                             SymbolToken sigToken);
-    } ;
+                                 Object value,
+                                 SymbolToken sigToken);
+    };
 
     [
         ComImport,
@@ -295,10 +297,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     {
         // ISymUnmanagedWriter interfaces (need to define the base interface methods also, per COM interop requirements)
         new void DefineDocument([MarshalAs(UnmanagedType.LPWStr)] String url,
-                                ref Guid language,
-                                ref Guid languageVendor,
-                                ref Guid documentType,
-                                [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
+                                     ref Guid language,
+                                     ref Guid languageVendor,
+                                     ref Guid documentType,
+                                     [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocumentWriter RetVal);
 
         new void SetUserEntryPoint(SymbolToken entryMethod);
 
@@ -312,53 +314,53 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void CloseScope(int endOffset);
 
         new void SetScopeRange(int scopeID,
-                               int startOffset,
-                               int endOffset);
+                                int startOffset,
+                                int endOffset);
 
         new void DefineLocalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
+                                    int attributes,
+                                    int cSig,
+                                    [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
+                                    int addressKind,
+                                    int addr1,
+                                    int addr2,
+                                    int addr3,
+                                    int startOffset,
+                                    int endOffset);
+
+        new void DefineParameter([MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int attributes,
+                                int sequence,
+                                int addressKind,
+                                int addr1,
+                                int addr2,
+                                int addr3);
+
+        new void DefineField(SymbolToken parent,
+                          [MarshalAs(UnmanagedType.LPWStr)] String name,
+                          int attributes,
+                          int cSig,
+                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
+                          int addressKind,
+                          int addr1,
+                          int addr2,
+                          int addr3);
+
+        new void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
                                      int attributes,
                                      int cSig,
                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
                                      int addressKind,
                                      int addr1,
                                      int addr2,
-                                     int addr3,
-                                     int startOffset,
-                                     int endOffset);
-
-        new void DefineParameter([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                 int attributes,
-                                 int sequence,
-                                 int addressKind,
-                                 int addr1,
-                                 int addr2,
-                                 int addr3);
-
-        new void DefineField(SymbolToken parent,
-                             [MarshalAs(UnmanagedType.LPWStr)] String name,
-                             int attributes,
-                             int cSig,
-                             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] signature,
-                             int addressKind,
-                             int addr1,
-                             int addr2,
-                             int addr3);
-
-        new void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                      int attributes,
-                                      int cSig,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature,
-                                      int addressKind,
-                                      int addr1,
-                                      int addr2,
-                                      int addr3);
+                                     int addr3);
 
         new void Close();
 
         new void SetSymAttribute(SymbolToken parent,
-                                 [MarshalAs(UnmanagedType.LPWStr)] String name,
-                                 int cData,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
+                                [MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int cData,
+                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] data);
 
         new void OpenNamespace([MarshalAs(UnmanagedType.LPWStr)] String name);
 
@@ -367,43 +369,43 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         new void UsingNamespace([MarshalAs(UnmanagedType.LPWStr)] String fullName);
 
         new void SetMethodSourceRange(ISymUnmanagedDocumentWriter startDoc,
-                                      int startLine,
-                                      int startColumn,
-                                      ISymUnmanagedDocumentWriter endDoc,
-                                      int endLine,
-                                      int endColumn);
+                                     int startLine,
+                                     int startColumn,
+                                     ISymUnmanagedDocumentWriter endDoc,
+                                     int endLine,
+                                     int endColumn);
 
         new void Initialize(IntPtr emitter,
-                            [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                            IStream stream,
-                            Boolean fullBuild);
+                       [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                       IStream stream,
+                       Boolean fullBuild);
 
         new void GetDebugInfo(out ImageDebugDirectory iDD,
-                              int cData,
-                              out int pcData,
-                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
+                             int cData,
+                             out int pcData,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
 
         new void DefineSequencePoints(ISymUnmanagedDocumentWriter document,
-                                      int spCount,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
-                                      [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
+                                     int spCount,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] offsets,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] lines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] columns,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endLines,
+                                     [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] int[] endColumns);
 
         new void RemapToken(SymbolToken oldToken,
-                            SymbolToken newToken);
+                             SymbolToken newToken);
 
         new void Initialize2(IntPtr emitter,
-                             [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
-                             IStream stream,
-                             Boolean fullBuild,
-                             [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
+                        [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
+                        IStream stream,
+                        Boolean fullBuild,
+                        [MarshalAs(UnmanagedType.LPWStr)] String finalfilename);
 
         new void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                Object value,
-                                int cSig,
-                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
+                               Object value,
+                               int cSig,
+                               [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
 
         new void Abort();
 
@@ -433,25 +435,55 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         // ISymUnmanagedWriter3 interfaces
         void OpenMethod2(SymbolToken method,
-                         int isect,
-                         int offset);
-
+                              int isect,
+                              int offset);
         void Commit();
     }
 
     /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter"]/*' />
-    internal class SymbolWriter : ISymbolWriter2
+    internal class SymbolWriter : ISymbolWriter2, IDisposable
     {
-        private ISymUnmanagedWriter m_target;
+        ISymUnmanagedWriter m_target;
+
+        protected static readonly Guid CLSID_CorSymWriter = new Guid("0AE2DEB0-F901-478b-BB9F-881EE8066788");
+
+        private unsafe ISymUnmanagedWriter GetWriter(IntPtr ppUnderlyingWriter)
+        {
+            // this comes in as double pointer, so need to deference in order to create CCW
+            return (ISymUnmanagedWriter)Marshal.GetObjectForIUnknown((IntPtr)(*((void**)ppUnderlyingWriter.ToPointer())));
+        }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.SymbolWriter"]/*' />
         public SymbolWriter()
         {
-            var CLSID_CorSymWriter = new Guid("0AE2DEB0-F901-478b-BB9F-881EE8066788");
-            m_target = (ISymUnmanagedWriter) Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_CorSymWriter));
+            // Create the writer from the COM catalog
+            Type writerType = Type.GetTypeFromCLSID(CLSID_CorSymWriter);
+            object comWriterObj = Activator.CreateInstance(writerType);
+            m_target = (ISymUnmanagedWriter)comWriterObj;
         }
 
-        #region ISymbolWriter2 Members
+        public void Dispose()
+        {
+            // If the underlying symbol API supports the Destroy method, then call it.
+            ISymUnmanagedDispose disposer = m_target as ISymUnmanagedDispose;
+            if (disposer != null)
+                disposer.Destroy();
+            m_target = null;
+        }
+
+        /// <summary>
+        /// Constructor which allows the underlying COM object to be customized
+        /// </summary>
+        /// <param name="comWriterObject"></param>
+        /// <remarks>This would ideally be protected AND internal, but C# can only express protected OR internal</remarks>
+        internal SymbolWriter(ISymUnmanagedWriter comWriterObject)
+        {
+            // We should not wrap null instances
+            if (comWriterObject == null)
+                throw new ArgumentNullException("comWriterObject");
+
+            m_target = comWriterObject;
+        }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.SetUnderlyingWriter"]/*' />
         public void SetUnderlyingWriter(IntPtr ppUnderlyingWriter)
@@ -483,9 +515,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.Initialize1"]/*' />
         public void Initialize(Object emitter,
-                               [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                               IStream stream,
-                               Boolean fullBuild)
+                        [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                        IStream stream,
+                        Boolean fullBuild)
         {
             IntPtr uEmitter = IntPtr.Zero;
             try
@@ -502,10 +534,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.Initialize2"]/*' />
         public void Initialize(Object emitter,
-                               [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
-                               IStream stream,
-                               Boolean fullBuild,
-                               [MarshalAs(UnmanagedType.LPWStr)] String finalfilename)
+                        [MarshalAs(UnmanagedType.LPWStr)] String tempfilename,
+                        IStream stream,
+                        Boolean fullBuild,
+                        [MarshalAs(UnmanagedType.LPWStr)] String finalfilename)
         {
             IntPtr uEmitter = IntPtr.Zero;
             try
@@ -522,9 +554,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineDocument"]/*' />
         public ISymbolDocumentWriter DefineDocument(String url,
-                                                    Guid language,
-                                                    Guid languageVendor,
-                                                    Guid documentType)
+                                          Guid language,
+                                          Guid languageVendor,
+                                          Guid documentType)
         {
             ISymUnmanagedDocumentWriter writer = null;
             m_target.DefineDocument(url, ref language, ref languageVendor, ref documentType, out writer);
@@ -551,14 +583,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineSequencePoints"]/*' />
         public void DefineSequencePoints(ISymbolDocumentWriter document,
-                                         int[] offsets,
-                                         int[] lines,
-                                         int[] columns,
-                                         int[] endLines,
-                                         int[] endColumns)
+                                  int[] offsets,
+                                  int[] lines,
+                                  int[] columns,
+                                  int[] endLines,
+                                  int[] endColumns)
         {
-            m_target.DefineSequencePoints(((SymDocumentWriter) document).InternalDocumentWriter, offsets.Length,
-                                          offsets, lines, columns, endLines, endColumns);
+            m_target.DefineSequencePoints(((SymDocumentWriter)document).InternalDocumentWriter, offsets.Length,
+                                        offsets, lines, columns, endLines, endColumns);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.OpenScope"]/*' />
@@ -583,29 +615,29 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineLocalVariable"]/*' />
         public void DefineLocalVariable(String name,
-                                        FieldAttributes attributes,
-                                        byte[] signature,
-                                        SymAddressKind addressKind,
-                                        int addr1,
-                                        int addr2,
-                                        int addr3,
-                                        int startOffset,
-                                        int endOffset)
+                                    FieldAttributes attributes,
+                                    byte[] signature,
+                                    SymAddressKind addressKind,
+                                    int addr1,
+                                    int addr2,
+                                    int addr3,
+                                    int startOffset,
+                                    int endOffset)
         {
-            m_target.DefineLocalVariable(name, (int) attributes, signature.Length, signature,
-                                         (int) addressKind, addr1, addr2, addr3, startOffset, endOffset);
+            m_target.DefineLocalVariable(name, (int)attributes, signature.Length, signature,
+                                         (int)addressKind, addr1, addr2, addr3, startOffset, endOffset);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineParameter"]/*' />
         public void DefineParameter(String name,
-                                    ParameterAttributes attributes,
-                                    int sequence,
-                                    SymAddressKind addressKind,
-                                    int addr1,
-                                    int addr2,
-                                    int addr3)
+                                ParameterAttributes attributes,
+                                int sequence,
+                                SymAddressKind addressKind,
+                                int addr1,
+                                int addr2,
+                                int addr3)
         {
-            m_target.DefineParameter(name, (int) attributes, sequence, (int) addressKind, addr1, addr2, addr3);
+            m_target.DefineParameter(name, (int)attributes, sequence, (int)addressKind, addr1, addr2, addr3);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineField"]/*' />
@@ -618,21 +650,21 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                                 int addr2,
                                 int addr3)
         {
-            m_target.DefineField(parent, name, (int) attributes, signature.Length, signature,
-                                 (int) addressKind, addr1, addr2, addr3);
+            m_target.DefineField(parent, name, (int)attributes, signature.Length, signature,
+                                 (int)addressKind, addr1, addr2, addr3);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineGlobalVariable"]/*' />
         public void DefineGlobalVariable(String name,
-                                         FieldAttributes attributes,
-                                         byte[] signature,
-                                         SymAddressKind addressKind,
-                                         int addr1,
-                                         int addr2,
-                                         int addr3)
+                                     FieldAttributes attributes,
+                                     byte[] signature,
+                                     SymAddressKind addressKind,
+                                     int addr1,
+                                     int addr2,
+                                     int addr3)
         {
-            m_target.DefineGlobalVariable(name, (int) attributes, signature.Length, signature,
-                                          (int) addressKind, addr1, addr2, addr3);
+            m_target.DefineGlobalVariable(name, (int)attributes, signature.Length, signature,
+                                          (int)addressKind, addr1, addr2, addr3);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.Close"]/*' />
@@ -673,8 +705,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                                          int endLine,
                                          int endColumn)
         {
-            m_target.SetMethodSourceRange(((SymDocumentWriter) startDoc).InternalDocumentWriter, startLine, startColumn,
-                                          ((SymDocumentWriter) endDoc).InternalDocumentWriter, endLine, endColumn);
+            m_target.SetMethodSourceRange(((SymDocumentWriter)startDoc).InternalDocumentWriter, startLine, startColumn,
+                                          ((SymDocumentWriter)endDoc).InternalDocumentWriter, endLine, endColumn);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.GetDebugInfo"]/*' />
@@ -682,16 +714,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             int length;
             m_target.GetDebugInfo(out iDD, 0, out length, null);
-            var data = new byte[length];
+            byte[] data = new byte[length];
             m_target.GetDebugInfo(out iDD, length, out length, data);
-            Debug.Assert(data.Length == length);
+            System.Diagnostics.Debug.Assert(data.Length == length);
             return data;
         }
 
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.RemapToken"]/*' />
         public void RemapToken(SymbolToken oldToken,
-                               SymbolToken newToken)
+                            SymbolToken newToken)
         {
             m_target.RemapToken(oldToken, newToken);
         }
@@ -699,8 +731,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineConstant"]/*' />
         public void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                   Object value,
-                                   byte[] signature)
+                                Object value,
+                                byte[] signature)
         {
             m_target.DefineConstant(name, value, signature.Length, signature);
         }
@@ -722,41 +754,31 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                                         int startOffset,
                                         int endOffset)
         {
-            ((ISymUnmanagedWriter2) m_target).DefineLocalVariable2(name, attributes, sigToken,
-                                                                   addressKind, addr1, addr2, addr3, startOffset,
-                                                                   endOffset);
+            ((ISymUnmanagedWriter2)m_target).DefineLocalVariable2(name, attributes, sigToken,
+                                         addressKind, addr1, addr2, addr3, startOffset, endOffset);
         }
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineGlobalVariable1"]/*' />
         public void DefineGlobalVariable([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                         int attributes,
-                                         SymbolToken sigToken,
-                                         int addressKind,
-                                         int addr1,
-                                         int addr2,
-                                         int addr3)
+                                       int attributes,
+                                       SymbolToken sigToken,
+                                       int addressKind,
+                                       int addr1,
+                                       int addr2,
+                                       int addr3)
         {
-            ((ISymUnmanagedWriter2) m_target).DefineGlobalVariable2(name, attributes, sigToken,
-                                                                    addressKind, addr1, addr2, addr3);
+            ((ISymUnmanagedWriter2)m_target).DefineGlobalVariable2(name, attributes, sigToken,
+                                                                  addressKind, addr1, addr2, addr3);
         }
+
 
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineConstant1"]/*' />
         public void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
-                                   Object value,
-                                   SymbolToken sigToken)
+                                  Object value,
+                                  SymbolToken sigToken)
         {
-            ((ISymUnmanagedWriter2) m_target).DefineConstant2(name, value, sigToken);
-        }
-
-        #endregion
-
-        private unsafe ISymUnmanagedWriter GetWriter(IntPtr ppUnderlyingWriter)
-        {
-            // this comes in as double pointer, so need to deference in order to create CCW
-            return
-                (ISymUnmanagedWriter)
-                Marshal.GetObjectForIUnknown((IntPtr) (*((void**) ppUnderlyingWriter.ToPointer())));
+            ((ISymUnmanagedWriter2)m_target).DefineConstant2(name, value, sigToken);
         }
     }
 }

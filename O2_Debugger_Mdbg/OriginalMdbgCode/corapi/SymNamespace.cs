@@ -6,14 +6,16 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Text;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
-    // Interface does not need to be marked with the serializable attribute
+    using System.Diagnostics.SymbolStore;
+
+    using System;
+	using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+	
+	// Interface does not need to be marked with the serializable attribute
     /// <include file='doc\ISymNamespace.uex' path='docs/doc[@for="ISymbolNamespace"]/*' />
     [
         ComImport,
@@ -24,33 +26,35 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     internal interface ISymUnmanagedNamespace
     {
         void GetName(int cchName,
-                     out int pcchName,
-                     [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
-
+                        out int pcchName,
+                        [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
+    
         void GetNamespaces(int cNameSpaces,
-                           out int pcNameSpaces,
-                           [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[]
-                               namespaces);
-
+                                out int pcNameSpaces,
+                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedNamespace[] namespaces);
+    
         void GetVariables(int cVars,
-                          out int pcVars,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] pVars);
+                             out int pcVars,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedVariable[] pVars);
     }
+
 
 
     internal class SymNamespace : ISymbolNamespace
     {
-        private readonly ISymUnmanagedNamespace m_unmanagedNamespace;
-
+        ISymUnmanagedNamespace m_unmanagedNamespace;
+        
         internal SymNamespace(ISymUnmanagedNamespace nameSpace)
         {
+            // We should not wrap null instances
+            if (nameSpace == null)
+                throw new ArgumentNullException("nameSpace");
+
             m_unmanagedNamespace = nameSpace;
         }
-
-        #region ISymbolNamespace Members
-
-        public String Name
-        {
+        
+        public String Name 
+        { 
             get
             {
                 StringBuilder Name;
@@ -67,10 +71,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             uint i;
             int cNamespaces = 0;
             m_unmanagedNamespace.GetNamespaces(0, out cNamespaces, null);
-            var unmamagedNamespaces = new ISymUnmanagedNamespace[cNamespaces];
+            ISymUnmanagedNamespace[] unmamagedNamespaces = new ISymUnmanagedNamespace[cNamespaces];
             m_unmanagedNamespace.GetNamespaces(cNamespaces, out cNamespaces, unmamagedNamespaces);
-
-            var Namespaces = new ISymbolNamespace[cNamespaces];
+            
+            ISymbolNamespace[] Namespaces = new ISymbolNamespace[cNamespaces];
             for (i = 0; i < cNamespaces; i++)
             {
                 Namespaces[i] = new SymNamespace(unmamagedNamespaces[i]);
@@ -83,17 +87,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             int cVars = 0;
             uint i;
             m_unmanagedNamespace.GetVariables(0, out cVars, null);
-            var unmanagedVariables = new ISymUnmanagedVariable[cVars];
+            ISymUnmanagedVariable[] unmanagedVariables = new ISymUnmanagedVariable[cVars];
             m_unmanagedNamespace.GetVariables(cVars, out cVars, unmanagedVariables);
 
-            var Variables = new ISymbolVariable[cVars];
+            ISymbolVariable[] Variables = new ISymbolVariable[cVars];
             for (i = 0; i < cVars; i++)
             {
                 Variables[i] = new SymVariable(unmanagedVariables[i]);
             }
             return Variables;
         }
-
-        #endregion
     }
 }

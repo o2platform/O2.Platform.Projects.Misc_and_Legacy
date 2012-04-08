@@ -7,30 +7,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
+using System.Text.RegularExpressions;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
-namespace O2.Debugger.Mdbg.Tools.Mdbg
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.MdbgEngine;
+
+namespace Microsoft.Samples.Tools.Mdbg
 {
     /// <summary>
     /// This class contains information about an executed command.
     /// </summary>
     public class CommandExecutedEventArgs : EventArgs
     {
-        private readonly string m_arguments;
-        private readonly IMDbgCommand m_command;
-        private readonly bool m_movementCommand;
-        private readonly IMDbgShell m_sender;
-
         /// <summary>
         /// Initializes a new instance of the <b>CommandExecutedEventArgs</b> class.
         /// </summary>
@@ -39,7 +31,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="arguments">The arguments for the command</param>
         /// <param name="movementCommand">Is this a movement command.</param>
         public CommandExecutedEventArgs(IMDbgShell sender, IMDbgCommand command, string arguments,
-                                        bool movementCommand)
+                                    bool movementCommand)
         {
             Debug.Assert(sender != null);
             Debug.Assert((command == null) == (arguments == null));
@@ -56,7 +48,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The sender for this event</value>
         public IMDbgShell Sender
         {
-            get { return m_sender; }
+            get
+            {
+                return m_sender;
+            }
         }
 
         /// <summary>
@@ -65,7 +60,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The command that is getting executed.</value>
         public IMDbgCommand Command
         {
-            get { return m_command; }
+            get
+            {
+                return m_command;
+            }
         }
 
         /// <summary>
@@ -74,7 +72,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The arguments for the command</value>
         public string Arguments
         {
-            get { return m_arguments; }
+            get
+            {
+                return m_arguments;
+            }
         }
 
         /// <summary>
@@ -83,8 +84,16 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>Is this a movement command.</value>
         public bool MovementCommand
         {
-            get { return m_movementCommand; }
+            get
+            {
+                return m_movementCommand;
+            }
         }
+
+        private IMDbgShell m_sender;
+        private IMDbgCommand m_command;
+        private string m_arguments;
+        private bool m_movementCommand;
     }
 
     /// <summary>
@@ -151,58 +160,56 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Gets or sets with MDbgEngine should be used for all other actions.
         /// </summary>
         /// <value>The MDbgEngine.</value>
-        MDbgEngine Debugger { get; set; }
+        MDbgEngine Debugger
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets the available commands.
         /// </summary>
         /// <value>The commands.</value>
-        IMDbgCommandCollection Commands { get; }
+        IMDbgCommandCollection Commands
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets or sets the IO interface.
         /// </summary>
         /// <value>The implementer of IMDbgIO.</value>
-        IMDbgIO IO { get; set; }
+        IMDbgIO IO
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets the File Locator.
         /// </summary>
         /// <value>The File Locator.</value>
-        IMDbgFileLocator FileLocator { get; }
+        IMDbgFileLocator FileLocator
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the Source File Manager
         /// </summary>
         /// <value>The Source File Manager</value>
-        IMDbgSourceFileMgr SourceFileMgr { get; }
+        IMDbgSourceFileMgr SourceFileMgr
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets properties for the shell.
         /// </summary>
-        IDictionary Properties { get; }
-
-        /// <summary>
-        /// Get the default Breakpoint parser for this collection.
-        /// </summary>
-        /// <remarks> The breakpoint collection maintains a default breakpoint parser. 
-        /// Extensions can get the parser so that they can use the share the parsing implementation to get the 
-        /// same breakpoint syntax as the rest of the shell. This encourages a uniform breakpoint syntax.
-        /// Extensions can also set the parser so that they can override and even extend the breakpoint syntax.
-        /// This may be null (and is in fact null by default), though it is reasonable for extensions to 
-        /// expect that the shell supplies a parser.
-        /// </remarks>
-        IBreakpointParser BreakpointParser { get; set; }
-
-        /// <summary>
-        /// Get the default expression parser for this shell.
-        /// </summary>
-        /// <remarks>
-        ///   The expressino parser is responsible for parsing variable names and
-        ///   simple expressions into MDbgValue objects that represent a result of
-        ///   parsing.
-        /// </remarks>
-        IExpressionParser ExpressionParser { get; set; }
+        IDictionary Properties
+        {
+            get;
+        }
 
         /// <summary>
         /// Quits with a given exit code.
@@ -213,7 +220,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <summary>
         /// Called when command is executed and prompt is going to be displayed.
         /// </summary>
-        //event CommandExecutedEventHandler OnCommandExecuted;   // implemented by O2MDbg
+        event CommandExecutedEventHandler OnCommandExecuted;
 
         /// <summary>
         /// Displays current location.
@@ -225,6 +232,38 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Shell displays to the user a reason for the failure.
         /// </summary>
         void ReportException(Exception e);
+
+
+        /// <summary>
+        /// Get the default Breakpoint parser for this collection.
+        /// </summary>
+        /// <remarks> The breakpoint collection maintains a default breakpoint parser. 
+        /// Extensions can get the parser so that they can use the share the parsing implementation to get the 
+        /// same breakpoint syntax as the rest of the shell. This encourages a uniform breakpoint syntax.
+        /// Extensions can also set the parser so that they can override and even extend the breakpoint syntax.
+        /// This may be null (and is in fact null by default), though it is reasonable for extensions to 
+        /// expect that the shell supplies a parser.
+        /// </remarks>
+        IBreakpointParser BreakpointParser
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Get the default expression parser for this shell.
+        /// </summary>
+        /// <remarks>
+        ///   The expressino parser is responsible for parsing variable names and
+        ///   simple expressions into MDbgValue objects that represent a result of
+        ///   parsing.
+        /// </remarks>
+        IExpressionParser ExpressionParser
+        {
+            get;
+            set;
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -238,19 +277,17 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     public sealed class MDbgOutputConstants
     {
         /// <summary>
-        /// This is special output type.  It will be written to StdOut, but its content should be ignored (non-important output).
+        /// Output goes to Standard Out
         /// </summary>
-        public const string Ignore = "IGNORE";
-
+        public const string StdOutput = "STDOUT";
         /// <summary>
         /// Output goes to Standard Error
         /// </summary>
         public const string StdError = "STDERR";
-
         /// <summary>
-        /// Output goes to Standard Out
+        /// This is special output type.  It will be written to StdOut, but its content should be ignored (non-important output).
         /// </summary>
-        public const string StdOutput = "STDOUT";
+        public const string Ignore = "IGNORE";
     }
 
     /// <summary>
@@ -324,44 +361,56 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// <summary>
     /// Interface for mdbg commands.
     /// </summary>
-    public interface IMDbgCommand : IComparable
+    public interface IMDbgCommand : IComparable, IEquatable<IMDbgCommand>
     {
         /// <summary>
         /// Returns the command name.
         /// </summary>
         /// <value>Name of the command.</value>
-        string CommandName { get; }
-
+        string CommandName
+        {
+            get;
+        }
         /// <summary>
         /// Returns the minimum number of characters you must use to invoke this command.
         /// </summary>
         /// <value>The minimum number of characters.</value>
-        int MinimumAbbrev { get; }
-
+        int MinimumAbbrev
+        {
+            get;
+        }
         /// <summary>
         /// Returns if the command is repeatable (hitting enter again will repeat these commands)
         /// </summary>
         /// <value>true if the command is repeatable</value>
-        bool IsRepeatable { get; }
-
+        bool IsRepeatable
+        {
+            get;
+        }
         /// <summary>
         /// Returns a brief help message for the command.
         /// </summary>
         /// <value>The help message.</value>
-        string ShortHelp { get; }
-
+        string ShortHelp
+        {
+            get;
+        }
         /// <summary>
         /// Returns a more detailed help message for the command.
         /// </summary>
         /// <value>The help message.</value>
-        string LongHelp { get; }
-
+        string LongHelp
+        {
+            get;
+        }
         /// <summary>
         /// Assembly the command was loaded from
         /// </summary>
         /// <value>The Assembly.</value>
-        Assembly LoadedFrom { get; }
-
+        Assembly LoadedFrom
+        {
+            get;
+        }
         /// <summary>
         /// Executes the command.
         /// </summary>
@@ -379,6 +428,12 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// </summary>
         /// <param name="command">Command to add.</param>
         void Add(IMDbgCommand command);
+
+        /// <summary>
+        /// Removes a command from the collection.
+        /// </summary>
+        /// <param name="command">Command to remove.</param>
+        void Remove(IMDbgCommand command);
 
         /// <summary>
         /// Looks up a command in the collection.
@@ -411,7 +466,11 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Gets or Sets the path. Setting a path will clear any associations.
         /// </summary>
         /// <value>the path</value>
-        string Path { get; set; }
+        string Path
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets a file location
@@ -437,7 +496,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// <summary>
     /// This is an exception for when mdbg shell needs its own special type
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class MDbgShellException : Exception
     {
         /// <summary>
@@ -475,6 +534,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
             : base(info, context)
         {
         }
+
     }
 
     /// <summary>
@@ -483,41 +543,19 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     public abstract class CommandBase
     {
         /// <summary>
-        /// Internal Only.  Do not use.
-        /// </summary>
-        public static bool AssertOnErrors;
-
-        /// <summary>
-        /// ExtensionPath variable contains a set of paths that are searched for extensions when
-        /// "load" command is used to load an extension.
-        /// </summary>
-        /// <remarks>
-        /// The paths are separated with the PathSeparator char.
-        /// This defaults to the 1) current directory and 2) the directory that the debugger 
-        /// was loaded from.
-        /// </remarks>
-        public static string ExtensionPath = "." + Path.PathSeparator + AppDomain.CurrentDomain.BaseDirectory;
-
-        private static IMDbgShell m_shell;
-
-        /// <summary>
-        /// ShowInternalFrames is used by mode if command to
-        /// Enable/Disable showing of internal frames in where
-        /// command. This flag is defined here and not in the Engine.cs
-        /// (engine layer) because this flag only affects whether the
-        /// frames are visible in "where" command. However they are
-        /// always exposed by the engine.
-        /// </summary>
-        public static bool ShowInternalFrames = true;
-
-        /// <summary>
         /// Gets or sets the IMdbgShell.
         /// </summary>
         /// <value>The IMdbgShell.</value>
         public static IMDbgShell Shell
         {
-            get { return m_shell; }
-            set { m_shell = value; }
+            get
+            {
+                return m_shell;
+            }
+            set
+            {
+                m_shell = value;
+            }
         }
 
         /// <summary>
@@ -526,7 +564,10 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <value>The Debugger.</value>
         public static MDbgEngine Debugger
         {
-            get { return Shell.Debugger; }
+            get
+            {
+                return Shell.Debugger;
+            }
         }
 
         /// <summary>
@@ -570,7 +611,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
             }
             else
             {
-                WriteOutput(outputType, message); // we don't have support for hi-ligting
+                WriteOutput(outputType, message);                // we don't have support for hi-ligting
             }
         }
 
@@ -627,6 +668,45 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         // The flag is defined here because it is used also by
         // recorder extension to stop at the point of failure during
         // replay of recorded scripts.
+        /// <summary>
+        /// Internal Only.  Do not use.
+        /// </summary>
+        public static bool AssertOnErrors = false;
+
+        // ShowFullExceptionInfo flag is used to toggle the
+        // reporting of detailed exception information for all
+        // exceptions which escape the method implementing a given
+        // command. Typically this is off because the message alone
+        // conveys the necessary user information, however for diagnostic
+        // purposes this can be very useful
+        public static bool ShowFullExceptionInfo = false;
+
+        /// <summary>
+        /// ShowInternalFrames is used by mode if command to
+        /// Enable/Disable showing of internal frames in where
+        /// command. This flag is defined here and not in the Engine.cs
+        /// (engine layer) because this flag only affects whether the
+        /// frames are visible in "where" command. However they are
+        /// always exposed by the engine.
+        /// </summary>
+        public static bool ShowInternalFrames = true;
+
+        /// <summary>
+        /// Gets or sets if Mdbg should fail on errors.
+        /// </summary>
+        /// <value>Default is false.</value>
+        public static bool FailOnError = false;
+
+        /// <summary>
+        /// ExtensionPath variable contains a set of paths that are searched for extensions when
+        /// "load" command is used to load an extension.
+        /// </summary>
+        /// <remarks>
+        /// The paths are separated with the PathSeparator char.
+        /// This defaults to the 1) current directory and 2) the directory that the debugger 
+        /// was loaded from.
+        /// </remarks>
+        public static string ExtensionPath = "." + System.IO.Path.PathSeparator + AppDomain.CurrentDomain.BaseDirectory;
 
         /// <summary>
         /// Parses arguments for the run command, but does not provide direct access to the path to the
@@ -643,7 +723,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// being run.  Note that the program name may be quoted and may not contain
         /// a ".exe" extension.  Rather than try to parse this, if you need the path to the binary
         /// being run, then use the 5 argument overload below.</param>
-        public static void PreParseRunArguments(string arguments, out DebugModeFlag debugMode,
+        static public void PreParseRunArguments(string arguments, out DebugModeFlag debugMode,
                                                 out string debuggeeVersion,
                                                 out string programAndArgsToRun)
         {
@@ -671,134 +751,22 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="programToRun">Returns path of the program to execute.</param>
         /// <param name="programArguments">Returns arguments to pass to the program being 
         /// run, including the binary name as the 0th argument</param>
-        public static void PreParseRunArguments(string arguments, out DebugModeFlag debugMode,
-                                                out string debuggeeVersion,
-                                                out string programToRun,
-                                                out string programArguments)
+        /// <seealso cref="RunOptions"/>
+        static public void PreParseRunArguments(string arguments, out DebugModeFlag debugMode,
+                                        out string debuggeeVersion,
+                                        out string programToRun,
+                                        out string programArguments)
         {
-            Debug.Assert(arguments != null);
-            if (arguments == null)
-                throw new ArgumentException("Parameter cannot be null.", "arguments");
-
-            debugMode = DebugModeFlag.Debug;
-            // Is this the mode we want to always start in?
-
-            int start, end;
-            start = end = 0;
-
-            // those flags are necessary so that people can run any program under debugger.
-            // e.g to run program named '-debug.exe', they can write 'run -debug -debug'
-            //
-            // One obvious issue here is that if the binary name is same as the flag, then
-            // user need to pass the flag to the run command so that the program name is not
-            // interpreted as a flag.
-            //
-
-            bool debugModeFlagSet = false;
-            bool versionFlagSet = false;
-
-            debuggeeVersion = null;
-
-            while (FindToken(arguments, ref start, ref end))
-            {
-                Debug.Assert(start <= end);
-
-                switch (arguments.Substring(start, end - start))
-                {
-                    case "-default":
-                        if (debugModeFlagSet)
-                            goto default;
-                        debugMode = DebugModeFlag.Default;
-                        debugModeFlagSet = true;
-                        break;
-
-                    case "-debug":
-                    case "-d":
-                        if (debugModeFlagSet)
-                            goto default;
-                        debugMode = DebugModeFlag.Debug;
-                        debugModeFlagSet = true;
-                        break;
-
-                    case "-optimize":
-                    case "-o":
-                        if (debugModeFlagSet)
-                            goto default;
-                        debugMode = DebugModeFlag.Optimized;
-                        debugModeFlagSet = true;
-                        break;
-
-                    case "-enc":
-                        if (debugModeFlagSet)
-                            goto default;
-                        debugMode = DebugModeFlag.Enc;
-                        debugModeFlagSet = true;
-                        break;
-
-                    case "-ver":
-                        if (versionFlagSet)
-                            goto default;
-
-                        if (!FindToken(arguments, ref start, ref end))
-                            throw new MDbgShellException("missing argument to -ver option");
-                        debuggeeVersion = arguments.Substring(start, end - start);
-                        versionFlagSet = true;
-                        break;
-
-                    default:
-                        // this means we have found some different token.
-                        // To keep comaptibility with cordbg, we assume that this is a program binary name.
-
-                        // Expand environment variables on the binary name so that we can use env vars in
-                        // the program path. Note that environment variables are not expanded in program
-                        // arguments so that we can pass in original strings. Programs can expand the environment
-                        // themselves if they wish so. 
-                        string prog = Environment.ExpandEnvironmentVariables(arguments.Substring(start, end - start));
-
-                        // program may be quoted, remove surrounding quotes
-                        // Note: ideally we'd have a general escapedPath format and escape/unescape methods to convert
-                        // but this is good enough for our purposes here.
-                        if (prog.Length >= 2 && prog.StartsWith("\"") && prog.EndsWith("\""))
-                            prog = prog.Substring(1, prog.Length - 2);
-
-                        // may have omitted .exe extension, add it if necessary
-                        const string optExt = ".exe";
-                        if (!prog.EndsWith(optExt, StringComparison.OrdinalIgnoreCase))
-                            prog += optExt;
-
-                        // We're left with the program binary path
-                        programToRun = prog;
-
-                        // Use everything unmodified (including the possibly quoted binary path) as the run arguments
-                        programArguments = arguments.Substring(start);
-
-                        if (debuggeeVersion == null)
-                        {
-                            // user didn't specify, we need to guess it.
-                            try
-                            {
-                                debuggeeVersion = CorDebugger.GetDebuggerVersionFromFile(programToRun);
-                            }
-                            catch (COMException)
-                            {
-                                // we could not retrieve dee version.
-                                debuggeeVersion = null;
-                            }
-                        }
-
-                        // Rest of line processed, we're done.
-                        return;
-                }
-            }
-
-            // we didn't find any token -- no other binary specified than options            
-            programToRun = null;
-            programArguments = null;
-
-            return;
+            // This is now just a wrapper around RunOptions.
+            RunOptions options = new RunOptions(arguments);
+            debugMode = options.DebugMode;
+            debuggeeVersion = options.Version;
+            programToRun = options.Application;
+            programArguments = options.Arguments;
         }
 
-        private static bool FindToken(string text, ref int start, ref int end)
+
+        static internal bool FindToken(string text, ref int start, ref int end)
         {
             Debug.Assert(text != null);
             Debug.Assert(end <= text.Length && end >= 0);
@@ -826,7 +794,236 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
             }
             return start != end;
         }
+
+        private static IMDbgShell m_shell;
     }
+
+    /// <summary>
+    /// Identify the CLR implementation model which will ultimately be used to get the factory to instantiate
+    /// an ICorDebugProcess.
+    /// </summary>
+    public enum ClrImplementationModel
+    {
+        /// <summary>
+        /// Use Whidbey creation model via mscoree!CreateDebuggingInterfaceFromVersion
+        /// </summary>
+        Whidbey,
+    }
+
+    /// <summary>
+    /// Controls the level of informational output in the standard "run" command
+    /// </summary>
+    public enum RunVerbosity
+    {
+        Low = 0,
+        Normal = 1,
+        High = 2
+    }
+
+    /// <summary>
+    /// Options for a standard "run" command. This supercedes the PreParseRunArguments functions.
+    /// </summary>
+    public class RunOptions
+    {
+        DebugModeFlag m_debugMode;
+
+        /// <summary>
+        /// Debug mode (optimized, enc, etc).  Pass this to MDbgProcess.DebugMode.
+        /// </summary>
+        public DebugModeFlag DebugMode
+        {
+            get { return m_debugMode; }
+        }
+
+        string m_application;
+
+        /// <summary>
+        /// Path to application executable to startup. Non-null.
+        /// </summary>
+        public string Application
+        {
+            get { return m_application; }
+        }
+
+        string m_arguments;
+
+        /// <summary>
+        /// Arguments to pass to debuggee. May be null. This may honor the convention of including the application name as argument 0.
+        /// </summary>
+        public string Arguments
+        {
+            get { return m_arguments; }
+        }
+
+        string m_debuggeeVersion;
+
+        /// <summary>
+        /// Debuggee version string. May be null. This may default to a version infered from the Application path.
+        /// </summary>
+        public string Version
+        {
+            get { return m_debuggeeVersion; }
+        }
+
+        RunVerbosity m_verbosity;
+
+        public RunVerbosity Verbosity
+        {
+            get { return m_verbosity; }
+        }
+        ClrImplementationModel m_model = ClrImplementationModel.Whidbey;
+        
+        /// <summary>
+        /// Model used to get the factory for creating an ICorDebugProcess.
+        /// </summary>
+        public ClrImplementationModel Model
+        {
+            get { return m_model; }
+        }
+
+
+
+        /// <summary>
+        /// Parse from a command string 
+        /// </summary>
+        /// <param name="arguments">arguments string passed to a 'run' command. This gets parsed to fill out
+        /// the run options. </param>
+        public RunOptions(string arguments)
+        {
+            Debug.Assert(arguments != null);
+            if (arguments == null)
+                throw new ArgumentException("Parameter cannot be null.", "arguments");
+
+            this.m_debugMode = DebugModeFlag.Debug;
+            m_verbosity = RunVerbosity.Normal;
+            // Is this the mode we want to always start in?
+
+            int start, end;
+            start = end = 0;
+
+            // those flags are necessary so that people can run any program under debugger.
+            // e.g to run program named '-debug.exe', they can write 'run -debug -debug'
+            //
+            // One obvious issue here is that if the binary name is same as the flag, then
+            // user need to pass the flag to the run command so that the program name is not
+            // interpreted as a flag.
+            //
+
+            bool debugModeFlagSet = false;
+            bool versionFlagSet = false;
+            bool verboseSet = false;
+
+            while (CommandBase.FindToken(arguments, ref start, ref end))
+            {
+                Debug.Assert(start <= end);
+                switch (arguments.Substring(start, end - start))
+                {
+                    case "-default":
+                        if (debugModeFlagSet)
+                            goto default;
+                        this.m_debugMode = DebugModeFlag.Default;
+                        debugModeFlagSet = true;
+                        break;
+
+                    case "-debug":
+                    case "-d":
+                        if (debugModeFlagSet)
+                            goto default;
+                        this.m_debugMode = DebugModeFlag.Debug;
+                        debugModeFlagSet = true;
+                        break;
+
+                    case "-optimize":
+                    case "-o":
+                        if (debugModeFlagSet)
+                            goto default;
+                        this.m_debugMode = DebugModeFlag.Optimized;
+                        debugModeFlagSet = true;
+                        break;
+
+                    case "-enc":
+                        if (debugModeFlagSet)
+                            goto default;
+                        this.m_debugMode = DebugModeFlag.Enc;
+                        debugModeFlagSet = true;
+                        break;
+
+                    case "-ver":
+                        if (versionFlagSet)
+                            goto default;
+
+                        if (!CommandBase.FindToken(arguments, ref start, ref end))
+                        {
+                            throw new MDbgShellException("missing argument to -ver option");
+                        }
+                        this.m_debuggeeVersion = arguments.Substring(start, end - start);
+                        versionFlagSet = true;
+                        break;
+
+                    case "-verbose":
+                        if (verboseSet)
+                            goto default;
+
+                        if (!CommandBase.FindToken(arguments, ref start, ref end))
+                        {
+                            throw new MDbgShellException("missing argument to -verbose option");
+                        }
+                        try
+                        {
+                            m_verbosity = (RunVerbosity)Enum.Parse(typeof(RunVerbosity), arguments.Substring(start, end - start), true);
+                        }
+                        catch (ArgumentException)
+                        {
+                            throw new MDbgShellException("Invalid argument to -verbose option. Use Low, Normal or High.");
+                        }
+                        verboseSet = true;
+                        break;
+
+                    default:
+                        // this means we have found some different token.
+                        // To keep comaptibility with cordbg, we assume that this is a program binary name.
+
+                        // Expand environment variables on the binary name so that we can use env vars in
+                        // the program path. Note that environment variables are not expanded in program
+                        // arguments so that we can pass in original strings. Programs can expand the environment
+                        // themselves if they wish so. 
+                        string prog = Environment.ExpandEnvironmentVariables(arguments.Substring(start, end - start));
+
+                        // program may be quoted, remove surrounding quotes
+                        // Note: ideally we'd have a general escapedPath format and escape/unescape methods to convert
+                        // but this is good enough for our purposes here.
+                        if (prog.Length >= 2 && prog.StartsWith("\"") && prog.EndsWith("\""))
+                        {
+                            prog = prog.Substring(1, prog.Length - 2);
+                        }
+
+                        // may have omitted .exe extension, add it if necessary
+                        const string optExt = ".exe";
+                        if (!prog.EndsWith(optExt, StringComparison.OrdinalIgnoreCase))
+                        {
+                            prog += optExt;
+                        }
+
+                        // We're left with the program binary path
+                        this.m_application = prog;
+
+                        // Use everything unmodified (including the possibly quoted binary path) as the run arguments
+                        // This will include the application name as arg[0], which is the standard convention.
+                        this.m_arguments = arguments.Substring(start);
+
+                        // Rest of line processed, we're done.
+                        return;
+                }
+            }
+
+            // we didn't find any token -- no other binary specified than options            
+            // Leaves properties as null.
+            Debug.Assert(this.m_application == null);
+            Debug.Assert(this.m_arguments == null);
+
+            return;
+        }
+    } // end class RunOptions
 
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -843,7 +1040,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Clears the document cache.
         /// </summary>
         void ClearDocumentCache();
-
         /// <summary>
         /// Gets a source file.
         /// </summary>
@@ -861,20 +1057,27 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// Where is the file.
         /// </summary>
         /// <value>Where is the file.</value>
-        string Path { get; }
-
+        string Path
+        {
+            get;
+        }
         /// <summary>
         /// Allows for indexing into the file by line number. Index is 1-based. Highest valud index is Count property.
         /// </summary>
         /// <param name="lineNo">Which line number to get.</param>
         /// <returns>The text in the file at the requested line number.</returns>
-        string this[int lineNo] { get; }
-
+        string this[int lineNo]
+        {
+            get;
+        }
         /// <summary>
         /// How many lines are in the file.
         /// </summary>
         /// <value>How many lines are in the file.</value>
-        int Count { get; }
+        int Count
+        {
+            get;
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -888,25 +1091,41 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     ///   implement to create situation-specific methods.
     /// </summary>
     [
-        AttributeUsage(
-            AttributeTargets.Class,
-            AllowMultiple = false,
-            Inherited = false
-            )
+     AttributeUsage(
+        AttributeTargets.Class,
+        AllowMultiple = false,
+        Inherited = false
+        )
     ]
     public sealed class MDbgExtensionEntryPointClassAttribute : Attribute
     {
         /// <summary> URL to provde more detail about this extension. May be null if not supplied.
         /// </summary>
-        public string Url { get; set; }
+        public string Url
+        {
+            get { return m_url; }
+            set { m_url = value; }
+        }
 
         /// <summary> Email address to contract for more detail about this extension. May be null if not supplied.
         /// </summary>
-        public string EMailAddress { get; set; }
+        public string EMailAddress
+        {
+            get { return m_email; }
+            set { m_email = value; }
+        }
 
         /// <summary> Short description of functionality in this extension. May be null.
         /// </summary>        
-        public string ShortDescription { get; set; }
+        public string ShortDescription
+        {
+            get { return m_Descr; }
+            set { m_Descr = value; }
+        }
+
+        private string m_url;
+        private string m_email;
+        private string m_Descr;
     }
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -925,14 +1144,12 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// </value>
         public const string PropertyName = "MdbgStopOptions";
 
-        private readonly List<MDbgStopOptionPolicy>[] m_stopOptions;
-
         /// <summary>
         /// Default constructor.
         /// </summary>
         public MDbgStopOptions()
         {
-            m_stopOptions = new List<MDbgStopOptionPolicy>[Enum.GetValues(typeof (ManagedCallbackType)).Length];
+            m_stopOptions = new List<MDbgStopOptionPolicy>[Enum.GetValues(typeof(ManagedCallbackType)).Length];
         }
 
         /// <summary>
@@ -944,11 +1161,11 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// policy for.</param>
         public void Add(MDbgStopOptionPolicy sop, ManagedCallbackType callbackType)
         {
-            if (m_stopOptions[(int) callbackType] == null)
+            if (m_stopOptions[(int)callbackType] == null)
             {
-                m_stopOptions[(int) callbackType] = new List<MDbgStopOptionPolicy>();
+                m_stopOptions[(int)callbackType] = new List<MDbgStopOptionPolicy>();
             }
-            m_stopOptions[(int) callbackType].Add(sop);
+            m_stopOptions[(int)callbackType].Add(sop);
         }
 
         /// <summary>
@@ -972,7 +1189,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="sop">The stop option policy to remove.</param>
         public void Remove(MDbgStopOptionPolicy sop)
         {
-            foreach (var policies in m_stopOptions)
+            foreach (List<MDbgStopOptionPolicy> policies in m_stopOptions)
             {
                 if (policies != null)
                 {
@@ -993,9 +1210,9 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <param name="args">Debugger callback arguments.</param>
         public void ActOnCallback(MDbgProcess currentProcess, CustomPostCallbackEventArgs args)
         {
-            if (m_stopOptions[(int) args.CallbackType] != null)
+            if (m_stopOptions[(int)args.CallbackType] != null)
             {
-                foreach (MDbgStopOptionPolicy sop in m_stopOptions[(int) args.CallbackType])
+                foreach (MDbgStopOptionPolicy sop in m_stopOptions[(int)args.CallbackType])
                 {
                     sop.ActOnCallback(currentProcess, args);
                 }
@@ -1043,8 +1260,8 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>An iterator over all contained stop option policies.</returns>
         public IEnumerable<MDbgStopOptionPolicy> Policies()
         {
-            var allPolicies = new List<MDbgStopOptionPolicy>();
-            foreach (var policies in m_stopOptions)
+            List<MDbgStopOptionPolicy> allPolicies = new List<MDbgStopOptionPolicy>();
+            foreach (List<MDbgStopOptionPolicy> policies in m_stopOptions)
             {
                 if (policies != null)
                 {
@@ -1061,6 +1278,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         }
 
         // collection of stop option policies, indexed by their callback type.
+        private List<MDbgStopOptionPolicy>[] m_stopOptions;
     }
 
     /// <summary>
@@ -1073,15 +1291,17 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// </value>
         public const string PropertyName = "MdbgModeSettings";
 
-        private readonly ArrayList m_items = new ArrayList();
-
         /// <value>
         ///     A list of different modes supported the shell.
         /// </value>
         public ArrayList Items
         {
-            get { return m_items; }
+            get
+            {
+                return m_items;
+            }
         }
+        private ArrayList m_items = new ArrayList();
     }
 
     /// <summary>
@@ -1104,11 +1324,6 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
     /// </summary>
     public sealed class MDbgModeItem
     {
-        private readonly string m_description;
-        private readonly GetModeValueEvent m_getModeValue;
-        private readonly ModeChangedEvent m_onModeChanged;
-        private readonly string m_shortcut;
-
         /// <summary>
         /// Creates a new MDbgModeItem object.
         /// </summary>
@@ -1140,32 +1355,55 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         ///     Shortcut used by user to change the mode.
         /// </value>
         public string ShortCut
-        {
-            get { return m_shortcut; }
-        }
+        { get { return m_shortcut; } }
 
         /// <value>
         ///     A description of the mode.
         /// </value>
         public string Description
-        {
-            get { return m_description; }
-        }
+        { get { return m_description; } }
 
         /// <value>
         ///     Gets or sets current setting of the mode.
         /// </value>
         public bool OnOff
         {
-            get { return m_getModeValue(this); }
-            set { m_onModeChanged(this, value); }
+            get
+            {
+                return m_getModeValue(this);
+            }
+            set
+            {
+                m_onModeChanged(this, value);
+            }
         }
+
+        public override bool Equals(Object obj)
+        {
+            MDbgModeItem mode = obj as MDbgModeItem;
+            if (this.ShortCut == mode.ShortCut && this.Description == mode.Description)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        private ModeChangedEvent m_onModeChanged;
+        private GetModeValueEvent m_getModeValue;
+        private string m_description;
+        private string m_shortcut;
     }
 
     /// <summary>
     /// A class of utility functions used in mdbg.
     /// </summary>
-    public static class MDbgUtil
+    static public class MDbgUtil
     {
         /// <summary>
         /// converts a dos-like regexp to true regular expresion.
@@ -1179,7 +1417,7 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
         /// <returns>A regexp pattern matching teh dos regular exrepssion</returns>
         public static string ConvertSimpleExpToRegExp(string simpleExp)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("^");
             foreach (char c in simpleExp)
             {
@@ -1246,20 +1484,23 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg
             }
             if (args.CallbackType == ManagedCallbackType.OnExceptionUnwind2)
             {
-                var ea = args as CorExceptionUnwind2EventArgs;
+                CorExceptionUnwind2EventArgs ea = args as CorExceptionUnwind2EventArgs;
                 return new ExceptionUnwindStopReason(ea.AppDomain, ea.Thread, ea.EventType, ea.Flags);
             }
             if (args.CallbackType == ManagedCallbackType.OnModuleLoad)
             {
-                var ea = args as CorModuleEventArgs;
+                CorModuleEventArgs ea = args as CorModuleEventArgs;
                 return new ModuleLoadedStopReason(currentProcess.Modules.Lookup(ea.Module));
             }
             if (args.CallbackType == ManagedCallbackType.OnMDANotification)
             {
-                var ea = args as CorMDAEventArgs;
+                CorMDAEventArgs ea = args as CorMDAEventArgs;
                 return new MDANotificationStopReason(ea.MDA);
             }
             return args.ToString();
         }
+
+
     }
+
 }

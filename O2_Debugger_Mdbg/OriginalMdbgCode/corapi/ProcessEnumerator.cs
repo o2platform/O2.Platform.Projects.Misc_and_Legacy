@@ -3,24 +3,21 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     /** Exposes an enumerator for Processes. */
-
-    internal class CorProcessEnumerator :
+    internal class CorProcessEnumerator : 
         IEnumerable, IEnumerator, ICloneable
     {
-        private readonly ICorDebugProcessEnum m_enum;
+        private ICorDebugProcessEnum m_enum;
         private CorProcess m_proc;
 
-        internal CorProcessEnumerator(ICorDebugProcessEnum processEnumerator)
+        internal CorProcessEnumerator (ICorDebugProcessEnum processEnumerator)
         {
             m_enum = processEnumerator;
         }
@@ -28,60 +25,48 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         //
         // ICloneable interface
         //
-
-        #region ICloneable Members
-
-        public Object Clone()
+        public Object Clone ()
         {
             ICorDebugEnum clone = null;
-            m_enum.Clone(out clone);
-            return new CorProcessEnumerator((ICorDebugProcessEnum) clone);
+            m_enum.Clone (out clone);
+            return new CorProcessEnumerator ((ICorDebugProcessEnum)clone);
         }
-
-        #endregion
 
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
-        public IEnumerator GetEnumerator()
+        public IEnumerator GetEnumerator ()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
-        public bool MoveNext()
+        public bool MoveNext ()
         {
-            var a = new ICorDebugProcess[1];
+            ICorDebugProcess[] a = new ICorDebugProcess[1];
             uint c = 0;
-            int r = m_enum.Next((uint) a.Length, a, out c);
-            if (r == 0 && c == 1) // S_OK && we got 1 new element
-                m_proc = CorProcess.GetCorProcess(a[0]);
+            int r = m_enum.Next ((uint) a.Length, a, out c);
+            if (r==0 && c==1) // S_OK && we got 1 new element
+                m_proc =  CorProcess.GetCorProcess(a[0]);
             else
                 m_proc = null;
             return m_proc != null;
         }
 
-        public void Reset()
+        public void Reset ()
         {
-            m_enum.Reset();
+            m_enum.Reset ();
             m_proc = null;
         }
 
         public Object Current
         {
-            get { return m_proc; }
+            get 
+            {
+                return m_proc;
+            }
         }
-
-        #endregion
     } /* class ProcessEnumerator */
 } /* namespace */

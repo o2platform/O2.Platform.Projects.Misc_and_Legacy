@@ -4,54 +4,37 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
+using System.IO;
 using System.Collections;
 using System.Diagnostics;
-using System.Diagnostics.SymbolStore;
 using System.Globalization;
-using System.IO;
+using System.Diagnostics.SymbolStore;
+using Microsoft.Samples.Debugging.CorSymbolStore;
+using SymbolStore = Microsoft.Samples.Debugging.CorSymbolStore;
+
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorSymbolStore;
-using O2.Debugger.Mdbg.Debugging.CorSymbolStore;
-using O2.Debugger.Mdbg.Debugging.CorSymbolStore;
-using CorFunction=O2.Debugger.Mdbg.Debugging.CorDebug.CorFunction;
-using CorModule=O2.Debugger.Mdbg.Debugging.CorDebug.CorModule;
-using SymbolStore=O2.Debugger.Mdbg.Debugging.CorSymbolStore;
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata;
 
 
-namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
+
+
+namespace Microsoft.Samples.Debugging.MdbgEngine
 {
+
     /// <summary>
     /// MDbgModuleCollection class.  Allows for grouping of Modules.
     /// </summary>
     public sealed class MDbgModuleCollection : MarshalByRefObject, IEnumerable, IDisposable
     {
-        private readonly Hashtable m_items = new Hashtable();
-        private readonly MDbgProcess m_process;
-        private int m_freeModuleNumber;
-
-        internal MDbgModuleCollection(MDbgProcess process)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            Debug.Assert(process != null);
-            m_process = process;
+            MDbgModule[] ret = new MDbgModule[m_items.Count];
+            m_items.Values.CopyTo(ret, 0);
+            Array.Sort(ret);
+            return ret.GetEnumerator();
         }
-
-        /// <summary>
-        /// How many modules are in the collection.
-        /// </summary>
-        /// <value>Module Count.</value>
-        public int Count
-        {
-            get { return m_items.Count; }
-        }
-
-        #region IDisposable Members
 
         /// <summary>
         /// Releases all resources used by the MDbgModuleCollection.
@@ -68,28 +51,33 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             Clear();
         }
 
-        #endregion
-
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
+        /// <summary>
+        /// How many modules are in the collection.
+        /// </summary>
+        /// <value>Module Count.</value>
+        public int Count
         {
-            var ret = new MDbgModule[m_items.Count];
-            m_items.Values.CopyTo(ret, 0);
-            Array.Sort(ret);
-            return ret.GetEnumerator();
+            get
+            {
+                return m_items.Count;
+            }
         }
-
-        #endregion
 
         /// <summary>
         /// Looks up a CorFunction.
         /// </summary>
         /// <param name="managedFunction">Which CorFunction to lookup.</param>
         /// <returns>The coresponding MDbgFunction.</returns>
-        public MDbgFunction LookupFunction(CorDebug.CorFunction managedFunction)
+        public MDbgFunction LookupFunction(CorFunction managedFunction)
         {
-            return Lookup(managedFunction.Module).GetFunction(managedFunction);
+            if (managedFunction != null)
+            {
+                return this.Lookup(managedFunction.Module).GetFunction(managedFunction);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -97,9 +85,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         /// <param name="managedModule">Which CorModule to lookup.</param>
         /// <returns>The coresponding MDbgModule.</returns>
-        public MDbgModule Lookup(CorDebug.CorModule managedModule)
+        public MDbgModule Lookup(CorModule managedModule)
         {
-            return (MDbgModule) m_items[managedModule];
+            return (MDbgModule)m_items[managedModule];
         }
 
         /// <summary>
@@ -117,11 +105,16 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     if (matchedModule == null)
                         matchedModule = module;
                     else
-                        DI.log.error("MDbgAmbiguousModuleNameException , could not find module with name: {0}", moduleName);
-                        //throw new MDbgAmbiguousModuleNameException();
+                        throw new MDbgAmbiguousModuleNameException();
                 }
             }
             return matchedModule;
+        }
+
+        internal MDbgModuleCollection(MDbgProcess process)
+        {
+            Debug.Assert(process != null);
+            m_process = process;
         }
 
         internal void Clear()
@@ -129,12 +122,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             m_items.Clear();
         }
 
-        internal MDbgModule Register(CorDebug.CorModule managedModule)
+        internal MDbgModule Register(CorModule managedModule)
         {
             MDbgModule mdbgModule;
             if (m_items.ContainsKey(managedModule))
             {
-                mdbgModule = (MDbgModule) m_items[managedModule];
+                mdbgModule = (MDbgModule)m_items[managedModule];
                 return mdbgModule;
             }
 
@@ -143,11 +136,15 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             return mdbgModule;
         }
 
-        internal void Unregister(CorDebug.CorModule managedModule)
+        internal void Unregister(CorModule managedModule)
         {
             Debug.Assert(m_items.ContainsKey(managedModule));
             m_items.Remove(managedModule);
         }
+
+        private Hashtable m_items = new Hashtable();
+        private MDbgProcess m_process;
+        private int m_freeModuleNumber = 0;
     }
 
     /// <summary>
@@ -155,27 +152,6 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
     /// </summary>
     public sealed class MDbgModule : MarshalByRefObject, IComparable, IDisposable
     {
-        private static ISymbolBinder1 g_symBinder;
-        private readonly int m_number;
-        private readonly MDbgProcess m_process;
-        private int m_editsCounter;
-
-        private ArrayList m_editsSources;
-
-        private MDbgFunctionMgr m_functions;
-        private CorMetadataImport m_importer;
-        private bool m_isSymReaderInitialized;
-        private CorDebug.CorModule m_module;
-        private ISymbolReader m_symReader;
-
-        internal MDbgModule(MDbgProcess process, CorDebug.CorModule managedModule, int number)
-        {
-            Debug.Assert(process != null && managedModule != null);
-            m_process = process;
-            m_module = managedModule;
-            m_functions = new MDbgFunctionMgr(this);
-            m_number = number;
-        }
 
         /// <summary>
         /// Gets the MDbgProcess that has loaded the module.
@@ -183,7 +159,31 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The MDbgProcess.</value>
         public MDbgProcess Process
         {
-            get { return m_process; }
+            get
+            {
+                return m_process;
+            }
+        }
+
+        /// <summary>
+        /// Releases all resources used by the MDbgModule.
+        /// </summary>
+        public void Dispose()
+        {
+            // Our funtion list may hold onto unmanaged SymbolMethod objects, so dispose that too.
+            m_functions.Dispose();
+            m_functions = null;
+
+            // Release unmanaged resources
+            if (m_symReader != null)
+            {
+                // Disposing the symbol reader will release the file lock on the PDB (even when other
+                // reader COM objects have yet to be released by the garbage collector).
+                ((IDisposable)m_symReader).Dispose();
+                m_symReader = null;
+            }
+            m_module = null;
+            m_importer = null;
         }
 
         /// <summary>
@@ -192,7 +192,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The CorModule.</value>
         public CorModule CorModule
         {
-            get { return m_module; }
+            get
+            {
+                return m_module;
+            }
         }
 
         // lazy loading of Importer
@@ -221,10 +224,12 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <value>The number.</value>
         public int Number
         {
-            get { return m_number; }
+            get
+            {
+                return m_number;
+            }
         }
 
-        // lazy loading of SymReader
         /// <summary>
         /// Gets the SymReader for the Module. 
         /// This will attempt to load symbols if not already loaded.
@@ -234,32 +239,96 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             get
             {
-                // Try and initialize the symbol reader if we haven't already.  For in-memory and dynamic
-                // modules we can't explicitly initialize the symbol reader on demand because the symbols
-                // must be provided to us in a stream.
-                if (!m_isSymReaderInitialized && !CorModule.IsDynamic && !CorModule.IsInMemory)
+                // Try and initialize the symbol reader if we haven't already.  
+                if (!m_isSymReaderInitialized)
                 {
+                    // Mark the symbol reader as initialized so that we won't try to initialize again
+                    // (even if we fail here) until an interesting event has occurred (eg. LoadClass / 
+                    // UpdateModuleSymbolsif) or a user explicitly requests a symbol reload.
                     m_isSymReaderInitialized = true;
 
-                    string sympath = m_process.SymbolPath;
-                    if (sympath == null)
-                        sympath = m_process.m_engine.Options.SymbolPath;
-                    string moduleName = m_module.Name;
-                    Debug.Assert(moduleName.Length > 0);
-                    try
+                    if (CorModule.IsInMemory && !CorModule.IsDynamic)
                     {
-                        m_symReader = (SymBinder as ISymbolBinder2).
-                            GetReaderForFile(Importer.RawCOMObject, moduleName, sympath);
+                        // Module is in-memory and non-dynamic (i.e. loaded from byte-array).
+                        // We could use the below case to eagerly get the reader, but symbols won't 
+                        // be available until the UpdateModuleSymbols callback is dispatched anyway, 
+                        // so we'll just continue to rely on that to avoid the extra cost of 
+                        // transferring the symbol data twice in that case.
+                        // This is just a perf optimization and could be removed in the future if we 
+                        // want to support scenarios / versions in which UpdateModuleSymbols doesn't 
+                        // get dispatched
+                        return null;
                     }
-                    catch (COMException e)
+
+                    // Try and eagerly create the symbol reader (if in-memory symbols exist and the API
+                    // to get them eaglery is supported by this CLR).
+                    object symObj = this.CorModule.CreateReaderForInMemorySymbols();
+                    if (symObj != null)
                     {
-                        if (e.ErrorCode == unchecked((int) 0x806D0014)) // E_PDB_CORRUPT
+                        // The module supported ICDModule3 and has in-memory symbols available.
+                        // Therefore we can update our symbol reader eagerly.
+                        System.Diagnostics.SymbolStore.ISymbolReader symReader =
+                            Microsoft.Samples.Debugging.CorSymbolStore.SymbolBinder.GetReaderFromCOM(symObj);
+
+                        // Now we have a new symbol reader object, follow the same code path as used for
+                        // UpdateModulesymbols
+                        this.UpdateSymbols(symReader);
+                    }
+                    else if (CorModule.IsInMemory || CorModule.IsDynamic)
+                    {
+                        // Couldn't create a symbol reader eagerly and the module is in-memory, so we
+                        // don't want to try and load symbols from disk.  Dynamic modules are always updating
+                        // so even if we found a copy on disk it might be stale.  The "Name" for in-memory modules 
+                        // won't necessarily correspond to any file name, so there's not much point in
+                        // trying to look for symbols based on it (although conceptually it would be nice to
+                        // support an option to find symbols on disk for in-memory modules).
+                        // If this module has symbols, we'll get it from the UpdateModuleSymbols callback.
+                    }
+                    else // The module was loaded from disk...
+                    {
+                        // Shouldn't be any harm in Mdbg scenarios to looking everywhere possible for matching PDBs
+                        // Note that symsrv.dll must be available on the path in order for symbol server access to work.
+                        SymSearchPolicies symPolicy =
+                            SymSearchPolicies.AllowOriginalPathAccess |
+                            SymSearchPolicies.AllowReferencePathAccess |
+                            SymSearchPolicies.AllowRegistryAccess |
+                            SymSearchPolicies.AllowSymbolServerAccess;
+
+                        string sympath = m_process.SymbolPath;
+                        if (sympath == null)
+                            sympath = m_process.m_engine.Options.SymbolPath;
+                        string moduleName = m_module.Name;
+                        Debug.Assert(moduleName.Length > 0);
+                        // If we can load a file from the same path then we will assume that we got the same
+                        // module as the one in memory (But we could still be cross machine loading a completely
+                        // different file that happens to have the same path locally as the debuggee's
+                        // module does remotely). If we can't find the file then we will assume that the module
+                        // is layed out in memory just as LoadLibrary would place it and read the data from there.
+
+                        try
                         {
-                            // Ignore it.
-                            // This may happen for mismatched pdbs
+                            if (File.Exists(moduleName))
+                            {
+                                m_symReader = SymBinder.GetReaderForFile(Importer.RawCOMObject, moduleName, sympath, symPolicy);
+                            }
+                            else
+                            {
+                                m_symReader = SymBinder.GetReaderForFile(Importer.RawCOMObject,
+                                    moduleName, sympath, symPolicy, new ModuleRVAReader(CorModule));
+                            }
                         }
-                        else
-                            throw;
+                        catch (COMException e)
+                        {
+                            if ((e.ErrorCode == (int)HResult.E_PDB_CORRUPT) ||
+                                (e.ErrorCode == (int)HResult.E_PARTIAL_COPY)) // Only part of a ReadProcessMemory or WriteProcessMemory request was completed.
+                            {
+                                // Ignore it.
+                                // The first may happen for mismatched pdbs
+                                // The second may happen for a dump
+                            }
+                            else
+                                throw;
+                        }
                     }
                 }
                 return m_symReader;
@@ -281,7 +350,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 // Try to get exact PDB name.
                 try
                 {
-                    var s2 = (SymReader as ISymbolReader2);
+                    SymbolStore.ISymbolReader2 s2 = (SymReader as SymbolStore.ISymbolReader2);
                     if (s2 != null)
                     {
                         string stPdbName = s2.GetSymbolStoreFileName();
@@ -292,59 +361,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 {
                     // We've already set it to a default, so ignore the rest.   
                 }
+
                 return null;
             }
         }
-
-        /// <summary>
-        /// Gets the number of edits performed on a module.
-        /// </summary>
-        /// <value>The number of edits.</value>
-        public int EditsCounter
-        {
-            get { return m_editsCounter; }
-        }
-
-        private static ISymbolBinder1 SymBinder
-        {
-            get
-            {
-                if (g_symBinder == null)
-                {
-                    g_symBinder = new SymbolBinder();
-                    Debug.Assert(g_symBinder != null);
-                }
-                return g_symBinder;
-            }
-        }
-
-        #region IComparable Members
-
-        int IComparable.CompareTo(object obj)
-        {
-            return Number - (obj as MDbgModule).Number;
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        /// <summary>
-        /// Releases all resources used by the MDbgModule.
-        /// </summary>
-        public void Dispose()
-        {
-            // Our funtion list may hold onto unmanaged SymbolMethod objects, so dispose that too.
-            m_functions.Dispose();
-            m_functions = null;
-
-            // Release unmanaged resources.
-            m_symReader = null;
-            m_module = null;
-            m_importer = null;
-        }
-
-        #endregion
 
         /// <summary>
         /// Checks if the module name string matches this module.
@@ -356,6 +376,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </return>
         public bool MatchesModuleName(string moduleName)
         {
+
             // module names can be provide in following forms:
             // :1                       -- identifes module by logical number
             // mscorlib                 -- identifes module by base module name without path
@@ -375,16 +396,13 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 UInt32 logicalNumber;
                 if (!UInt32.TryParse(moduleName.Substring(1), out logicalNumber))
                     return false;
-                return logicalNumber == Number;
+                return logicalNumber == this.Number;
             }
 
             // maybe the module has been specified with a full path
             bool fullNameProvided;
-            if (moduleName.IndexOfAny(new[]
-                                          {
-                                              Path.DirectorySeparatorChar,
-                                              Path.AltDirectorySeparatorChar
-                                          }) == -1)
+            if (moduleName.IndexOfAny(new char[]{ System.IO.Path.DirectorySeparatorChar,
+                                               System.IO.Path.AltDirectorySeparatorChar }) == -1)
                 fullNameProvided = false;
             else
                 fullNameProvided = true;
@@ -428,7 +446,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                     moduleName = moduleName.Substring(0, i);
             }
 
-            if (CorModule.IsInMemory && !CorModule.IsDynamic)
+            if (this.CorModule.IsInMemory && !this.CorModule.IsDynamic)
             {
                 //  in-memory modules need to be referenced only by : syntax
                 // because CorModule.Name for those modules is always: "<unknown>".
@@ -440,8 +458,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             bool isMatch;
             if (fullNameProvided)
             {
-                isMatch = String.Compare(CorModule.Name, moduleName,
-                                         true, CultureInfo.InvariantCulture) == 0;
+                isMatch = String.Compare(this.CorModule.Name, moduleName,
+                                          true, CultureInfo.InvariantCulture) == 0;
             }
             else
             {
@@ -454,8 +472,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 else
                     checkOnlyFullName = false;
 
-                isMatch = String.Compare(Path.GetFileName(CorModule.Name), moduleName,
-                                         true, CultureInfo.InvariantCulture) == 0;
+                isMatch = String.Compare(System.IO.Path.GetFileName(this.CorModule.Name), moduleName,
+                                          true, CultureInfo.InvariantCulture) == 0;
 
                 // Dot at the end of module name explicitely says that we have specified an extension.
                 // e.g. "a." will match only module named: "a." not "a..dll" or "a.dll".
@@ -463,8 +481,8 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
 
                 if (!isMatch && !checkOnlyFullName)
                 {
-                    isMatch = String.Compare(Path.GetFileNameWithoutExtension(CorModule.Name), moduleName,
-                                             true, CultureInfo.InvariantCulture) == 0;
+                    isMatch = String.Compare(System.IO.Path.GetFileNameWithoutExtension(this.CorModule.Name), moduleName,
+                                              true, CultureInfo.InvariantCulture) == 0;
                 }
             }
 
@@ -472,7 +490,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 // we'll check if the appdomain matches as well.
                 isMatch =
-                    m_process.AppDomains.Lookup(CorModule.Assembly.AppDomain).Number == appDomainNumber;
+                    m_process.AppDomains.Lookup(this.CorModule.Assembly.AppDomain).Number == appDomainNumber;
             }
 
             return isMatch;
@@ -487,8 +505,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             if (m_isSymReaderInitialized == false)
                 return;
 
-            if (m_isSymReaderInitialized && m_symReader != null &&
-                !force)
+            if (m_isSymReaderInitialized && (m_symReader != null) && !force)
                 return; // we don't want to reload symbols that has been sucessfully loaded
 
             if (EditsCounter > 0)
@@ -505,7 +522,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         /// <summary>
-        /// Updates the symbols for the module.
+        /// Updates the symbols for the module given the raw PDB symbol stream.
         /// </summary>
         /// <param name="symbolStream">New IStream to use for symbol reading.
         /// If this is null, unloads the symbols for this module.</param>
@@ -521,13 +538,35 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 return true;
             }
 
-            ISymbolReader newSymReader = (SymBinder as ISymbolBinder2).GetReaderFromStream(Importer.RawCOMObject,
-                                                                                           symbolStream);
+            // Create a new symbol reader for this stream
+            ISymbolReader newSymReader = SymBinder.GetReaderFromStream(Importer.RawCOMObject, symbolStream);
             if (newSymReader == null)
                 return false;
-            m_symReader = newSymReader; // replace symbol reader with the updated one.
-            m_isSymReaderInitialized = true;
+
+            UpdateSymbols(newSymReader);
             return true;
+        }
+
+        /// <summary>
+        /// Updates the symbols for a module given a new reader object
+        /// </summary>
+        /// <param name="newSymReader">The new symbol reader object</param>
+        private void UpdateSymbols(ISymbolReader newSymReader)
+        {
+            // replace symbol reader with the updated one.
+            m_symReader = newSymReader;
+            m_isSymReaderInitialized = true;
+
+            // Reset the cache of MDbgFunction objects since their symbol information is now
+            // possibly out-of-date.
+            // Note that in practice UpdateModuleSymbols is really only used to add symbols 
+            // for newly emitted types.  This means we could probably get away with something
+            // lighter weight, like looping through the MDbgFunction objects, finding ones
+            // with missing symbol info, and resetting their m_isInitialized to false.  But this
+            // would leave multiple symbol readers alive, taking up memory etc.  It's better
+            // to throw away all references to the old symbol reader and recreate everything
+            // for the new reader.
+            m_functions.Clear();
         }
 
         /// <summary>
@@ -538,10 +577,10 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// <param name="deltaPdbFile">File containing the PDB delta.</param>
         /// <param name="editSourceFile">The edited source file. WARNING - this param may be removed in next release.</param>
         public void ApplyEdit(string deltaMetadataFile,
-                              string deltaILFile,
-                              string deltaPdbFile,
-                              string editSourceFile
-            )
+                               string deltaILFile,
+                               string deltaPdbFile,
+                               string editSourceFile
+                               )
         {
             if (SymReader == null && deltaPdbFile != null)
                 throw new MDbgException("Cannot update symbols on module without loaded symbols.");
@@ -567,7 +606,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 // apply dpdb to the symbol store.
                 ISymbolReader sr = SymReader;
-                (sr as ISymbolReader2).UpdateSymbolStore(deltaPdbFile, null);
+                (sr as SymbolStore.ISymbolReader2).UpdateSymbolStore(deltaPdbFile, null);
             }
 
             // save file name into of the edit
@@ -586,7 +625,7 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         /// </summary>
         /// <param name="managedFunction">The CorFunction to lookup.</param>
         /// <returns>The coresponding MDbgFunction.</returns>
-        public MDbgFunction GetFunction(CorDebug.CorFunction managedFunction)
+        public MDbgFunction GetFunction(CorFunction managedFunction)
         {
             return m_functions.Get(managedFunction);
         }
@@ -604,6 +643,18 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         }
 
         /// <summary>
+        /// Gets the number of edits performed on a module.
+        /// </summary>
+        /// <value>The number of edits.</value>
+        public int EditsCounter
+        {
+            get
+            {
+                return m_editsCounter;
+            }
+        }
+
+        /// <summary>
         /// Gets the name of edit file that was to used to do specified edits.
         /// </summary>
         /// <param name="editNumber">Which edit to lookup.</param>
@@ -612,13 +663,58 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
         {
             Debug.Assert(editNumber <= m_editsCounter);
             Debug.Assert(editNumber > 0);
-            if (! (editNumber <= m_editsCounter ||
-                   editNumber > 0))
+            if (!(editNumber <= m_editsCounter ||
+                  editNumber > 0))
                 throw new ArgumentException();
 
             if (m_editsSources == null)
                 return null;
-            return (string) m_editsSources[editNumber - 1];
+            return (string)m_editsSources[editNumber - 1];
         }
+
+        internal MDbgModule(MDbgProcess process, CorModule managedModule, int number)
+        {
+            Debug.Assert(process != null && managedModule != null);
+            m_process = process;
+            m_module = managedModule;
+            m_functions = new MDbgFunctionMgr(this);
+            m_number = number;
+        }
+
+        int IComparable.CompareTo(object obj)
+        {
+            return this.Number - (obj as MDbgModule).Number;
+        }
+
+        // lazy initialization of SymBiner (on Class level)
+        private static ISymbolBinder2 SymBinder
+        {
+            get
+            {
+                if (g_symBinder == null)
+                {
+                    g_symBinder = new SymbolStore.SymbolBinder();
+                    Debug.Assert(g_symBinder != null);
+                }
+                return g_symBinder;
+            }
+        }
+
+        private CorModule m_module;
+        private MDbgProcess m_process;
+        private int m_number;
+
+        private CorMetadataImport m_importer;
+        private ISymbolReader m_symReader;
+        private bool m_isSymReaderInitialized = false;
+
+        private int m_editsCounter = 0;
+
+        private ArrayList m_editsSources;
+
+        private MDbgFunctionMgr m_functions;
+
+        private static ISymbolBinder2 g_symBinder;
     }
+
 }

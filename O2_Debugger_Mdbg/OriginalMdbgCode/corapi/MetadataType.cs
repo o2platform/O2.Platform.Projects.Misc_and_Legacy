@@ -4,35 +4,22 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata.NativeApi;
+using System.Runtime.InteropServices;
+using System.Globalization;
+using System.Diagnostics;
 
-namespace O2.Debugger.Mdbg.Debugging.CorMetadata
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Debugging.CorMetadata
 {
     public sealed class MetadataType : Type
     {
-        private readonly CorElementType m_enumUnderlyingType;
-        private readonly IMetadataImport m_importer;
-        private readonly bool m_isEnum;
-        private readonly bool m_isFlagsEnum;
-        private readonly string m_name;
-        private readonly int m_typeToken;
-        private List<KeyValuePair<string, ulong>> m_enumValues;
-
         internal MetadataType(IMetadataImport importer, int classToken)
         {
             Debug.Assert(importer != null);
@@ -57,17 +44,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                                          out size,
                                          out pdwTypeDefFlags,
                                          out ptkExtends
-                    );
-                var szTypedef = new StringBuilder(size);
+                                         );
+                StringBuilder szTypedef = new StringBuilder(size);
                 importer.GetTypeDefProps(classToken,
                                          szTypedef,
                                          szTypedef.Capacity,
                                          out size,
                                          out pdwTypeDefFlags,
                                          out ptkExtends
-                    );
+                                         );
 
-                m_name = GetNestedClassPrefix(importer, classToken, pdwTypeDefFlags) + szTypedef;
+                m_name = GetNestedClassPrefix(importer, classToken, pdwTypeDefFlags) + szTypedef.ToString();
 
                 // Check whether the type is an enum
                 string baseTypeName = GetTypeName(importer, ptkExtends);
@@ -81,138 +68,21 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                     // Check for flags enum by looking for FlagsAttribute
                     uint sigSize = 0;
                     ppvSig = IntPtr.Zero;
-                    int hr = importer.GetCustomAttributeByName(classToken, "System.FlagsAttribute", out ppvSig,
-                                                               out sigSize);
+                    int hr = importer.GetCustomAttributeByName(classToken, "System.FlagsAttribute", out ppvSig, out sigSize);
                     if (hr < 0)
                     {
                         throw new COMException("Exception looking for flags attribute", hr);
                     }
-                    m_isFlagsEnum = (hr == 0); // S_OK means the attribute is present.
+                    m_isFlagsEnum = (hr == 0);  // S_OK means the attribute is present.
                 }
-            }
-        }
-
-        // properties
-
-        public override int MetadataToken
-        {
-            get { return m_typeToken; }
-        }
-
-        public override string Name
-        {
-            get { return FullName; }
-        }
-
-        public override Type UnderlyingSystemType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override Type BaseType
-        {
-            get
-            {
-                // NOTE: If you ever try to implement this, remember that the base type
-                // can be represented in metadata by a TypeDef, TypeRef, or TypeSpec
-                // token, depending on the nature and location of the base type.
-                //
-                // See ECMA Partition II for more details.
-                throw new NotImplementedException();
-            }
-        }
-
-        public override String AssemblyQualifiedName
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override String Namespace
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override String FullName
-        {
-            get { return m_name; }
-        }
-
-        public override RuntimeTypeHandle TypeHandle
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override Assembly Assembly
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override Module Module
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-
-        public override Guid GUID
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool ReallyIsEnum
-        {
-            get { return m_isEnum; }
-        }
-
-        public bool ReallyIsFlagsEnum
-        {
-            get { return m_isFlagsEnum; }
-        }
-
-        public CorElementType EnumUnderlyingType
-        {
-            get { return m_enumUnderlyingType; }
-        }
-
-
-        [CLSCompliant(false)]
-        public IList<KeyValuePair<string, ulong>> EnumValues
-        {
-            get
-            {
-                if (m_enumValues == null)
-                {
-                    // Build a big list of field values
-                    FieldInfo[] fields = GetFields(BindingFlags.Public);
-                    // BindingFlags is actually ignored in the "fake" type,
-                    // but we only want the public fields anyway
-                    m_enumValues = new List<KeyValuePair<string, ulong>>();
-                    FieldAttributes staticLiteralField = FieldAttributes.HasDefault | FieldAttributes.Literal |
-                                                         FieldAttributes.Static;
-                    for (int i = 0; i < fields.Length; i++)
-                    {
-                        var field = fields[i] as MetadataFieldInfo;
-                        if ((field.Attributes & staticLiteralField) == staticLiteralField)
-                        {
-                            m_enumValues.Add(new KeyValuePair<string, ulong>(field.Name,
-                                                                             Convert.ToUInt64(field.GetValue(null),
-                                                                                              CultureInfo.
-                                                                                                  InvariantCulture)));
-                        }
-                    }
-
-                    var comparer = new AscendingValueComparer<string, ulong>();
-                    m_enumValues.Sort(comparer);
-                }
-
-                return m_enumValues;
             }
         }
 
         private static string GetTypeName(IMetadataImport importer, int tk)
         {
             // Get the base type name
-            var sbBaseName = new StringBuilder();
-            var token = new MetadataToken(tk);
+            StringBuilder sbBaseName = new StringBuilder();
+            MetadataToken token = new MetadataToken(tk);
             int size;
             TypeAttributes pdwTypeDefFlags;
             int ptkExtends;
@@ -220,20 +90,20 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             if (token.IsOfType(MetadataTokenType.TypeDef))
             {
                 importer.GetTypeDefProps(token,
-                                         null,
-                                         0,
-                                         out size,
-                                         out pdwTypeDefFlags,
-                                         out ptkExtends
-                    );
+                                    null,
+                                    0,
+                                    out size,
+                                    out pdwTypeDefFlags,
+                                    out ptkExtends
+                                    );
                 sbBaseName.Capacity = size;
                 importer.GetTypeDefProps(token,
-                                         sbBaseName,
-                                         sbBaseName.Capacity,
-                                         out size,
-                                         out pdwTypeDefFlags,
-                                         out ptkExtends
-                    );
+                                    sbBaseName,
+                                    sbBaseName.Capacity,
+                                    out size,
+                                    out pdwTypeDefFlags,
+                                    out ptkExtends
+                                    );
             }
             else if (token.IsOfType(MetadataTokenType.TypeRef))
             {
@@ -243,18 +113,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                 {
                     int resolutionScope;
                     importer.GetTypeRefProps(token,
-                                             out resolutionScope,
-                                             null,
-                                             0,
-                                             out size
-                        );
+                                        out resolutionScope,
+                                        null,
+                                        0,
+                                        out size
+                                        );
                     sbBaseName.Capacity = size;
                     importer.GetTypeRefProps(token,
-                                             out resolutionScope,
-                                             sbBaseName,
-                                             sbBaseName.Capacity,
-                                             out size
-                        );
+                                        out resolutionScope,
+                                        sbBaseName,
+                                        sbBaseName.Capacity,
+                                        out size
+                                        );
                 }
             }
             // Note the base type can also be a TypeSpec token, but that only happens
@@ -281,18 +151,16 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             importer.EnumFields(ref hEnum, tk, out mdFieldDef, 1, out numFieldDefs);
             while (numFieldDefs != 0)
             {
-                importer.GetFieldProps(mdFieldDef, out classToken, null, 0, out nameSize, out fieldAttributes,
-                                       out ppvSig, out size, out cPlusTypeFlab, out ppValue, out pcchValue);
+                importer.GetFieldProps(mdFieldDef, out classToken, null, 0, out nameSize, out fieldAttributes, out ppvSig, out size, out cPlusTypeFlab, out ppValue, out pcchValue);
                 Debug.Assert(tk == classToken);
 
                 // Enums should have one instance field that indicates the underlying type
-                if ((((FieldAttributes) fieldAttributes) & FieldAttributes.Static) == 0)
+                if ((((FieldAttributes)fieldAttributes) & FieldAttributes.Static) == 0)
                 {
                     Debug.Assert(size == 2); // Primitive type field sigs should be two bytes long
 
                     IntPtr ppvSigTemp = ppvSig;
-                    CorCallingConvention callingConv =
-                        MetadataHelperFunctions.CorSigUncompressCallingConv(ref ppvSigTemp);
+                    CorCallingConvention callingConv = MetadataHelperFunctions.CorSigUncompressCallingConv(ref ppvSigTemp);
                     Debug.Assert(callingConv == CorCallingConvention.Field);
 
                     return MetadataHelperFunctions.CorSigUncompressElementType(ref ppvSigTemp);
@@ -303,6 +171,102 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
 
             Debug.Fail("Should never get here.");
             throw new ArgumentException("Non-enum passed to GetEnumUnderlyingType.");
+        }
+
+        // properties
+
+        public override int MetadataToken
+        {
+            get
+            {
+                return m_typeToken;
+            }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return FullName;
+            }
+        }
+
+        public override Type UnderlyingSystemType
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override Type BaseType
+        {
+            get
+            {
+                // NOTE: If you ever try to implement this, remember that the base type
+                // can be represented in metadata by a TypeDef, TypeRef, or TypeSpec
+                // token, depending on the nature and location of the base type.
+                //
+                // See ECMA Partition II for more details.
+                throw new NotImplementedException();
+            }
+        }
+
+        public override String AssemblyQualifiedName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override String Namespace
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override String FullName
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public override RuntimeTypeHandle TypeHandle
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override Assembly Assembly
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override Module Module
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        public override Guid GUID
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
 
@@ -359,7 +323,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
         }
 
         protected override TypeAttributes GetAttributeFlagsImpl()
-        {            
+        {
             throw new NotImplementedException();
         }
 
@@ -380,8 +344,37 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
 
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
         {
-            return null;
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Return an array of the property tokens on the type.
+        /// </summary>
+        public int[] GetPropertiesTokens()
+        {
+            // It may be more efficient to use the technique in EnumerateAllMethodTokens where we
+            // just get the number of rows and then iterate through token values.
+            // This approach tests enumerating properties on metadata.
+            List<int> al = new List<int>();
+            IntPtr hEnum = new IntPtr();
+
+            int propToken;
+            try
+            {
+                while (true)
+                {
+                    uint size;
+                    m_importer.EnumProperties(ref hEnum, (int)m_typeToken, out propToken, 1, out size);
+                    if (size == 0)
+                        break;
+                    al.Add(propToken);
+                }
+            }
+            finally
+            {
+                m_importer.CloseEnum(hEnum);
+            }
+            return al.ToArray();
         }
 
         protected override PropertyInfo GetPropertyImpl(String name, BindingFlags bindingAttr, Binder binder,
@@ -417,8 +410,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
 
         public override FieldInfo[] GetFields(BindingFlags bindingAttr)
         {
-            var al = new ArrayList();
-            var hEnum = new IntPtr();
+            List<FieldInfo> al = new List<FieldInfo>();
+            IntPtr hEnum = new IntPtr();
 
             int fieldToken;
             try
@@ -426,9 +419,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                 while (true)
                 {
                     uint size;
-                    m_importer.EnumFields(ref hEnum, m_typeToken, out fieldToken, 1, out size);
+                    m_importer.EnumFields(ref hEnum, (int)m_typeToken, out fieldToken, 1, out size);
                     if (size == 0)
                         break;
+                    Debug.Assert((fieldToken >> 24 == 4) && ((fieldToken & 0x00FFFFFF) >= 1));
                     al.Add(new MetadataFieldInfo(m_importer, fieldToken, this));
                 }
             }
@@ -436,13 +430,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             {
                 m_importer.CloseEnum(hEnum);
             }
-            return (FieldInfo[]) al.ToArray(typeof (FieldInfo));
+            return al.ToArray();
         }
 
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
         {
-            var al = new ArrayList();
-            var hEnum = new IntPtr();
+            ArrayList al = new ArrayList();
+            IntPtr hEnum = new IntPtr();
 
             int methodToken;
             try
@@ -450,7 +444,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                 while (true)
                 {
                     int size;
-                    m_importer.EnumMethods(ref hEnum, m_typeToken, out methodToken, 1, out size);
+                    m_importer.EnumMethods(ref hEnum, (int)m_typeToken, out methodToken, 1, out size);
                     if (size == 0)
                         break;
                     al.Add(new MetadataMethodInfo(m_importer, methodToken));
@@ -460,7 +454,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             {
                 m_importer.CloseEnum(hEnum);
             }
-            return (MethodInfo[]) al.ToArray(typeof (MethodInfo));
+            return (MethodInfo[])al.ToArray(typeof(MethodInfo));
         }
 
         protected override MethodInfo GetMethodImpl(String name,
@@ -499,6 +493,58 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             return MetadataHelperFunctions.GetGenericArgumentNames(m_importer, m_typeToken);
         }
 
+        public bool ReallyIsEnum
+        {
+            get
+            {
+                return m_isEnum;
+            }
+        }
+
+        public bool ReallyIsFlagsEnum
+        {
+            get
+            {
+                return m_isFlagsEnum;
+            }
+        }
+
+        public CorElementType EnumUnderlyingType
+        {
+            get
+            {
+                return m_enumUnderlyingType;
+            }
+        }
+
+        [CLSCompliant(false)]
+        public IList<KeyValuePair<string, ulong>> EnumValues
+        {
+            get
+            {
+                if (m_enumValues == null)
+                {
+                    // Build a big list of field values
+                    FieldInfo[] fields = GetFields(BindingFlags.Public);       // BindingFlags is actually ignored in the "fake" type,
+                    // but we only want the public fields anyway
+                    m_enumValues = new List<KeyValuePair<string, ulong>>();
+                    FieldAttributes staticLiteralField = FieldAttributes.HasDefault | FieldAttributes.Literal | FieldAttributes.Static;
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        MetadataFieldInfo field = fields[i] as MetadataFieldInfo;
+                        if ((field.Attributes & staticLiteralField) == staticLiteralField)
+                        {
+                            m_enumValues.Add(new KeyValuePair<string, ulong>(field.Name, Convert.ToUInt64(field.GetValue(null), CultureInfo.InvariantCulture)));
+                        }
+                    }
+
+                    AscendingValueComparer<string, ulong> comparer = new AscendingValueComparer<string, ulong>();
+                    m_enumValues.Sort(comparer);
+                }
+
+                return m_enumValues;
+            }
+        }
 
         // returns "" for normal classes, returns prefix for nested classes
         private static string GetNestedClassPrefix(IMetadataImport importer, int classToken, TypeAttributes attribs)
@@ -508,27 +554,35 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
                 // it is a nested class
                 int enclosingClass;
                 importer.GetNestedClassProps(classToken, out enclosingClass);
-                var mt = new MetadataType(importer, enclosingClass);
-                return mt.Name + ".";
+                MetadataType mt = new MetadataType(importer, enclosingClass);
+
+                // Karthik Kailash -- 08/04/07
+                // Changed this from using a ‘.’ instead of  a ‘+’ to prefix a nested class (e.g. Foo.Nested instead of 
+                // Foo+Nested, where Nested is a class defined inside Foo). Since MDbg is implementing reflection 
+                // interfaces, it should be using reflection syntax, not syntax specific to C#.
+                return mt.Name + "+";
             }
             else
                 return String.Empty;
         }
 
         // member variables
+        private string m_name;
+        private IMetadataImport m_importer;
+        private int m_typeToken;
+        private bool m_isEnum;
+        private bool m_isFlagsEnum;
+        private CorElementType m_enumUnderlyingType;
+        private List<KeyValuePair<string, ulong>> m_enumValues;
     }
 
     // Sorts KeyValuePair<string,ulong>'s in increasing order by the value
-    internal class AscendingValueComparer<K, V> : IComparer<KeyValuePair<K, V>> where V : IComparable
+    class AscendingValueComparer<K, V> : IComparer<KeyValuePair<K, V>> where V : IComparable
     {
-        #region IComparer<KeyValuePair<K,V>> Members
-
         public int Compare(KeyValuePair<K, V> p1, KeyValuePair<K, V> p2)
         {
             return p1.Value.CompareTo(p2.Value);
         }
-
-        #endregion
 
         public bool Equals(KeyValuePair<K, V> p1, KeyValuePair<K, V> p2)
         {
@@ -548,18 +602,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
     //
     //////////////////////////////////////////////////////////////////////////////////
 
-    internal class TypeDefEnum : IEnumerable, IEnumerator, IDisposable
+    class TypeDefEnum : IEnumerable, IEnumerator, IDisposable
     {
-        private readonly CorMetadataImport m_corMeta;
-        private IntPtr m_enum;
-        private Type m_type;
-
         public TypeDefEnum(CorMetadataImport corMeta)
         {
             m_corMeta = corMeta;
         }
 
-        #region IDisposable Members
+        ~TypeDefEnum()
+        {
+            DestroyEnum();
+        }
 
         public void Dispose()
         {
@@ -567,27 +620,17 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             GC.SuppressFinalize(this);
         }
 
-        #endregion
-
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
         public IEnumerator GetEnumerator()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
         public bool MoveNext()
         {
             int token;
@@ -609,14 +652,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
 
         public Object Current
         {
-            get { return m_type; }
-        }
-
-        #endregion
-
-        ~TypeDefEnum()
-        {
-            DestroyEnum();
+            get
+            {
+                return m_type;
+            }
         }
 
         protected void DestroyEnum()
@@ -624,5 +663,10 @@ namespace O2.Debugger.Mdbg.Debugging.CorMetadata
             m_corMeta.m_importer.CloseEnum(m_enum);
             m_enum = new IntPtr();
         }
+
+        private CorMetadataImport m_corMeta;
+        private IntPtr m_enum;
+        private Type m_type;
     }
 }
+

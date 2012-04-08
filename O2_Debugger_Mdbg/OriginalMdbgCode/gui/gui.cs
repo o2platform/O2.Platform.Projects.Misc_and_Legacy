@@ -4,31 +4,27 @@
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Diagnostics;
+using Microsoft.Samples.Tools.Mdbg;
+using Microsoft.Samples.Debugging.MdbgEngine;
 using System.Threading;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
+using System.Security.Permissions;
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
+[assembly:CLSCompliant(true)]
+[assembly:System.Runtime.InteropServices.ComVisible(false)]
+
+namespace Microsoft.Samples.Tools.Mdbg.Extension
 {
-    public class GuiExtension : CommandBase
+    public abstract class GuiExtension : CommandBase
     {
-        private static MainForm m_mainForm;
-
         public static void LoadExtension()
         {
-            try
+            try 
             {
-                MDbgAttributeDefinedCommand.AddCommandsFromType(Shell.Commands, typeof (GuiExtension));
-            }
+                MDbgAttributeDefinedCommand.AddCommandsFromType(Shell.Commands,typeof(GuiExtension));
+            } 
             catch
             {
                 // we'll ignore errors about multiple defined gui command in case gui is loaded
@@ -39,93 +35,27 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
             Gui("");
         }
 
-        [
-            CommandDescription(
-                CommandName = "gui",
-                ShortHelp = "gui [close] - starts/closes a gui interface",
-                LongHelp =
-                    "Usage: gui [close]"
-                )
-        ]
-        public static void Gui(string args)
-        {
-            // just do the check that gui is not already loaded,
-            // strange things are happening else:
-            var ap = new ArgParser(args);
-            if (ap.Exists(0))
-            {
-                if (ap.AsString(0) == "close")
-                {
-                    if (m_mainForm != null)
-                    {
-                        m_mainForm.CloseGui();
-                        Application.Exit(); // this line will cause the message pump on other thread to quit.
-                        return;
-                    }
-                    else
-                        throw new MDbgShellException("GUI not started.");
-                }
-                else
-                    throw new MDbgShellException("invalid argument");
-            }
-
-            if (Shell.IO == m_mainForm)
-            {
-                WriteOutput("GUI already started. Cannot start second instance.");
-                return;
-            }
-
-            WriteOutput("starting gui");
-
-            m_mainForm = new MainForm(Shell);
-
-            var t = new Thread(RunMessageLoop);
-
-            // Only MTA Threads can access CorDebug interfaces because mscordbi doesn't provide marshalling to make them accessable from STA Threads
-            // However, UI thread must be STA. So we'll make cross-thread calls to a worker thread for all ICorDebug access.
-            t.SetApartmentState(ApartmentState.STA);
-            t.IsBackground = true;
-
-            t.Start();
-            m_mainForm.InitComplete.WaitOne(); // wait till form is fully displayed.
-
-            WriteOutput(MainForm.MetaInfoOutputConstant, "GUI: Simple Extension for Managed debugger (MDbg) started");
-            WriteOutput(MainForm.MetaInfoOutputConstant,
-                        "for information on how to use the extension select in menu bar help|about");
-            WriteOutput(MainForm.MetaInfoOutputConstant,
-                        "!!This is just a sample. It is not intended for Production purposes!!\n");
-        }
-
-        public static void RunMessageLoop()
-        {
-            // if we have following code here and close the dialog the we cannot break into debugger.
-            //m_mainForm.Show();
-            //Application.Run(m_mainForm);//new ApplicationContext(m_mainForm));
-            m_mainForm.ShowDialog();
-        }
-
         #region Extra IL stepping commands        
-
         [
-            CommandDescription(
-                CommandName = "il_next",
-                ShortHelp = "Step over the next IL instruction",
-                MinimumAbbrev = 4,
-                LongHelp = "Usage: il_next"
-                )
-        ]
+         CommandDescription(
+                            CommandName = "il_next",
+                            ShortHelp = "Step over the next IL instruction",
+                            MinimumAbbrev = 4,
+                            LongHelp = "Usage: il_next"
+                            )
+         ]
         public static void ILNextCmd(string args)
         {
             ILStepWorker(false, true, args);
         }
-
+        
         [
-            CommandDescription(
-                CommandName = "il_step",
-                ShortHelp = "Step into the next IL instruction",
-                MinimumAbbrev = 4,
-                LongHelp = "Usage: il_step"
-                )
+         CommandDescription(
+                            CommandName = "il_step",
+                            ShortHelp = "Step into the next IL instruction",
+                            MinimumAbbrev = 4,
+                            LongHelp = "Usage: il_step"
+                            )
         ]
         public static void ILStepCmd(string args)
         {
@@ -143,13 +73,13 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
             }
 
             // Do an IL-level step by single-stepping native code until our IL IP changes.
-            MDbgProcess proc = Shell.Debugger.Processes.Active;
+            MDbgProcess proc = GuiExtension.Shell.Debugger.Processes.Active;
             CorFrame curFrame = proc.Threads.Active.CurrentFrame.CorFrame;
 
             uint ipNative;
             uint offsetStart;
             uint offsetNew;
-
+            
             ulong oldStackStart;
             ulong oldStackEnd;
             ulong newStackStart;
@@ -163,18 +93,17 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
             if (isVerbose)
             {
                 WriteOutput(String.Format("  IL step starting at offset IL_{0:x}, N=0x{1:x}, frame=({2:x},{3:x})",
-                                          offsetStart, ipNative, oldStackStart, oldStackEnd));
+                    offsetStart, ipNative, oldStackStart, oldStackEnd));
             }
 
             // We'll just do native single-steps until our IL ip changes.
-            while (true)
+            while(true)
             {
                 // Single step native code.
                 if (stepIn)
                 {
                     proc.StepInto(true).WaitOne();
-                }
-                else
+                }else
                 {
                     proc.StepOver(true).WaitOne();
                 }
@@ -187,14 +116,13 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
                     // We're in a new frame. Maybe from step-in or step-out.
                     if (isVerbose)
                     {
-                        WriteOutput(String.Format("  IL step stopping at new frame =({0:x},{1:x})", newStackStart,
-                                                  newStackEnd));
+                        WriteOutput(String.Format("  IL step stopping at new frame =({0:x},{1:x})", newStackStart, newStackEnd));
                     }
                     break;
                 }
                 curFrame.GetIP(out offsetNew, out result);
                 curFrame.GetNativeIP(out ipNative);
-                if ((offsetNew == offsetStart) && (proc.StopReason.GetType() == typeof (StepCompleteStopReason)))
+                if ((offsetNew == offsetStart) && (proc.StopReason.GetType() == typeof(StepCompleteStopReason)))
                 {
                     if (isVerbose)
                     {
@@ -209,15 +137,16 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
                 }
                 break;
             }
-        }
+            
 
+        }        
         #endregion
 
         #region .Menu command
 
         // Return a stripped version of the menu item that we can compare against.
         // Removes any &, 
-        private static string StripMenuCommand(string name)
+        static string StripMenuCommand(string name)
         {
             name = name.Trim().Replace("&", "").Replace(" ", "").Replace(".", "");
             return name;
@@ -226,35 +155,34 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
         // Command to invoke a GUI menu element from the command line.
         [
             CommandDescription(
-                CommandName = ".menu",
-                MinimumAbbrev = 2,
-                ShortHelp = "Execute gui menu command",
-                LongHelp =
-                    @"Executes a gui menu command. Command is specified via menu names, and uses '|' to 
+            CommandName = ".menu",
+            MinimumAbbrev = 2,
+            ShortHelp = "Execute gui menu command",
+            LongHelp = @"Executes a gui menu command. Command is specified via menu names, and uses '|' to 
 specifiy sub menues. Eg, '.menu Tools|Callstack'"
-                )
+            )
         ]
         public static void ExecuteGuiCommand(string args)
         {
             if (m_mainForm == null || m_mainForm.IsDisposed)
             {
-                throw new MDbgShellException("Gui is closed");
+                throw new MDbgShellException("Gui is closed");                
             }
             if (args == null || args.Length == 0)
             {
-                throw new MDbgShellException("Illegal usage. Expecting args");
+                throw new MDbgShellException("Illegal usage. Expecting args");                
             }
             string[] parts = args.Split('|');
             if (parts.Length <= 0)
             {
-                throw new MDbgShellException("Illegal usage. Expecting args");
+                throw new MDbgShellException("Illegal usage. Expecting args");                
             }
 
             MenuItem m = null;
             Menu.MenuItemCollection c = m_mainForm.Menu.MenuItems;
 
             string lastPart = "<top>";
-            foreach (String rawPart in parts)
+            foreach(String rawPart in parts)
             {
                 string part = StripMenuCommand(rawPart);
                 // 'MenuItemCollection.Find' doesn't search on Text property. So we search manually.
@@ -276,13 +204,11 @@ specifiy sub menues. Eg, '.menu Tools|Callstack'"
                     {
                         WriteOutput(MDbgOutputConstants.Ignore, "Menu '" + lastPart + "' has no sub menus.");
                     }
-                    else
-                    {
-                        WriteOutput(MDbgOutputConstants.Ignore,
-                                    "Menu '" + lastPart + "' only has the following sub menus:");
+                    else {
+                        WriteOutput(MDbgOutputConstants.Ignore, "Menu '" + lastPart +"' only has the following sub menus:");
                         foreach (MenuItem m2 in c)
                         {
-                            string name = StripMenuCommand(m2.Text);
+                            string name  =  StripMenuCommand(m2.Text);
                             if (name != "-") // skip separators.
                             {
                                 WriteOutput(MDbgOutputConstants.Ignore, "   " + name);
@@ -290,34 +216,99 @@ specifiy sub menues. Eg, '.menu Tools|Callstack'"
                         }
                     }
 
-                    throw new MDbgShellException("Can't find item '" + part + "' in '" + args + "'");
+                    throw new MDbgShellException("Can't find item '" + part + "' in '" + args + "'");                    
                 }
 
                 lastPart = part;
                 c = m.MenuItems;
             }
-            Debug.Assert(m != null);
+            System.Diagnostics.Debug.Assert(m != null);
 
             string prefix = "Invoking menu command:";
             WriteOutput(MDbgOutputConstants.StdOutput, prefix + args, prefix.Length, args.Length);
             InvokeMenuItemHelper(m, args);
         }
-
+        
         // Called on worker thread to invoke a menu command.
-        private static void InvokeMenuItemHelper(MenuItem m, string args)
+        static void InvokeMenuItemHelper(MenuItem m, string args)
         {
             // Need to make cross-thread call to invoke. Don't block since the GUI thread won't pump messages.            
-            m_mainForm.BeginInvoke(new MethodInvoker(delegate
-                                                         {
+            m_mainForm.BeginInvoke(new MethodInvoker(delegate()
+            {
+                
+                {
+                    m.PerformClick();
+                    WriteOutput("Done invoking menu command:" + args);
+                }
+                /*  */
+            }));            
+        }
+        #endregion .Menu command
 
-                                                             {
-                                                                 m.PerformClick();
-                                                                 WriteOutput("Done invoking menu command:" + args);
-                                                             }
-                                                             /*  */
-                                                         }));
+        [
+         CommandDescription(
+           CommandName = "gui",
+           ShortHelp = "gui [close] - starts/closes a gui interface",
+           LongHelp =
+             "Usage: gui [close]"
+         )
+        ]
+        public static void Gui(string args)
+        {
+            // just do the check that gui is not already loaded,
+            // strange things are happening else:
+            ArgParser ap = new ArgParser(args);
+            if( ap.Exists(0) )
+            {
+                if( ap.AsString(0) == "close" )
+                {
+                    if( m_mainForm!=null )
+                    {
+                        m_mainForm.CloseGui();
+                        Application.Exit(); // this line will cause the message pump on other thread to quit.
+                        return;
+                    }
+                    else
+                        throw new MDbgShellException("GUI not started.");
+                }
+                else
+                    throw new MDbgShellException("invalid argument");
+            }
+            
+            if(Shell.IO == m_mainForm)
+            {
+                WriteOutput("GUI already started. Cannot start second instance.");
+                return;
+            }
+
+            WriteOutput("starting gui");
+
+            m_mainForm = new MainForm(Shell);
+
+            Thread t = new Thread(new ThreadStart(RunMessageLoop));
+
+            // Only MTA Threads can access CorDebug interfaces because mscordbi doesn't provide marshalling to make them accessable from STA Threads
+            // However, UI thread must be STA. So we'll make cross-thread calls to a worker thread for all ICorDebug access.
+            t.SetApartmentState(ApartmentState.STA);
+            t.IsBackground = true;
+
+            t.Start();
+            m_mainForm.InitComplete.WaitOne(); // wait till form is fully displayed.
+            
+            WriteOutput(MainForm.MetaInfoOutputConstant, "GUI: Simple Extension for Managed debugger (MDbg) started");
+            WriteOutput(MainForm.MetaInfoOutputConstant, "for information on how to use the extension select in menu bar help|about");
+            WriteOutput(MainForm.MetaInfoOutputConstant, "!!This is just a sample. It is not intended for Production purposes!!\n");
         }
 
-        #endregion .Menu command
+        public static void RunMessageLoop()
+        {
+            // if we have following code here and close the dialog the we cannot break into debugger.
+            //m_mainForm.Show();
+            //Application.Run(m_mainForm);//new ApplicationContext(m_mainForm));
+            m_mainForm.ShowDialog();
+        }
+        private static MainForm m_mainForm;
     }
 }
+
+        

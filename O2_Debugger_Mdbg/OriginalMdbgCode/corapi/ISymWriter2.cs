@@ -6,30 +6,31 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
+    using System.Diagnostics.SymbolStore;
+
+    
+	using System;
+	using System.Text;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+
     [StructLayout(LayoutKind.Sequential)]
-    public struct ImageDebugDirectory
-    {
-        private int Characteristics;
-        private int TimeDateStamp;
-        private short MajorVersion;
-        private short MinorVersion;
-        private int Type;
-        private int SizeOfData;
-        private int AddressOfRawData;
-        private int PointerToRawData;
+    public struct ImageDebugDirectory {
+        int     Characteristics;
+        int     TimeDateStamp;
+        short   MajorVersion;
+        short   MinorVersion;
+        int     Type;
+        int     SizeOfData;
+        int     AddressOfRawData;
+        int     PointerToRawData;
 
         public override string ToString()
         {
-            return
-                String.Format(
-                    @"Characteristics: {0}
+            return String.Format( @"Characteristics: {0}
 TimeDateStamp: {1}
 MajorVersion: {2}
 MinorVersion: {3}
@@ -37,26 +38,26 @@ Type: {4}
 SizeOfData: {5}
 AddressOfRawData: {6}
 PointerToRawData: {7}
-",
-                    Characteristics,
-                    TimeDateStamp,
-                    MajorVersion,
-                    MinorVersion,
-                    Type,
-                    SizeOfData,
-                    AddressOfRawData,
-                    PointerToRawData);
+", 
+                      Characteristics, 
+                      TimeDateStamp, 
+                      MajorVersion, 
+                      MinorVersion, 
+                      Type, 
+                      SizeOfData, 
+                      AddressOfRawData, 
+                      PointerToRawData);
         }
-    } ;
+    };
 
     [
         ComVisible(false)
     ]
-    public interface ISymbolWriter2 : ISymbolWriter
+    public interface ISymbolWriter2 : ISymbolWriter, IDisposable
     {
         void Initialize(Object emitter,
-                        String fileName,
-                        Boolean fullBuild);
+                    String fileName,
+                    Boolean fullBuild);
 
         void Initialize(Object emitter,
                         String fileName,
@@ -70,37 +71,37 @@ PointerToRawData: {7}
                         String finalFileName);
 
         byte[] GetDebugInfo(out ImageDebugDirectory imageDebugDirectory);
-
+                             
         void RemapToken(SymbolToken oldToken,
-                        SymbolToken newToken);
-
+                            SymbolToken newToken);
+                             
         void DefineConstant(String name,
-                            Object value,
-                            byte[] signature);
-
-        void Abort();
+                               Object value,
+                               byte[] signature);
+    
+        void Abort();   
 
         void DefineLocalVariable(String name,
-                                 int attributes,
-                                 SymbolToken sigToken,
-                                 int addressKind,
-                                 int addr1,
-                                 int addr2,
-                                 int addr3,
-                                 int startOffset,
-                                 int endOffset);
-
+                                     int attributes,
+                                     SymbolToken sigToken,
+                                     int addressKind,
+                                     int addr1,
+                                     int addr2,
+                                     int addr3,
+                                     int startOffset,
+                                     int endOffset);
+    
         void DefineGlobalVariable(String name,
-                                  int attributes,
-                                  SymbolToken sigToken,
-                                  int addressKind,
-                                  int addr1,
-                                  int addr2,
-                                  int addr3);
-
-
-        void DefineConstant(String name,
-                            Object value,
-                            SymbolToken sigToken);
+                                       int attributes,
+                                       SymbolToken sigToken,
+                                       int addressKind,
+                                       int addr1,
+                                       int addr2,
+                                       int addr3);
+        
+        
+         void DefineConstant(String name,
+                                  Object value,
+                                  SymbolToken sigToken);
     }
 }

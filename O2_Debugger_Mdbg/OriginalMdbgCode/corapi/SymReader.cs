@@ -6,18 +6,16 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System.Diagnostics.SymbolStore;
+    using Microsoft.Samples.Debugging.CorDebug;
+
     // Interface does not need to be marked with the serializable attribute
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComImport,
@@ -28,14 +26,14 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     internal interface ISymUnmanagedReader
     {
         void GetDocument([MarshalAs(UnmanagedType.LPWStr)] String url,
-                         Guid language,
-                         Guid languageVendor,
-                         Guid documentType,
-                         [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocument retVal);
+                              Guid language,
+                              Guid languageVendor,
+                              Guid documentType,
+                              [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedDocument retVal);
 
         void GetDocuments(int cDocs,
-                          out int pcDocs,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedDocument[] pDocs);
+                               out int pcDocs,
+                               [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedDocument[] pDocs);
 
 
         // These methods will often return error HRs in common cases.
@@ -47,69 +45,67 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
         [PreserveSig]
         int GetMethod(SymbolToken methodToken,
-                      [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
+                          [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
 
         [PreserveSig]
         int GetMethodByVersion(SymbolToken methodToken,
-                               int version,
-                               [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
+                                      int version,
+                                      [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
 
         void GetVariables(SymbolToken parent,
-                          int cVars,
-                          out int pcVars,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ISymUnmanagedVariable[] vars);
+                            int cVars,
+                            out int pcVars,
+                            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ISymUnmanagedVariable[] vars);
 
         void GetGlobalVariables(int cVars,
-                                out int pcVars,
-                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[]
-                                    vars);
+                                    out int pcVars,
+                                    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] vars);
 
 
         void GetMethodFromDocumentPosition(ISymUnmanagedDocument document,
-                                           int line,
-                                           int column,
-                                           [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
+                                              int line,
+                                              int column,
+                                              [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedMethod retVal);
 
         void GetSymAttribute(SymbolToken parent,
-                             [MarshalAs(UnmanagedType.LPWStr)] String name,
-                             int sizeBuffer,
-                             out int lengthBuffer,
-                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] buffer);
+                                [MarshalAs(UnmanagedType.LPWStr)] String name,
+                                int sizeBuffer,
+                                out int lengthBuffer,
+                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] buffer);
 
         void GetNamespaces(int cNameSpaces,
-                           out int pcNameSpaces,
-                           [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[]
-                               namespaces);
+                                out int pcNameSpaces,
+                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[] namespaces);
 
         void Initialize(IntPtr importer,
-                        [MarshalAs(UnmanagedType.LPWStr)] String filename,
-                        [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
-                        IStream stream);
+                       [MarshalAs(UnmanagedType.LPWStr)] String filename,
+                       [MarshalAs(UnmanagedType.LPWStr)] String searchPath,
+                       IStream stream);
 
         void UpdateSymbolStore([MarshalAs(UnmanagedType.LPWStr)] String filename,
-                               IStream stream);
+                                     IStream stream);
 
         void ReplaceSymbolStore([MarshalAs(UnmanagedType.LPWStr)] String filename,
-                                IStream stream);
+                                      IStream stream);
 
         void GetSymbolStoreFileName(int cchName,
-                                    out int pcchName,
-                                    [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
+                                           out int pcchName,
+                                           [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
 
         void GetMethodsFromDocumentPosition(ISymUnmanagedDocument document,
-                                            int line,
-                                            int column,
-                                            int cMethod,
-                                            out int pcMethod,
-                                            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ISymUnmanagedMethod[] pRetVal);
+                                                      int line,
+                                                      int column,
+                                                      int cMethod,
+                                                      out int pcMethod,
+                                                      [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ISymUnmanagedMethod[] pRetVal);
 
         void GetDocumentVersion(ISymUnmanagedDocument pDoc,
-                                out int version,
-                                out Boolean pbCurrent);
+                                      out int version,
+                                      out Boolean pbCurrent);
 
         void GetMethodVersion(ISymUnmanagedMethod pMethod,
-                              out int version);
-    } ;
+                                   out int version);
+    };
 
     [
         ComImport,
@@ -119,18 +115,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     ]
     internal interface ISymUnmanagedEncUpdate
     {
+
         void UpdateSymbolStore2(IStream stream,
-                                [MarshalAs(UnmanagedType.LPArray)] SymbolLineDelta[] iSymbolLineDeltas,
-                                int cDeltaLines);
+                                      [MarshalAs(UnmanagedType.LPArray)] SymbolLineDelta[] iSymbolLineDeltas,
+                                      int cDeltaLines);
 
         void GetLocalVariableCount(SymbolToken mdMethodToken,
-                                   out int pcLocals);
+                                        out int pcLocals);
 
         void GetLocalVariables(SymbolToken mdMethodToken,
-                               int cLocals,
-                               [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ISymUnmanagedVariable[]
-                                   rgLocals,
-                               out int pceltFetched);
+                                  int cLocals,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ISymUnmanagedVariable[] rgLocals,
+                                  out int pceltFetched);
     }
 
 
@@ -145,70 +141,55 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         void GetSymbolSearchInfoCount(out int pcSearchInfo);
 
         void GetSymbolSearchInfo(int cSearchInfo,
-                                 out int pcSearchInfo,
-                                 [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedSymbolSearchInfo[] searchInfo);
+                                    out int pcSearchInfo,
+                                    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedSymbolSearchInfo[] searchInfo);
     }
 
 
-    internal class SymReader : ISymbolReader, ISymbolReader2, ISymbolReaderSymbolSearchInfo, ISymbolEncUpdate,
-                               IDisposable
+    [
+        ComImport,
+        Guid("969708D2-05E5-4861-A3B0-96E473CDF63F"),
+        InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+        ComVisible(false)
+    ]
+    internal interface ISymUnmanagedDispose
     {
+        void Destroy();
+    }
+
+
+    internal class SymReader : ISymbolReader, ISymbolReader2, ISymbolReaderSymbolSearchInfo, ISymbolEncUpdate, IDisposable
+    {
+
         private ISymUnmanagedReader m_reader; // Unmanaged Reader pointer
 
         internal SymReader(ISymUnmanagedReader reader)
         {
+            // We should not wrap null instances
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
             m_reader = reader;
         }
-
-        #region IDisposable Members
 
         public void Dispose()
         {
             // Release our unmanaged resources
+            // If the underlying symbol reader supports an explicit dispose interface to release it's resources,
+            // then call it.
+            ISymUnmanagedDispose disposer = m_reader as ISymUnmanagedDispose;
+            if (disposer != null)
+            {
+                disposer.Destroy();
+            }
+
             m_reader = null;
         }
 
-        #endregion
-
-        #region ISymbolEncUpdate Members
-
-        public void UpdateSymbolStore(IStream stream,
-                                      SymbolLineDelta[] iSymbolLineDeltas)
-        {
-            ((ISymUnmanagedEncUpdate) m_reader).UpdateSymbolStore2(stream, iSymbolLineDeltas, iSymbolLineDeltas.Length);
-        }
-
-        public int GetLocalVariableCount(SymbolToken mdMethodToken)
-        {
-            int count = 0;
-            ((ISymUnmanagedEncUpdate) m_reader).GetLocalVariableCount(mdMethodToken, out count);
-            return count;
-        }
-
-        public ISymbolVariable[] GetLocalVariables(SymbolToken mdMethodToken)
-        {
-            int count = 0;
-            ((ISymUnmanagedEncUpdate) m_reader).GetLocalVariables(mdMethodToken, 0, null, out count);
-            var unmanagedVariables = new ISymUnmanagedVariable[count];
-            ((ISymUnmanagedEncUpdate) m_reader).GetLocalVariables(mdMethodToken, count, unmanagedVariables, out count);
-
-            var variables = new ISymbolVariable[count];
-            uint i;
-            for (i = 0; i < count; i++)
-            {
-                variables[i] = new SymVariable(unmanagedVariables[i]);
-            }
-            return variables;
-        }
-
-        #endregion
-
-        #region ISymbolReader Members
-
         public ISymbolDocument GetDocument(String url,
-                                           Guid language,
-                                           Guid languageVendor,
-                                           Guid documentType)
+                                        Guid language,
+                                        Guid languageVendor,
+                                        Guid documentType)
         {
             ISymUnmanagedDocument document = null;
             m_reader.GetDocument(url, language, languageVendor, documentType, out document);
@@ -223,7 +204,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             int cDocs = 0;
             m_reader.GetDocuments(0, out cDocs, null);
-            var unmanagedDocuments = new ISymUnmanagedDocument[cDocs];
+            ISymUnmanagedDocument[] unmanagedDocuments = new ISymUnmanagedDocument[cDocs];
             m_reader.GetDocuments(cDocs, out cDocs, unmanagedDocuments);
 
             ISymbolDocument[] documents = new SymbolDocument[cDocs];
@@ -241,7 +222,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             {
                 SymbolToken entryPoint;
                 int hr = m_reader.GetUserEntryPoint(out entryPoint);
-                if (hr == (int) HResult.E_FAIL)
+                if (hr == (int)HResult.E_FAIL)
                 {
                     // Not all assemblies have entry points
                     // dlls for example...
@@ -259,7 +240,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             ISymUnmanagedMethod unmanagedMethod = null;
             int hr = m_reader.GetMethod(method, out unmanagedMethod);
-            if (hr == (int) HResult.E_FAIL)
+            if (hr == (int)HResult.E_FAIL)
             {
                 // This means that the method has no symbol info because it's probably empty
                 // This can happen for virtual methods with no IL
@@ -276,7 +257,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         {
             ISymUnmanagedMethod unmanagedMethod = null;
             int hr = m_reader.GetMethodByVersion(method, version, out unmanagedMethod);
-            if (hr == (int) HResult.E_FAIL)
+            if (hr == (int)HResult.E_FAIL)
             {
                 // This means that the method has no symbol info because it's probably empty
                 // This can happen for virtual methods with no IL
@@ -294,9 +275,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             int cVars = 0;
             uint i;
             m_reader.GetVariables(parent, 0, out cVars, null);
-            var unmanagedVariables = new ISymUnmanagedVariable[cVars];
+            ISymUnmanagedVariable[] unmanagedVariables = new ISymUnmanagedVariable[cVars];
             m_reader.GetVariables(parent, cVars, out cVars, unmanagedVariables);
-            var variables = new SymVariable[cVars];
+            SymVariable[] variables = new SymVariable[cVars];
 
             for (i = 0; i < cVars; i++)
             {
@@ -310,9 +291,9 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             int cVars = 0;
             uint i;
             m_reader.GetGlobalVariables(0, out cVars, null);
-            var unmanagedVariables = new ISymUnmanagedVariable[cVars];
+            ISymUnmanagedVariable[] unmanagedVariables = new ISymUnmanagedVariable[cVars];
             m_reader.GetGlobalVariables(cVars, out cVars, unmanagedVariables);
-            var variables = new SymVariable[cVars];
+            SymVariable[] variables = new SymVariable[cVars];
 
             for (i = 0; i < cVars; i++)
             {
@@ -322,12 +303,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         }
 
         public ISymbolMethod GetMethodFromDocumentPosition(ISymbolDocument document,
-                                                           int line,
-                                                           int column)
+                                                        int line,
+                                                        int column)
         {
             ISymUnmanagedMethod unmanagedMethod = null;
-            m_reader.GetMethodFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column,
-                                                   out unmanagedMethod);
+            m_reader.GetMethodFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, out unmanagedMethod);
             return new SymMethod(unmanagedMethod);
         }
 
@@ -336,6 +316,11 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             byte[] Data;
             int cData = 0;
             m_reader.GetSymAttribute(parent, name, 0, out cData, null);
+            if (cData == 0)
+            {
+                // no such attribute (can't distinguish from empty attribute value)
+                return null;
+            }
             Data = new byte[cData];
             m_reader.GetSymAttribute(parent, name, cData, out cData, Data);
             return Data;
@@ -346,7 +331,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             int count = 0;
             uint i;
             m_reader.GetNamespaces(0, out count, null);
-            var unmanagedNamespaces = new ISymUnmanagedNamespace[count];
+            ISymUnmanagedNamespace[] unmanagedNamespaces = new ISymUnmanagedNamespace[count];
             m_reader.GetNamespaces(count, out count, unmanagedNamespaces);
             ISymbolNamespace[] namespaces = new SymNamespace[count];
 
@@ -357,12 +342,8 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             return namespaces;
         }
 
-        #endregion
-
-        #region ISymbolReader2 Members
-
         public void Initialize(Object importer, String filename,
-                               String searchPath, IStream stream)
+                       String searchPath, IStream stream)
         {
             IntPtr uImporter = IntPtr.Zero;
             try
@@ -395,7 +376,6 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
 
             // there's a known issue in Diasymreader where we can't query the size of the pdb filename.
             // So we'll just estimate large as a workaround. 
-
             count = 300;
             fileName = new StringBuilder(count);
             m_reader.GetSymbolStoreFileName(count, out count, fileName);
@@ -403,18 +383,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         }
 
         public ISymbolMethod[] GetMethodsFromDocumentPosition(
-            ISymbolDocument document, int line, int column)
-
+                ISymbolDocument document, int line, int column)
         {
             ISymUnmanagedMethod[] unmanagedMethods;
             ISymbolMethod[] methods;
             int count = 0;
             uint i;
-            m_reader.GetMethodsFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column, 0,
-                                                    out count, null);
+            m_reader.GetMethodsFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, 0, out count, null);
             unmanagedMethods = new ISymUnmanagedMethod[count];
-            m_reader.GetMethodsFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column, count,
-                                                    out count, unmanagedMethods);
+            m_reader.GetMethodsFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, count, out count, unmanagedMethods);
             methods = new ISymbolMethod[count];
 
             for (i = 0; i < count; i++)
@@ -425,39 +402,66 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
         }
 
         public int GetDocumentVersion(ISymbolDocument document,
-                                      out Boolean isCurrent)
+                                     out Boolean isCurrent)
         {
             int version = 0;
-            m_reader.GetDocumentVersion(((SymbolDocument) document).InternalDocument, out version, out isCurrent);
+            m_reader.GetDocumentVersion(((SymbolDocument)document).InternalDocument, out version, out isCurrent);
             return version;
         }
 
         public int GetMethodVersion(ISymbolMethod method)
         {
             int version = 0;
-            m_reader.GetMethodVersion(((SymMethod) method).InternalMethod, out version);
+            m_reader.GetMethodVersion(((SymMethod)method).InternalMethod, out version);
             return version;
         }
 
-        #endregion
 
-        #region ISymbolReaderSymbolSearchInfo Members
+        public void UpdateSymbolStore(IStream stream,
+                                     SymbolLineDelta[] iSymbolLineDeltas)
+        {
+            ((ISymUnmanagedEncUpdate)m_reader).UpdateSymbolStore2(stream, iSymbolLineDeltas, iSymbolLineDeltas.Length);
+        }
+
+        public int GetLocalVariableCount(SymbolToken mdMethodToken)
+        {
+            int count = 0;
+            ((ISymUnmanagedEncUpdate)m_reader).GetLocalVariableCount(mdMethodToken, out count);
+            return count;
+        }
+
+        public ISymbolVariable[] GetLocalVariables(SymbolToken mdMethodToken)
+        {
+            int count = 0;
+            ((ISymUnmanagedEncUpdate)m_reader).GetLocalVariables(mdMethodToken, 0, null, out count);
+            ISymUnmanagedVariable[] unmanagedVariables = new ISymUnmanagedVariable[count];
+            ((ISymUnmanagedEncUpdate)m_reader).GetLocalVariables(mdMethodToken, count, unmanagedVariables, out count);
+
+            ISymbolVariable[] variables = new ISymbolVariable[count];
+            uint i;
+            for (i = 0; i < count; i++)
+            {
+                variables[i] = new SymVariable(unmanagedVariables[i]);
+            }
+            return variables;
+        }
+
 
         public int GetSymbolSearchInfoCount()
         {
             int count = 0;
-            ((ISymUnmanagedReaderSymbolSearchInfo) m_reader).GetSymbolSearchInfoCount(out count);
+            ((ISymUnmanagedReaderSymbolSearchInfo)m_reader).GetSymbolSearchInfoCount(out count);
             return count;
         }
 
         public ISymbolSearchInfo[] GetSymbolSearchInfo()
         {
             int count = 0;
-            ((ISymUnmanagedReaderSymbolSearchInfo) m_reader).GetSymbolSearchInfo(0, out count, null);
-            var unmanagedSearchInfo = new ISymUnmanagedSymbolSearchInfo[count];
-            ((ISymUnmanagedReaderSymbolSearchInfo) m_reader).GetSymbolSearchInfo(count, out count, unmanagedSearchInfo);
+            ((ISymUnmanagedReaderSymbolSearchInfo)m_reader).GetSymbolSearchInfo(0, out count, null);
+            ISymUnmanagedSymbolSearchInfo[] unmanagedSearchInfo = new ISymUnmanagedSymbolSearchInfo[count];
+            ((ISymUnmanagedReaderSymbolSearchInfo)m_reader).GetSymbolSearchInfo(count, out count, unmanagedSearchInfo);
 
-            var searchInfo = new ISymbolSearchInfo[count];
+            ISymbolSearchInfo[] searchInfo = new ISymbolSearchInfo[count];
 
             uint i;
             for (i = 0; i < count; i++)
@@ -465,8 +469,7 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
                 searchInfo[i] = new SymSymbolSearchInfo(unmanagedSearchInfo[i]);
             }
             return searchInfo;
-        }
 
-        #endregion
+        }
     }
 }

@@ -1,35 +1,39 @@
-//---------------------------------------------------------------------
+﻿//---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 #region Using directives
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
-using O2.Debugger.Mdbg.Tools.Mdbg.Extension;
 
 #endregion
 
-namespace O2.Debugger.Mdbg.gui
+using System.Globalization;
+using Microsoft.Samples.Tools.Mdbg;
+using Microsoft.Samples.Debugging.MdbgEngine;
+using Microsoft.Samples.Tools.Mdbg.Extension;
+
+namespace gui
 {
-    internal partial class AutoWatchWindow : DebuggerToolWindow
+    partial class AutoWatchWindow : DebuggerToolWindow
     {
         public AutoWatchWindow(MainForm mainForm)
             : base(mainForm)
         {
             InitializeComponent();
             // Hook handler for lazily expanding
-            treeView1.BeforeExpand += treeView1_BeforeSelect;
+            treeView1.BeforeExpand += new TreeViewCancelEventHandler(treeView1_BeforeSelect);
         }
-
+        
         // Called On UI thread.
-        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
             Util.TryExpandNode(MainForm, e.Node);
         }
@@ -42,20 +46,20 @@ namespace O2.Debugger.Mdbg.gui
             MDbgValue[] locals = null;
             MDbgValue[] args = null;
 
-            MainForm.ExecuteOnWorkerThreadIfStoppedAndBlock(delegate(MDbgProcess proc)
-                                                                {
-                                                                    frame = GetCurrentFrame(proc);
-                                                                    if (frame == null)
-                                                                    {
-                                                                        return;
-                                                                    }
+            MainForm.ExecuteOnWorkerThreadIfStoppedAndBlock(delegate(MDbgProcess proc)            
+            {
+                frame = GetCurrentFrame(proc);
+                if (frame == null)
+                {
+                    return;
+                }
 
-                                                                    // Add Vars to window.            
-                                                                    MDbgFunction f = frame.Function;
+                // Add Vars to window.            
+                MDbgFunction f = frame.Function;
 
-                                                                    locals = f.GetActiveLocalVars(frame);
-                                                                    args = f.GetArguments(frame);
-                                                                });
+                locals = f.GetActiveLocalVars(frame);
+                args = f.GetArguments(frame);
+            });
 
             if (frame == null)
             {
@@ -63,7 +67,7 @@ namespace O2.Debugger.Mdbg.gui
             }
 
             // Reset
-            TreeView t = treeView1;
+            TreeView t = this.treeView1;
             t.BeginUpdate();
             t.Nodes.Clear();
 
@@ -85,6 +89,10 @@ namespace O2.Debugger.Mdbg.gui
             }
 
             t.EndUpdate();
+
+
         } // refresh
+
+
     } // AutoWatchWindow
 }

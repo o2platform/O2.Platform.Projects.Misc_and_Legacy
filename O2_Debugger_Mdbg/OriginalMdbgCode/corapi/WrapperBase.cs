@@ -6,7 +6,7 @@
 using System;
 using System.Diagnostics;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     /* This class is base class for all the wrapper classes we have.
      * We overload equivalance operators, so that we can figure out,
@@ -46,40 +46,41 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
 
     public abstract class WrapperBase : MarshalByRefObject
     {
-        private readonly Object m_comObject;
-
         protected WrapperBase(Object value)
         {
-            Debug.Assert(value != null);
+            Debug.Assert(value!=null);
             m_comObject = value;
         }
 
-        public override bool Equals(Object value)
+        public override bool Equals(Object value) 
         {
-            if (!(value is WrapperBase))
+            if(!(value is WrapperBase))
                 return false;
-            return ((value as WrapperBase).m_comObject == m_comObject);
+            return ((value as WrapperBase).m_comObject == this.m_comObject);
         }
-
-        public override int GetHashCode()
+            
+        public override int GetHashCode() 
         {
             return m_comObject.GetHashCode();
         }
 
-        public static bool operator ==(WrapperBase operand, WrapperBase operand2)
+        public static bool operator ==( WrapperBase operand,WrapperBase operand2)
         {
-            if (ReferenceEquals(operand, operand2))
+            if(Object.ReferenceEquals(operand,operand2))
                 return true;
 
-            if (ReferenceEquals(operand, null)) // this means that operand==null && operand2 is not null 
+            if(Object.ReferenceEquals(operand, null))               // this means that operand==null && operand2 is not null 
                 return false;
 
             return operand.Equals(operand2);
         }
-
-        public static bool operator !=(WrapperBase operand, WrapperBase operand2)
+        
+        public static bool operator !=( WrapperBase operand,WrapperBase operand2)
         {
-            return !(operand == operand2);
+            return !(operand==operand2);
         }
+
+        private Object m_comObject;
     }
+    
 } /* namespace */

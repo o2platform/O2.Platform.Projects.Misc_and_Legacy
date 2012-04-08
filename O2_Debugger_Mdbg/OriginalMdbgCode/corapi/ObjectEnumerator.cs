@@ -3,14 +3,12 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
 using System.Collections;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 
-namespace O2.Debugger.Mdbg.Debugging.CorDebug
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
+namespace Microsoft.Samples.Debugging.CorDebug
 {
     /** 
      * Exposes an enumerator for Objects. 
@@ -21,14 +19,13 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
      * At least, the ``Next'' method in the IDL returns a uint64, so there
      * isn't much else it could be returning...
      */
-
     internal class CorObjectEnumerator : IEnumerable, IEnumerator, ICloneable
     {
-        private readonly ICorDebugObjectEnum m_enum;
+        private ICorDebugObjectEnum m_enum;
 
         private ulong m_obj;
 
-        internal CorObjectEnumerator(ICorDebugObjectEnum objectEnumerator)
+        internal CorObjectEnumerator (ICorDebugObjectEnum objectEnumerator)
         {
             m_enum = objectEnumerator;
         }
@@ -36,43 +33,30 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
         //
         // ICloneable interface
         //
-
-        #region ICloneable Members
-
-        public Object Clone()
+        public Object Clone ()
         {
             ICorDebugEnum clone = null;
-            m_enum.Clone(out clone);
-            return new CorObjectEnumerator((ICorDebugObjectEnum) clone);
+            m_enum.Clone (out clone);
+            return new CorObjectEnumerator ((ICorDebugObjectEnum)clone);
         }
-
-        #endregion
 
         //
         // IEnumerable interface
         //
-
-        #region IEnumerable Members
-
-        public IEnumerator GetEnumerator()
+        public IEnumerator GetEnumerator ()
         {
             return this;
         }
 
-        #endregion
-
         //
         // IEnumerator interface
         //
-
-        #region IEnumerator Members
-
-        public bool MoveNext()
+        public bool MoveNext ()
         {
-            var a = new ulong[1];
+            ulong[] a = new ulong[1];
             uint c = 0;
-            int r = m_enum.Next((uint) a.Length, a, out c);
-            if (r == 0 && c == 1) // S_OK && we got 1 new element
+            int r = m_enum.Next ((uint)a.Length, a, out c);
+            if (r==0 && c==1) // S_OK && we got 1 new element
             {
                 m_obj = a[0];
                 return true;
@@ -80,17 +64,18 @@ namespace O2.Debugger.Mdbg.Debugging.CorDebug
             return false;
         }
 
-        public void Reset()
+        public void Reset ()
         {
-            m_enum.Reset();
+            m_enum.Reset ();
             m_obj = 0;
         }
 
         public Object Current
         {
-            get { return m_obj; }
+            get 
+            {
+                return m_obj;
+            }
         }
-
-        #endregion
     } /* class CorObjectEnumerator */
 } /* namespace */

@@ -3,33 +3,29 @@
 // 
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
+using System.Collections;
+using System.ComponentModel;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.Debugging.MdbgEngine;
 
-namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
+using System.Diagnostics;
+
+namespace Microsoft.Samples.Tools.Mdbg.Extension
 {
     /// <summary>
     /// Summary description for Form1.
     /// </summary>
-    public class AboutForm : Form
+    public class AboutForm : System.Windows.Forms.Form
     {
-        private Button closeBtn;
-
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button closeBtn;
+        private System.Windows.Forms.RichTextBox richTextBox1;
+        private Label labelVersion;
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private Container components;
-
-        private Label label1;
-        private Label labelVersion;
-        private RichTextBox richTextBox1;
+        private System.ComponentModel.Container components = null;
 
         public AboutForm()
         {
@@ -38,28 +34,29 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
             //
             InitializeComponent();
 
-            Type tGui = typeof (AboutForm);
-            Type tEngine = typeof (MDbgEngine);
+            Type tGui = typeof(AboutForm);
+            Type tEngine = typeof(Microsoft.Samples.Debugging.MdbgEngine.MDbgEngine);
             // Set version info
-            labelVersion.Text =
+            this.labelVersion.Text =
                 "Version:" +
-                "Gui=" + tGui.Assembly.GetName().Version +
-                ",  MdbgEng=" + tEngine.Assembly.GetName().Version;
+                "Gui=" + tGui.Assembly.GetName().Version.ToString() +
+                ",  MdbgEng=" + tEngine.Assembly.GetName().Version.ToString();
+
         }
 
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose( bool disposing )
         {
-            if (disposing)
+            if( disposing )
             {
-                if (components != null)
+                if(components != null)
                 {
                     components.Dispose();
                 }
             }
-            base.Dispose(disposing);
+            base.Dispose( disposing );
         }
 
         //#region Windows Form Designer generated code
@@ -69,43 +66,42 @@ namespace O2.Debugger.Mdbg.Tools.Mdbg.Extension
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
-            closeBtn = new Button();
-            richTextBox1 = new RichTextBox();
-            labelVersion = new Label();
-            SuspendLayout();
+            this.label1 = new System.Windows.Forms.Label();
+            this.closeBtn = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.labelVersion = new System.Windows.Forms.Label();
+            this.SuspendLayout();
 // 
 // label1
 // 
-            label1.Location = new Point(16, 8);
-            label1.Name = "label1";
-            label1.Size = new Size(328, 24);
-            label1.TabIndex = 0;
-            label1.Text = "GUI: Simple Extension for MDbg debugger";
+            this.label1.Location = new System.Drawing.Point(16, 8);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(328, 24);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "GUI: Simple Extension for MDbg debugger";
 // 
 // closeBtn
 // 
-            closeBtn.Anchor = (((AnchorStyles.Bottom | AnchorStyles.Right)));
-            closeBtn.DialogResult = DialogResult.Cancel;
-            closeBtn.Location = new Point(292, 255);
-            closeBtn.Name = "closeBtn";
-            closeBtn.Size = new Size(80, 23);
-            closeBtn.TabIndex = 1;
-            closeBtn.Text = "Close";
-            closeBtn.Click += closeBtn_Click;
+            this.closeBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.closeBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.closeBtn.Location = new System.Drawing.Point(292, 255);
+            this.closeBtn.Name = "closeBtn";
+            this.closeBtn.Size = new System.Drawing.Size(80, 23);
+            this.closeBtn.TabIndex = 1;
+            this.closeBtn.Text = "Close";
+            this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
 // 
 // richTextBox1
 // 
-            richTextBox1.Anchor = (((((AnchorStyles.Top | AnchorStyles.Bottom)
-                                      | AnchorStyles.Left)
-                                     | AnchorStyles.Right)));
-            richTextBox1.Location = new Point(8, 53);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(364, 195);
-            richTextBox1.TabIndex = 2;
-            richTextBox1.Text =
-                @"Defined Hotkeys:
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.Location = new System.Drawing.Point(8, 53);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(364, 195);
+            this.richTextBox1.TabIndex = 2;
+            this.richTextBox1.Text = @"Defined Hotkeys:
 F9  - Set / Remove Breakpoint at line
 F10 - Step Over
 F11 - Step Into
@@ -113,55 +109,56 @@ Shift+F11 - Step Out
 
 Visit the MDbg forum (http://forums.microsoft.com/MSDN/ShowForum.aspx?ForumID=868&SiteID=1) for MDbg issues or further questions about writing your own .NET diagnostic tools.
 ";
-            richTextBox1.LinkClicked += richTextBox1_LinkClicked;
-            richTextBox1.TextChanged += richTextBox1_TextChanged;
+            this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
+            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
 // 
 // labelVersion
 // 
-            labelVersion.AutoSize = true;
-            labelVersion.Location = new Point(16, 32);
-            labelVersion.Name = "labelVersion";
-            labelVersion.Size = new Size(43, 14);
-            labelVersion.TabIndex = 3;
-            labelVersion.Text = "Version";
+            this.labelVersion.AutoSize = true;
+            this.labelVersion.Location = new System.Drawing.Point(16, 32);
+            this.labelVersion.Name = "labelVersion";
+            this.labelVersion.Size = new System.Drawing.Size(43, 14);
+            this.labelVersion.TabIndex = 3;
+            this.labelVersion.Text = "Version";
 // 
 // AboutForm
 // 
-            AcceptButton = closeBtn;
-            AutoScaleBaseSize = new Size(5, 13);
-            CancelButton = closeBtn;
-            ClientSize = new Size(384, 290);
-            Controls.Add(labelVersion);
-            Controls.Add(richTextBox1);
-            Controls.Add(closeBtn);
-            Controls.Add(label1);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "AboutForm";
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "About";
-            ResumeLayout(false);
-            PerformLayout();
-        }
+            this.AcceptButton = this.closeBtn;
+            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.CancelButton = this.closeBtn;
+            this.ClientSize = new System.Drawing.Size(384, 290);
+            this.Controls.Add(this.labelVersion);
+            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.closeBtn);
+            this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "AboutForm";
+            this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "About";
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
+        }
         //#endregion
 
-        private void closeBtn_Click(object sender, EventArgs e)
+        private void closeBtn_Click(object sender, System.EventArgs e)
         {
-            Dispose();
+            this.Dispose();
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
+        
         }
 
         // Launch the target of the link
         private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
+        {            
             string target = e.LinkText;
-
+            
             try
             {
                 // More general start.
@@ -169,7 +166,7 @@ Visit the MDbg forum (http://forums.microsoft.com/MSDN/ShowForum.aspx?ForumID=86
 
                 return;
             }
-            catch (Exception)
+            catch(Exception)
             {
                 // Swallow exception.
             }
@@ -187,6 +184,7 @@ Visit the MDbg forum (http://forums.microsoft.com/MSDN/ShowForum.aspx?ForumID=86
             {
                 // Swallow exception.
             }
+
         }
     }
 }

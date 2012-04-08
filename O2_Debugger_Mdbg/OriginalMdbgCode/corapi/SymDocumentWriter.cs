@@ -6,13 +6,17 @@
 
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-using System;
-using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
-
-namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
+namespace Microsoft.Samples.Debugging.CorSymbolStore 
 {
-    // Interface does not need to be marked with the serializable attribute
+    using System.Diagnostics.SymbolStore;
+
+    
+    using System;
+	using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Runtime.InteropServices.ComTypes;
+	
+	// Interface does not need to be marked with the serializable attribute
     /// <include file='doc\ISymDocumentWriter.uex' path='docs/doc[@for="ISymbolDocumentWriter"]/*' />
     [
         ComImport,
@@ -23,30 +27,27 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
     internal interface ISymUnmanagedDocumentWriter
     {
         void SetSource(int sourceSize,
-                       [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] byte[] source);
-
+                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] byte[] source);
+    
         void SetCheckSum(Guid algorithmId,
-                         int checkSumSize,
-                         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] checkSum);
-    } ;
-
-
-    internal class SymDocumentWriter : ISymbolDocumentWriter
+                              int checkSumSize,
+                              [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] byte[] checkSum);
+    };
+        
+    
+    internal class SymDocumentWriter: ISymbolDocumentWriter
     {
-        private readonly ISymUnmanagedDocumentWriter m_unmanagedDocumentWriter;
-
+        ISymUnmanagedDocumentWriter m_unmanagedDocumentWriter;
+        
         public SymDocumentWriter(ISymUnmanagedDocumentWriter unmanagedDocumentWriter)
         {
+            // We should not wrap null instances
+            if (unmanagedDocumentWriter == null)
+                throw new ArgumentNullException("unmanagedDocumentWriter");
+
             m_unmanagedDocumentWriter = unmanagedDocumentWriter;
         }
-
-        internal ISymUnmanagedDocumentWriter InternalDocumentWriter
-        {
-            get { return m_unmanagedDocumentWriter; }
-        }
-
-        #region ISymbolDocumentWriter Members
-
+        
         public void SetSource(byte[] source)
         {
             m_unmanagedDocumentWriter.SetSource(source.Length, source);
@@ -57,8 +58,15 @@ namespace O2.Debugger.Mdbg.Debugging.CorSymbolStore
             m_unmanagedDocumentWriter.SetCheckSum(algorithmId, checkSum.Length, checkSum);
         }
 
-        #endregion
-
         // Public API
+        internal ISymUnmanagedDocumentWriter InternalDocumentWriter
+        {
+            get
+            {
+                return m_unmanagedDocumentWriter;
+            }
+        }
+                                      
+ 
     }
 }
