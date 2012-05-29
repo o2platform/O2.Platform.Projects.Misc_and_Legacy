@@ -8,30 +8,58 @@ namespace O2.API.Visualization.ExtensionMethods
 {
     public static class WPF_Threading_ExtensionMethods
     {    
-    	public static object wpfInvoke<T,TRet>(this T source, Func<TRet> func) where T:DispatcherObject
+    	public static TRet wpfInvoke<T,TRet>(this T source, Func<TRet> func) where T:DispatcherObject
     	{
+            "in wpfInvoke<T,TRet> with funcWithCatch".info();
+            //wrap func with a try catch
+            Func<TRet> funcWithCatch = 
+                ()=>{
+                        try
+                        { 
+                            return func();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.log("in wpfInvoke");
+                            return default(TRet);		
+                        }
+                    };
+
     		try
 			{
                 if (source.Dispatcher.CheckAccess())
-                    return func();
-                return (TRet)source.Dispatcher.Invoke(func, DispatcherPriority.Normal);
+                    return funcWithCatch();
+                return (TRet)source.Dispatcher.Invoke(funcWithCatch, DispatcherPriority.Normal);
         	}			
             catch (Exception ex)
             {
                 ex.log("in wpfInvoke");
-                return null;			// because I want to return null in these case I can't use TRet since that would fo
+                return default(TRet);			
             }
         	
     	}
     	
-    	public static void wpfInvoke<T>(this T source, Action act) where T:DispatcherObject 
+    	public static void wpfInvoke<T>(this T source, Action action) where T:DispatcherObject 
     	{
+             "in wpfInvoke<T,TRet> with funcWithCatch".info();
+            //wrap func with a try catch
+            Action actionWithCatch = 
+                ()=>{
+                        try
+                        { 
+                            action();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.log("in wpfInvoke");                            
+                        }
+                    };
     		try
 			{
                 if (source.Dispatcher.CheckAccess())
-                    act();
+                    actionWithCatch();
                 else
-                    source.Dispatcher.Invoke(act, DispatcherPriority.Normal);
+                    source.Dispatcher.Invoke(actionWithCatch, DispatcherPriority.Normal);
         	}			
             catch (Exception ex)
             {
