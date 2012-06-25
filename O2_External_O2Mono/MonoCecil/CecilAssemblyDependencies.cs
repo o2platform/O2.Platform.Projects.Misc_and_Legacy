@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Mono.Cecil;
+using O2.DotNetWrappers.ExtensionMethods;
 using O2.DotNetWrappers.Windows;
 using O2.Kernel.Objects;
 
@@ -137,10 +138,10 @@ namespace O2.External.O2Mono.MonoCecil
         {
             var pathsToFindReferencedDll = new List<string>();
             // if no paths were provided add the current one
-            pathsToFindReferencedDll.Add(Path.GetDirectoryName(targetAssembly));
-            // and if exists the hardcoded path
-            if (Directory.Exists(DI.config.hardCodedO2LocalBuildDir))
-                pathsToFindReferencedDll.Add(DI.config.hardCodedO2LocalBuildDir);
+            pathsToFindReferencedDll.add(Path.GetDirectoryName(targetAssembly));
+            // and if exists the hardcoded path            
+            pathsToFindReferencedDll.add(DI.config.CurrentExecutableDirectory);
+            pathsToFindReferencedDll.add(DI.config.ReferencesDownloadLocation);
             copyAssemblyDependenciesToAssemblyDirectory(targetAssembly, pathsToFindReferencedDll);
         }
         
@@ -221,8 +222,8 @@ namespace O2.External.O2Mono.MonoCecil
                 if (false == directoriesWithSourceAssemblies.Contains(assemblyDirectory)) 
                     directoriesWithSourceAssemblies.Add(assemblyDirectory);
             }
-            if (Directory.Exists(DI.config.hardCodedO2LocalBuildDir))   // if this exists add it (solves the problem that on the UnitTests executions the dlls are placed on unique directories
-                directoriesWithSourceAssemblies.Add(DI.config.hardCodedO2LocalBuildDir);
+            //if (Directory.Exists(DI.config.hardCodedO2LocalBuildDir))   // if this exists add it (solves the problem that on the UnitTests executions the dlls are placed on unique directories
+            //    directoriesWithSourceAssemblies.Add(DI.config.hardCodedO2LocalBuildDir);
             var executingDirectory = Path.GetDirectoryName(DI.config.ExecutingAssembly);
             if (false == directoriesWithSourceAssemblies.Contains(executingDirectory))      // also add the current executing directory (needed when running from standalone O2 module installs)
                 directoriesWithSourceAssemblies.Add(executingDirectory);   

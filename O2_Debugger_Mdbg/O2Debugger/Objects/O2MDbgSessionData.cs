@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using O2.DotNetWrappers.ExtensionMethods;
 using O2.Debugger.Mdbg.corapi;
 using O2.Debugger.Mdbg.Debugging.CorDebug;
 using O2.Debugger.Mdbg.Debugging.CorPublish;
@@ -49,9 +50,10 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
                 var assemblies = new List<CorAssembly>();
                 try
                 {
-                    foreach (MDbgAppDomain appDomain in mdbgProcess.AppDomains)
-                        foreach (CorAssembly assembly in appDomain.CorAppDomain.Assemblies)
-                            assemblies.Add(assembly);
+                    if (mdbgProcess.notNull())
+                        foreach (MDbgAppDomain appDomain in mdbgProcess.AppDomains)
+                            foreach (CorAssembly assembly in appDomain.CorAppDomain.Assemblies)
+                                assemblies.Add(assembly);
                 }
                 catch (Exception ex)
                 {

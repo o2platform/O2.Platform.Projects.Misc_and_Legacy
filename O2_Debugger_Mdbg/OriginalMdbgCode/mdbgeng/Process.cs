@@ -13,16 +13,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using O2.Debugger.Mdbg.corapi;
-using O2.Debugger.Mdbg.corapi;
+using O2.DotNetWrappers.ExtensionMethods;
 using O2.Debugger.Mdbg.corapi;
 using O2.Debugger.Mdbg.Debugging.CorDebug;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
 using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
-using O2.Debugger.Mdbg.Debugging.CorMetadata;
-using O2.Debugger.Mdbg.Debugging.CorMetadata;
 using O2.Debugger.Mdbg.Debugging.CorMetadata;
 using O2.Debugger.Mdbg.O2Debugger;
 using CorAppDomain=O2.Debugger.Mdbg.Debugging.CorDebug.CorAppDomain;
@@ -669,8 +663,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
             {
                 m_corProcess = m_corDebugger.CreateProcess(commandLine, commandArguments, ".", flags);
             }
-            catch
+            catch(Exception ex)
             {
+                ex.log();
                 CleanAfterProcessExit(); // remove process from process list in case of failure
                 throw;
             }
@@ -2266,8 +2261,9 @@ namespace O2.Debugger.Mdbg.Debugging.MdbgEngine
                 return;
 
             e.Continue = false;
-            InternalSignalRuntimeIsStopped(null, new DebuggerErrorStopReason());
-            Debug.Assert(false, "Critical failures -- received DebuggerError callback.");
+            InternalSignalRuntimeIsStopped(null, new DebuggerErrorStopReason());            
+            "[DebuggerErrorEventHandler] Critical failures -- received DebuggerError callback.".error();
+            //Debug.Assert(false, "Critical failures -- received DebuggerError callback.");
         }
 
         private void MDAEventHandler(Object sender, CorMDAEventArgs e)
