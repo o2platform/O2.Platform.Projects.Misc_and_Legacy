@@ -54,6 +54,7 @@ namespace O2.External.O2Mono.MonoCecil
             {
                 if (CecilUtils.isDotNetAssembly(dllToProcess,false))
                 {
+                    processedAssemblies.add(dllToProcess);
                     var assemblyDefinition = CecilUtils.getAssembly(dllToProcess);
                     addAssemblyToDependenciesList(assemblyDefinition.Name.FullName, dllToProcess);
                     var modulesInDll = CecilUtils.getModules(assemblyDefinition);

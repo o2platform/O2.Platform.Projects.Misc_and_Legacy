@@ -391,6 +391,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\O2.Platform.Projects\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj">
+      <Project>{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}</Project>
+      <Name>O2_External_WinFormsUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\O2_External_O2Mono\O2_External_O2Mono.csproj">
       <Project>{F457A7EB-A573-41BB-BC12-61ABE5ACF702}</Project>
       <Name>O2_External_O2Mono</Name>
@@ -402,10 +406,6 @@
     <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.CoreLib\O2.FluentSharp.CoreLib.csproj">
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>O2.FluentSharp.CoreLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj">
-      <Project>{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}</Project>
-      <Name>O2_External_WinFormsUI</Name>
     </ProjectReference>
     <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
