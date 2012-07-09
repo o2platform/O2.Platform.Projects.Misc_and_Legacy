@@ -9,8 +9,7 @@ namespace O2.API.Visualization.ExtensionMethods
     public static class WPF_Threading_ExtensionMethods
     {    
     	public static TRet wpfInvoke<T,TRet>(this T source, Func<TRet> func) where T:DispatcherObject
-    	{
-            "in wpfInvoke<T,TRet> with funcWithCatch".info();
+    	{            
             //wrap func with a try catch
             Func<TRet> funcWithCatch = 
                 ()=>{
@@ -40,8 +39,7 @@ namespace O2.API.Visualization.ExtensionMethods
     	}
     	
     	public static void wpfInvoke<T>(this T source, Action action) where T:DispatcherObject 
-    	{
-             "in wpfInvoke<T,TRet> with funcWithCatch".info();
+    	{             
             //wrap func with a try catch
             Action actionWithCatch = 
                 ()=>{
