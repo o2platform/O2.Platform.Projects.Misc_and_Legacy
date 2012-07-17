@@ -207,6 +207,10 @@
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>O2.FluentSharp.CoreLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.REPL\O2.FluentSharp.REPL.csproj">
+      <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
+      <Name>O2.FluentSharp.REPL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\O2_External_O2Mono\O2_External_O2Mono.csproj">
       <Project>{F457A7EB-A573-41BB-BC12-61ABE5ACF702}</Project>
       <Name>O2_External_O2Mono</Name>

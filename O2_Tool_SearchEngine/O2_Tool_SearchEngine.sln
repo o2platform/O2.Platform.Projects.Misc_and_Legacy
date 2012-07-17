@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_Tool_SearchEngine", "O2_Tool_SearchEngine.csproj", "{E301CD2B-1D22-433C-8C23-CCB76DE7CFCE}"
@@ -13,11 +12,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_SharpDevelop", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_Core_CIR", "..\O2_Core_CIR\O2_Core_CIR.csproj", "{F19ED2FE-8191-4534-8DAC-4C42DEE87B52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_WinFormsUI", "..\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj", "{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_WinFormsUI", "..\..\O2.Platform.Projects\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj", "{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_O2Mono", "..\O2_External_O2Mono\O2_External_O2Mono.csproj", "{F457A7EB-A573-41BB-BC12-61ABE5ACF702}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_Core_FileViewers", "..\O2_Core_FileViewers\O2_Core_FileViewers.csproj", "{6CDF7A9F-31CC-4496-90B1-09A39C8EEE08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2.FluentSharp.REPL", "..\..\O2.FluentSharp\O2.FluentSharp.REPL\O2.FluentSharp.REPL.csproj", "{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +62,10 @@ Global
 		{6CDF7A9F-31CC-4496-90B1-09A39C8EEE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CDF7A9F-31CC-4496-90B1-09A39C8EEE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CDF7A9F-31CC-4496-90B1-09A39C8EEE08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
