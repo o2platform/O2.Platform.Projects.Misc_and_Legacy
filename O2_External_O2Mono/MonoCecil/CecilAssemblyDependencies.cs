@@ -160,7 +160,7 @@ namespace O2.External.O2Mono.MonoCecil
                         File.Copy(assemblyToCopy, targetFile);
                         var pdbFile = assemblyToCopy.Replace(Path.GetExtension(assemblyToCopy), ".pdb");
                         if (File.Exists(pdbFile))
-                            Files.Copy(pdbFile, targetDirectory);
+                            Files.copy(pdbFile, targetDirectory);
                     }
                 }
 
@@ -261,7 +261,7 @@ namespace O2.External.O2Mono.MonoCecil
             if (pathsToFindReferencedDlls == null)
                 pathsToFindReferencedDlls = getDefaultDirectoriesWithSourceAssemblies(new List<string> { assemblyToAnalyze });
             Files.checkIfDirectoryExistsAndCreateIfNot(targetDirectory);
-            var fileInTargetDirectory = Files.Copy(assemblyToAnalyze, targetDirectory);
+            var fileInTargetDirectory = Files.copy(assemblyToAnalyze, targetDirectory);
             copyAssemblyDependenciesToAssemblyDirectory(fileInTargetDirectory, pathsToFindReferencedDlls);
         }
     }

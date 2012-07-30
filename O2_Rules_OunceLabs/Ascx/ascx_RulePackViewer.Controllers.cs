@@ -78,7 +78,7 @@ namespace O2.Rules.OunceLabs.Ascx
             //refreshRulesViewer();
         }
 
-        private void saveCurrentFilter(string typeOfRule, string signatureFilter, O2Thread.FuncVoid onComplete)
+        private void saveCurrentFilter(string typeOfRule, string signatureFilter, Action onComplete)
         {
             O2Thread.mtaThread(
                 () =>
@@ -90,7 +90,7 @@ namespace O2.Rules.OunceLabs.Ascx
                     });
         }
 
-        public Thread saveAllLoadedRules(O2Thread.FuncVoid onComplete)
+        public Thread saveAllLoadedRules(Action onComplete)
         {
             return O2Thread.mtaThread(
                 () =>
@@ -107,9 +107,7 @@ namespace O2.Rules.OunceLabs.Ascx
             return importFromLocalMySqlDatabase(true, true, true,true, true, true, true, true, null);
         }
 
-        public Thread importFromLocalMySqlDatabase(
-            bool addSources, bool addSinks, bool addCallbacks, bool addPropagateTaint, bool addDontPropagateTaint, bool addAnyHigh, bool addAnyMedium, bool addAnyLow,
-            O2Thread.FuncVoid onComplete)
+        public Thread importFromLocalMySqlDatabase(bool addSources, bool addSinks, bool addCallbacks, bool addPropagateTaint, bool addDontPropagateTaint, bool addAnyHigh, bool addAnyMedium, bool addAnyLow,Action onComplete)
         {
             return O2Thread.mtaThread(
                 () =>
@@ -912,7 +910,7 @@ namespace O2.Rules.OunceLabs.Ascx
                         this.invokeOnThread(()=>
                                                 {
                                                     clearChangedRulesList();
-                                                    return null;
+                                                    return "done";
                                                 });
                         
                         var newCallbackSignature = "O2.AutoMapping";

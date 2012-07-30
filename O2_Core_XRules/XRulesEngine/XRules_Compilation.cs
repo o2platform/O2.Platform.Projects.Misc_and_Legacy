@@ -15,7 +15,7 @@ namespace O2.Core.XRules.XRulesEngine
     public class XRules_Compilation
     {
 
-        public static void loadXRules(O2Thread.FuncVoidT1<List<IXRule>> onLoad, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static void loadXRules(O2Thread.FuncVoidT1<List<IXRule>> onLoad, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             O2Thread.mtaThread(
                 () =>
@@ -30,7 +30,7 @@ namespace O2.Core.XRules.XRulesEngine
             return getCompiledXRules(null, null, null);
         }
 
-        public static List<IXRule> getCompiledXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static List<IXRule> getCompiledXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             if (XRules_Config.xRulesDatabase != null)
             {
@@ -41,7 +41,7 @@ namespace O2.Core.XRules.XRulesEngine
             return new List<IXRule>();
         }
 
-        public static void compileXRules(O2Thread.FuncVoidT1<List<IXRule>> onCompilation, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static void compileXRules(O2Thread.FuncVoidT1<List<IXRule>> onCompilation, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             O2Thread.mtaThread(
                 () =>
@@ -51,7 +51,7 @@ namespace O2.Core.XRules.XRulesEngine
                     });
         }
 
-        public static List<IXRule> loadXRules(List<string>xRulesAssemblies, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static List<IXRule> loadXRules(List<string>xRulesAssemblies, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {           
             if (currentTask != null)
                 currentTask("Loading XRules");
@@ -70,7 +70,7 @@ namespace O2.Core.XRules.XRulesEngine
             return xRules;
         }
 
-        public static List<IXRule> compileXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static List<IXRule> compileXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             var compiledXRulesFiles = getCompiledXRulesAssemblies(currentTask,numberOfStepsToPerform, onStepEvent);
             
@@ -82,7 +82,7 @@ namespace O2.Core.XRules.XRulesEngine
             // dont add the dependencies since they are creating a prob with the cmd line tool
             Files.deleteAllFilesFromDir(XRules_Config.PathTo_XRulesCompiledDlls);
             foreach (var file in compiledXRulesFiles)
-                Files.Copy(file, XRules_Config.PathTo_XRulesCompiledDlls);
+                Files.copy(file, XRules_Config.PathTo_XRulesCompiledDlls);
 
 
             var pathToAppDomainWithXRulesAssemblies = XRules_Config.PathTo_XRulesCompiledDlls;
@@ -102,7 +102,7 @@ namespace O2.Core.XRules.XRulesEngine
             return loadXRules(xRulesAssemblies, currentTask, numberOfStepsToPerform, onStepEvent);
         }
 
-        private static string populateDirectoryWithAllDependencies(List<String> compiledXRulesFiles, O2Thread.FuncVoid onStepEvent)
+        private static string populateDirectoryWithAllDependencies(List<String> compiledXRulesFiles, Action onStepEvent)
         {
             var targetDirectory = XRules_Config.PathTo_XRulesCompiledDlls;
             Files.deleteFilesFromDirThatMatchPattern(targetDirectory,"*.dll");
@@ -115,7 +115,7 @@ namespace O2.Core.XRules.XRulesEngine
             return targetDirectory;
         }
 
-        public static List<String> getCompiledXRulesAssemblies(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static List<String> getCompiledXRulesAssemblies(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             currentTask("Compiling all rules together");
             numberOfStepsToPerform(1);
@@ -143,7 +143,7 @@ namespace O2.Core.XRules.XRulesEngine
             return new CompileEngine().compileSourceFiles(filesToCompile);
         }
 
-        public static List<String> compileAllFilesIndividually(List<String> filesToCompile, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, O2Thread.FuncVoid onStepEvent)
+        public static List<String> compileAllFilesIndividually(List<String> filesToCompile, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
         {
             currentTask("Compiling all rules individualy (one file at the time)");
             numberOfStepsToPerform(filesToCompile.Count);

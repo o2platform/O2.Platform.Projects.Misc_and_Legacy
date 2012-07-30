@@ -51,7 +51,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\O2_Binaries\</OutputPath>
+    <OutputPath>..\..\O2_Platform_ReferencedAssemblies\O2_Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -165,6 +165,10 @@
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>O2.FluentSharp.CoreLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.REPL\O2.FluentSharp.REPL.csproj">
+      <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
+      <Name>O2.FluentSharp.REPL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\O2_Core_CIR\O2_Core_CIR.csproj">
       <Project>{F19ED2FE-8191-4534-8DAC-4C42DEE87B52}</Project>
       <Name>O2_Core_CIR</Name>
@@ -172,10 +176,6 @@
     <ProjectReference Include="..\O2_Scanner_OunceLabsCLI\O2_Scanner_OunceLabsCLI.csproj">
       <Project>{39F35FB3-2A47-4DD9-A3EF-D18529C9A7A4}</Project>
       <Name>O2_Scanner_OunceLabsCLI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj">
-      <Project>{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}</Project>
-      <Name>O2_External_WinFormsUI</Name>
     </ProjectReference>
     <ProjectReference Include="..\O2_Rules_OunceLabs\O2_Rules_OunceLabs.csproj">
       <Project>{831EEFD3-A243-484E-B008-BA1EC6499954}</Project>

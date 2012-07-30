@@ -37,7 +37,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\O2.Platform.ReferenceAssemblies\O2_Assemblies\</OutputPath>
+    <OutputPath>..\..\O2_Platform_ReferencedAssemblies\O2_Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -52,14 +52,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HTMLparserLibDotNet20, Version=3.1.4.30523, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\_3rdPartyDlls\HTMLparserLibDotNet20.dll</HintPath>
-    </Reference>
-    <Reference Include="Merlin, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\_3rdPartyDlls\Merlin.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\_3rdPartyDlls\Mono.Cecil.dll</HintPath>
@@ -67,10 +59,6 @@
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\_3rdPartyDlls\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpSvn, Version=1.6006.1373.40218, Culture=neutral, PublicKeyToken=d729672594885a28, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\_3rdPartyDlls\SharpSvn.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -132,10 +120,6 @@
     <Compile Include="XRulesEngine\XRules_Config.cs" />
     <Compile Include="XRulesEngine\XRules_DatabaseSetup.cs" />
     <Compile Include="XRulesEngine\XRules_Execution.cs" />
-    <Compile Include="_UnitTests\CSharp_Tests\_Sample_UnitTests.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="_UnitTests\_Test_XRules_Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ascx\ascx_XRules_Execution.resx">

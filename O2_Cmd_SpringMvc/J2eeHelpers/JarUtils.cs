@@ -81,14 +81,14 @@ namespace O2.Cmd.SpringMvc.J2eeHelpers
                 {
                     if (dependencies[classFile].Count == 1)
                     {
-                        Files.Copy(dependencies[classFile][0], dependentJarFolder);
+                        Files.copy(dependencies[classFile][0], dependentJarFolder);
                     }
                     else
                     {
                         DI.log.debug("NOTE: there was more than one jar mapped to the class:{0}", classFile);
                         foreach (var jarFile in dependencies[classFile])
                         {
-                            Files.Copy(jarFile, dependentJarFolder);
+                            Files.copy(jarFile, dependentJarFolder);
                             DI.log.info("    {0}", jarFile);
                         }
                     }

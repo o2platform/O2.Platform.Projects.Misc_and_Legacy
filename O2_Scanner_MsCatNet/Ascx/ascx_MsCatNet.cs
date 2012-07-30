@@ -80,7 +80,10 @@ namespace O2.Scanner.MsCatNet.Ascx
                 if (File.Exists(fileToProcess))
                 {
                     if (Path.GetExtension(fileToProcess) == ".zip")
-                        TaskUtils.unzipFileAndInvokeCallback(fileToProcess, taskHostControl, processFile);
+                    {
+                        //fileToProcess.unzip_File(workDirectory);
+                        //TaskUtils.unzipFileAndInvokeCallback(fileToProcess, taskHostControl, processFile);
+                    }
                     else
                     {
                         switch (Path.GetExtension(fileToProcess))
@@ -88,7 +91,7 @@ namespace O2.Scanner.MsCatNet.Ascx
                             case ".dll":
                             case ".exe":
                                 if (workDirectory == "")
-                                    addScanTargetToTreeView(new ScanTarget_CatNet {Target = fileToProcess});
+                                    addScanTargetToTreeView(new ScanTarget_CatNet { Target = fileToProcess });
                                 else
                                     addScanTargetToTreeView(new ScanTarget_CatNet
                                                                 {
@@ -98,8 +101,8 @@ namespace O2.Scanner.MsCatNet.Ascx
                                                                 });
                                 break;
                             default:
-                                 DI.log.error("In processFile: File type not supported by CatNetScanner: {0} ",
-                                                Path.GetExtension(fileToProcess));
+                                DI.log.error("In processFile: File type not supported by CatNetScanner: {0} ",
+                                               Path.GetExtension(fileToProcess));
                                 break;
                         }
                     }
@@ -140,13 +143,13 @@ namespace O2.Scanner.MsCatNet.Ascx
 
         private void llDownloadDemoFile_HacmeBank_WebServices_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            WebRequests.downloadFileUsingAscxDownload(O2CoreResources.DemoScanTarget_Dll_Hacmebank_WebService,
-                                                      processFile);
+            //WebRequests.downloadFileUsingAscxDownload(O2CoreResources.DemoScanTarget_Dll_Hacmebank_WebService,
+            //                                          processFile);
         }
 
         private void llDownloadDemoFile_HacmeBank_Website_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            WebRequests.downloadFileUsingAscxDownload(O2CoreResources.DemoScanTarget_Dll_Hacmebank_WebSite, processFile);
+            //WebRequests.downloadFileUsingAscxDownload(O2CoreResources.DemoScanTarget_Dll_Hacmebank_WebSite, processFile);
         }
 
         private void checkIfCatNetScannerIsAvailable()

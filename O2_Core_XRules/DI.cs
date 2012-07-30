@@ -12,8 +12,8 @@ namespace O2.Core.XRules
             log = PublicDI.log;// new WinFormsUILog();            
             config = PublicDI.config; //new KO2Config();    
             reflection = PublicDI.reflection;
-            PathToLocalUnitTestsFiles = Path.Combine(config.hardCodedO2LocalSourceCodeDir, @"O2Core\O2_Core_XRules\_UnitTests");
-            PathToLocalXRulesUnitTestsFiles = Path.Combine(config.hardCodedO2LocalSourceCodeDir, @"_O2_UnitTests\Standalone");
+            //PathToLocalUnitTestsFiles = Path.Combine(config.hardCodedO2LocalSourceCodeDir, @"O2Core\O2_Core_XRules\_UnitTests");
+            //PathToLocalXRulesUnitTestsFiles = Path.Combine(config.hardCodedO2LocalSourceCodeDir, @"_O2_UnitTests\Standalone");
             SvnXRulesDatabaseUrl = "O2%20-%20All%20Active%20Projects/O2_XRules_Database/_Rules/";
         }
 
@@ -22,8 +22,8 @@ namespace O2.Core.XRules
         public static IReflection reflection { get; set; }
         //public string hardCodedO2LocalTempFolder { get; set; }
         //public string hardCodedO2LocalBuildDir { get; set; }
-        public static string PathToLocalUnitTestsFiles { get; set; }
-        public static string PathToLocalXRulesUnitTestsFiles { get; set; }
+        //public static string PathToLocalUnitTestsFiles { get; set; }
+        //public static string PathToLocalXRulesUnitTestsFiles { get; set; }
         public static string SvnXRulesDatabaseUrl { get; set; }
     }
 }

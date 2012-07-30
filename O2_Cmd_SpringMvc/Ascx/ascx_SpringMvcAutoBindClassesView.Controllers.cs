@@ -19,7 +19,7 @@ namespace O2.Cmd.SpringMvc.Ascx
         public ICirData cirData;
         public ICirClass cirRootClass;
         public List<ICirClass> cirClassMapped = new List<ICirClass>();
-        public O2Thread.FuncVoid onMapClassComplete;
+        public Action onMapClassComplete;
 
         public void mapClass(ICirClass cirClass, ICirData _cirData)
         {

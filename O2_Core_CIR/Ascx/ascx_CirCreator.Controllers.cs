@@ -19,7 +19,7 @@ namespace O2.Core.CIR.Ascx
 
         private void copyFileToCirCreationQueue(string fileToCopy)
         {
-            Files.Copy(fileToCopy, directory_CirCreationQueue.getCurrentDirectory());
+            Files.copy(fileToCopy, directory_CirCreationQueue.getCurrentDirectory());
         }
 
         private void deleteFilesFromCirCreationQueueDirectory()
@@ -52,7 +52,7 @@ namespace O2.Core.CIR.Ascx
                                            foreach (var fileInQueue in directory_CirCreationQueue.getFiles())
                                            {
                                                // first copy the assembly file to CreatedCirFiles directory
-                                               var fileToProcess = Files.MoveFile(fileInQueue, directory_CreatedCirFiles.getCurrentDirectory());
+                                               var fileToProcess = Files.moveFile(fileInQueue, directory_CreatedCirFiles.getCurrentDirectory());
                                                // start CirCreation thread
                                                createCirDataForFile(fileToProcess, true /*deleteFileOnCompletion*/, false /*decompileCodeIfNoPdb*/);                                               
                                            }

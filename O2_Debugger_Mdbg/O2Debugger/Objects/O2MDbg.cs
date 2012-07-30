@@ -45,7 +45,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
         {            
         }
 
-        public O2MDbg(O2Thread.FuncVoid onShellStart)            
+        public O2MDbg(Action onShellStart)            
         {
             if (DI.o2MDbg != null)
                 DI.log.error("DI.o2MDbg != null, and we should only have one instance of the O2MDbg per AppDomain, so this will override that one (and some data might be lost)");
@@ -69,7 +69,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
             return DI.o2MDbg;
         }
 
-        public void startMDbg(O2Thread.FuncVoid onShellStart)
+        public void startMDbg(Action onShellStart)
         {
             if (shell == null)
                 O2Thread.mtaThread(() =>
@@ -196,7 +196,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
             }
         }
 
-        public void updateDebuggerRunningAndActiveStatus(O2Thread.FuncVoid updateCompleteCallback)
+        public void updateDebuggerRunningAndActiveStatus(Action updateCompleteCallback)
         {
             O2Thread.mtaThread(() =>
             {

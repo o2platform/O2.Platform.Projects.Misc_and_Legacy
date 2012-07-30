@@ -28,7 +28,7 @@ namespace O2.Rules.OunceLabs.Ascx
                           mappedO2Findings =>
                               {
                                   findingsViewerMappedFindings.loadO2Findings(mappedO2Findings, true);
-                                  this.invokeOnThread((O2Thread.FuncVoid) (
+                                  this.invokeOnThread((Action) (
                                                                               () =>
                                                                               btFilter_BasicSinksMapping.Enabled = true));
                               });
@@ -42,7 +42,7 @@ namespace O2.Rules.OunceLabs.Ascx
                 mappedO2Findings =>
                     {
                         findingsViewerMappedFindings.loadO2Findings(mappedO2Findings, true);
-                        this.invokeOnThread((O2Thread.FuncVoid) (
+                        this.invokeOnThread((Action) (
                                                                               () =>
                                                                               btFilter_MapSinksToAllTraces.Enabled = true));
                               });                    
@@ -56,7 +56,7 @@ namespace O2.Rules.OunceLabs.Ascx
                 mappedO2Findings =>
                     {
                         findingsViewerMappedFindings.loadO2Findings(mappedO2Findings, true);
-                        this.invokeOnThread((O2Thread.FuncVoid)(
+                        this.invokeOnThread((Action)(
                                                                               () =>
                                                                               btCreateAllPartialTraces.Enabled = true));
                     });
@@ -71,7 +71,7 @@ namespace O2.Rules.OunceLabs.Ascx
                           mappedO2Findings =>
                               {
                                   findingsViewerMappedFindings.loadO2Findings(mappedO2Findings, true);
-                                  this.invokeOnThread((O2Thread.FuncVoid) (
+                                  this.invokeOnThread((Action) (
                                                                               () =>
                                                                               btMapSourcesToAllTraces.Enabled = true));
                               });
@@ -86,7 +86,7 @@ namespace O2.Rules.OunceLabs.Ascx
                           mappedO2Findings =>
                               {
                                   findingsViewerMappedFindings.loadO2Findings(mappedO2Findings, true);
-                                  this.invokeOnThread((O2Thread.FuncVoid)(
+                                  this.invokeOnThread((Action)(
                                                                               () =>
                                                                               btMapFirstSourcesThenSinksToAllTraces.Enabled = true));
                               });

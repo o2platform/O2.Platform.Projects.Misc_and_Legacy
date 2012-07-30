@@ -47,7 +47,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\O2_Binaries\</OutputPath>
+    <OutputPath>..\..\O2_Platform_ReferencedAssemblies\O2_Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -126,6 +126,10 @@
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>O2.FluentSharp.CoreLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.REPL\O2.FluentSharp.REPL.csproj">
+      <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
+      <Name>O2.FluentSharp.REPL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\O2.Platform.Projects\O2_External_SharpDevelop\O2_External_SharpDevelop.csproj">
       <Project>{E76BCE43-8511-4CE8-A965-C0150F713CE9}</Project>
       <Name>O2_External_SharpDevelop</Name>
@@ -145,10 +149,6 @@
     <ProjectReference Include="..\O2_External_O2Mono\O2_External_O2Mono.csproj">
       <Project>{F457A7EB-A573-41BB-BC12-61ABE5ACF702}</Project>
       <Name>O2_External_O2Mono</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\O2_External_WinFormsUI\O2_External_WinFormsUI.csproj">
-      <Project>{EED5F98D-00BA-4D9B-A9E7-A7794AD50132}</Project>
-      <Name>O2_External_WinFormsUI</Name>
     </ProjectReference>
     <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>

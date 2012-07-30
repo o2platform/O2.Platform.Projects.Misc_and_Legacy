@@ -3,6 +3,7 @@ using System;
 using System.Windows.Forms;
 using O2.Kernel.CodeUtils;
 using O2.Kernel.Objects;
+using O2.DotNetWrappers.DotNet;
 
 namespace O2.Kernel.CodeUtils
 {
@@ -11,7 +12,7 @@ namespace O2.Kernel.CodeUtils
         public static Form openO2Gui(this O2AppDomainFactory o2AppDomainFactory)
         {
             var o2Gui = (Form) o2AppDomainFactory.proxyInvokeInstance("O2_CoreLib", "O2GuiWithDockPanel", "");
-            O2Kernel_O2Thread.staThread(() => o2Gui.ShowDialog());
+            O2Thread.staThread(() => o2Gui.ShowDialog());
             return o2Gui;
         }
 
@@ -30,7 +31,7 @@ namespace O2.Kernel.CodeUtils
 
         public static void springExec(this O2AppDomainFactory o2AppDomainFactory, string springFileToLoad)
         {
-            O2Kernel_O2Thread.staThread(() =>
+            O2Thread.staThread(() =>
                                                    o2AppDomainFactory.proxyInvokeStatic("O2_CoreLib", "SpringExec",
                                                                                         "loadConfigAndStartGUI",
                                                                                         new object[] {springFileToLoad})

@@ -240,7 +240,7 @@ namespace O2.Cmd.SpringMvc.PythonScripts
                         break;
                     case ".class":
                         var targetFile = fileToProcess.Replace(':','_').Replace('/','_').Replace('\\','_');
-                        Files.Copy(fileToProcess, Path.Combine(targetFolder, targetFile));
+                        Files.copy(fileToProcess, Path.Combine(targetFolder, targetFile));
                         break;
                 }
             }

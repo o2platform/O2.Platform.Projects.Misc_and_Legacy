@@ -108,16 +108,16 @@ namespace O2.Scanner.OunceLabsCLI.Utils
         {
             if (File.Exists(srScanResults.sAssessmentFile_ScanWithExistingRules))
                 //Files.MoveFile(srScanResults.sAssessmentFile_ScanWithExistingRules, Path.Combine(sScanResultsFolder, Path.GetFileNameWithoutExtension(srScanResults.sApplicationToScan) + "_ScanWithExistingRules.ozasmt"));
-                Files.MoveFile(srScanResults.sAssessmentFile_ScanWithExistingRules, Path.Combine(sScanResultsFolder, "ScanWithExistingRules.ozasmt"));
+                Files.moveFile(srScanResults.sAssessmentFile_ScanWithExistingRules, Path.Combine(sScanResultsFolder, "ScanWithExistingRules.ozasmt"));
             if (File.Exists(srScanResults.sAssessmentFile_CallBacksOnControlFlowGraphs_And_ExternalSinks))
                 //Files.MoveFile(srScanResults.sAssessmentFile_CallBacksOnControlFlowGraphs_And_ExternalSinks, Path.Combine(sScanResultsFolder, Path.GetFileNameWithoutExtension(srScanResults.sApplicationToScan) + "_CallBacksOnControlFlowGraphs_And_ExternalSinks.ozasmt"));
-                Files.MoveFile(srScanResults.sAssessmentFile_CallBacksOnControlFlowGraphs_And_ExternalSinks, Path.Combine(sScanResultsFolder, "CallBacksOnControlFlowGraphs_And_ExternalSinks.ozasmt"));
+                Files.moveFile(srScanResults.sAssessmentFile_CallBacksOnControlFlowGraphs_And_ExternalSinks, Path.Combine(sScanResultsFolder, "CallBacksOnControlFlowGraphs_And_ExternalSinks.ozasmt"));
             if (File.Exists(srScanResults.sAssessmentFile_CallBacksOnEdges_And_ExternalSinks))
                 //Files.MoveFile(srScanResults.sAssessmentFile_CallBacksOnEdges_And_ExternalSinks, Path.Combine(sScanResultsFolder, Path.GetFileNameWithoutExtension(srScanResults.sApplicationToScan) + "_CallBacksOnEdges_And_ExternalSinks.ozasmt"));
-                Files.MoveFile(srScanResults.sAssessmentFile_CallBacksOnEdges_And_ExternalSinks, Path.Combine(sScanResultsFolder, "CallBacksOnEdges_And_ExternalSinks.ozasmt"));
+                Files.moveFile(srScanResults.sAssessmentFile_CallBacksOnEdges_And_ExternalSinks, Path.Combine(sScanResultsFolder, "CallBacksOnEdges_And_ExternalSinks.ozasmt"));
             if (File.Exists(srScanResults.sAssessmentFile_SourcesAndSinks))
                 //Files.MoveFile(srScanResults.sAssessmentFile_SourcesAndSinks, Path.Combine(sScanResultsFolder, Path.GetFileNameWithoutExtension(srScanResults.sApplicationToScan) + "_SourcesAndSinks.ozasmt"));         
-                Files.MoveFile(srScanResults.sAssessmentFile_SourcesAndSinks, Path.Combine(sScanResultsFolder, "SourcesAndSinks.ozasmt"));         
+                Files.moveFile(srScanResults.sAssessmentFile_SourcesAndSinks, Path.Combine(sScanResultsFolder, "SourcesAndSinks.ozasmt"));         
         }
 
         public static String CalculateCirDataFileNameInResultsFolder(string sApplicationToScan,

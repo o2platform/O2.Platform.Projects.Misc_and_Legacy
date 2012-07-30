@@ -3,6 +3,7 @@ using System;
 using System.ServiceModel;
 using O2.Kernel.CodeUtils;
 using System.Threading;
+using O2.DotNetWrappers.DotNet;
 
 namespace O2.Kernel.WCF.classes
 {    
@@ -35,7 +36,7 @@ namespace O2.Kernel.WCF.classes
         {
             try
             {
-                O2Kernel_O2Thread.mtaThread(() =>
+                O2Thread.mtaThread(() =>
                 {
                     using (var host = new ServiceHost(WcfImplementation))
                     {

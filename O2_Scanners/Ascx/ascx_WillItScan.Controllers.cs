@@ -152,7 +152,7 @@ namespace O2.Scanners.Ascx
                 scanProcessBar.invokeOnThread(delegate
                                                   {
                                                       scanProcessBar.Value = scanProcessBar.Maximum;
-                                                      return null;
+                                                      return "";
                                                   });
                 
             }
@@ -300,7 +300,7 @@ namespace O2.Scanners.Ascx
                                         scanProcessBar.Value++;
                                         if (scanProcessBar.Value == scanProcessBar.Maximum)
                                             scanProcessBar.Value = 0;                                        
-                                        return null;
+                                        return "";
                                     });
         }
     }

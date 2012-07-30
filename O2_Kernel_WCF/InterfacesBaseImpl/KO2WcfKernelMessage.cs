@@ -75,7 +75,7 @@ namespace O2.Kernel.WCF.InterfacesBaseImpl
 
         public bool unLoadAppDomainAndDeleteTempFolder(string appDomainName)
         {
-            var o2AppDomainFactory = PublicDI.appDomainsControledByO2Kernel[appDomainName];
+            var o2AppDomainFactory = O2AppDomainFactory.AppDomains_ControledByO2Kernel[appDomainName];
             if (o2AppDomainFactory != null)
                 return o2AppDomainFactory.unLoadAppDomainAndDeleteTempFolder();
             return false;
@@ -88,10 +88,10 @@ namespace O2.Kernel.WCF.InterfacesBaseImpl
 
         public object invokeOnAppDomainObject(string appDomainName, string typeToUse, string methodToInvoke, object[] methodParameters)
         {
-            if (PublicDI.appDomainsControledByO2Kernel != null && PublicDI.appDomainsControledByO2Kernel.ContainsKey(appDomainName))
+            if (O2AppDomainFactory.AppDomains_ControledByO2Kernel != null && O2AppDomainFactory.AppDomains_ControledByO2Kernel.ContainsKey(appDomainName))
             {
-               
-                var o2AppDomainFactory = PublicDI.appDomainsControledByO2Kernel[appDomainName];
+
+                var o2AppDomainFactory = O2AppDomainFactory.AppDomains_ControledByO2Kernel[appDomainName];
               //  DI.log.info("Inside DI with name: {0}", o2AppDomainFactory.Name);
                 var proxytObject = o2AppDomainFactory.getProxyObject(typeToUse);
                 if (proxytObject == null)
@@ -120,7 +120,7 @@ namespace O2.Kernel.WCF.InterfacesBaseImpl
             try
             {
                 WCF_DI.log.info("DI.O2KernelProcessName: {0}", appDomainName);
-                var o2AppDomainFactory = PublicDI.appDomainsControledByO2Kernel[appDomainName];
+                var o2AppDomainFactory = O2AppDomainFactory.AppDomains_ControledByO2Kernel[appDomainName];
                 if (o2AppDomainFactory != null)
                 {
                     var proxytObject = o2AppDomainFactory.getProxyObject("O2Messages");
