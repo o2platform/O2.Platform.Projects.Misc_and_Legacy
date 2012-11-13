@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_O2Mono", "O2_Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2_External_Python", "O2_External_Python\O2_External_Python.csproj", "{BE97BE11-8CBD-4EC7-812D-3024900A5AF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2 ImportExport OunceLabs", "O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj", "{49F0878F-E643-4D19-BE27-BC4CF4D6A138}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_O2 ImportExport OunceLabs (Not used in Scripts)", "O2_ImportExport_OunceLabs\_O2 ImportExport OunceLabs (Not used in Scripts).csproj", "{49F0878F-E643-4D19-BE27-BC4CF4D6A138}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "O2 Kernel WCF", "O2_Kernel_WCF\O2 Kernel WCF.csproj", "{A5CB8BED-722D-4A44-A00C-78A3791C7EB8}"
 EndProject

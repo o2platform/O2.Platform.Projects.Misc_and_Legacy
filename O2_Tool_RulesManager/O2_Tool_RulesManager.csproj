@@ -150,9 +150,9 @@
       <Project>{F457A7EB-A573-41BB-BC12-61ABE5ACF702}</Project>
       <Name>O2_External_O2Mono</Name>
     </ProjectReference>
-    <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
+    <ProjectReference Include="..\O2_ImportExport_OunceLabs\_O2 ImportExport OunceLabs %28Not used in Scripts%29.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
-      <Name>O2 ImportExport OunceLabs</Name>
+      <Name>_O2 ImportExport OunceLabs %28Not used in Scripts%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\O2_Rules_OunceLabs\O2_Rules_OunceLabs.csproj">
       <Project>{831EEFD3-A243-484E-B008-BA1EC6499954}</Project>

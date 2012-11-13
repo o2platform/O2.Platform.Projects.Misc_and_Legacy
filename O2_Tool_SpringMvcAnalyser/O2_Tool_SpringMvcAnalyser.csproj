@@ -135,9 +135,9 @@
       <Project>{F19ED2FE-8191-4534-8DAC-4C42DEE87B52}</Project>
       <Name>O2_Core_CIR</Name>
     </ProjectReference>
-    <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
-      <Project>{D388D146-D728-412E-8097-5C6E4E53612E}</Project>
-      <Name>O2 ImportExport OunceLabs</Name>
+    <ProjectReference Include="..\O2_ImportExport_OunceLabs\_O2 ImportExport OunceLabs %28Not used in Scripts%29.csproj">
+      <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
+      <Name>_O2 ImportExport OunceLabs %28Not used in Scripts%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -408,9 +408,9 @@
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>O2.FluentSharp.CoreLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
+    <ProjectReference Include="..\O2_ImportExport_OunceLabs\_O2 ImportExport OunceLabs %28Not used in Scripts%29.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
-      <Name>O2 ImportExport OunceLabs</Name>
+      <Name>_O2 ImportExport OunceLabs %28Not used in Scripts%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

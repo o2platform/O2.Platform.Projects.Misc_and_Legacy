@@ -77,7 +77,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
     <None Include="XSD\j2ee_1_4.xsd" />
     <None Include="XSD\j2ee_web_services_1_1.xsd" />
     <None Include="XSD\j2ee_web_services_client_1_1.xsd" />
@@ -255,9 +254,9 @@
       <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
       <Name>O2.FluentSharp.REPL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\O2_ImportExport_OunceLabs\O2 ImportExport OunceLabs.csproj">
+    <ProjectReference Include="..\O2_ImportExport_OunceLabs\_O2 ImportExport OunceLabs %28Not used in Scripts%29.csproj">
       <Project>{49F0878F-E643-4D19-BE27-BC4CF4D6A138}</Project>
-      <Name>O2 ImportExport OunceLabs</Name>
+      <Name>_O2 ImportExport OunceLabs %28Not used in Scripts%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
