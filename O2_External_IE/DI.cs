@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using O2.Interfaces.O2Core;
 using O2.Kernel;
+using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.External.IE
 {
@@ -19,10 +20,10 @@ namespace O2.External.IE
 
         // DI which will need to be injected 
 
-        public static IO2Config config { get; set; }
+        public static KO2Config config { get; set; }
         public static IO2Log log { get; set; }
 
-        public static IReflection reflection;
+        public static KReflection reflection;
 
     }
 }

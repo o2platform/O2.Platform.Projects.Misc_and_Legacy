@@ -47,7 +47,7 @@ namespace O2.Rules.OunceLabs.Ascx
         public Thread executeFilter(AvailableFilters filterToApply, bool addFindingsWithNoMatches, O2Thread.FuncVoidT1<List<IO2Finding>> onCompletion)
         {
 	        var o2TargetO2Findings = findingsViewerSourceFindings.currentO2Findings;
-	        var o2RulesToUse = rulePackViewer.currentO2RulePack.o2Rules;
+	        var o2RulesToUse = rulePackViewer.currentO2RulePack.O2Rules;
             return O2Thread.mtaThread(
                 () =>
                     {

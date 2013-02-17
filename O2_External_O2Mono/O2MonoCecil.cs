@@ -7,11 +7,11 @@ using Mono.Cecil;
 using O2.DotNetWrappers.Windows;
 using O2.External.O2Mono.MonoCecil;
 using O2.External.O2Mono.ViewHelpers;
-using O2.Interfaces.ExternalDlls;
+//using O2.Interfaces.ExternalDlls;
 
 namespace O2.External.O2Mono
 {
-    public class O2MonoCecil : IO2MonoCecil
+    public class O2MonoCecil //: IO2MonoCecil
     {
         #region using core MonoCecil lib
 

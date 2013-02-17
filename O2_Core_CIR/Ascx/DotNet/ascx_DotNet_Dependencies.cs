@@ -32,7 +32,7 @@ namespace O2.Core.CIR.Ascx.DotNet
 
         private void gacBrowser__onGacDllSelected(IGacDll selectedDll)
         {
-            showDependenciesForFile(selectedDll.fullPath);
+            showDependenciesForFile(selectedDll.FullPath);
         }
 
 

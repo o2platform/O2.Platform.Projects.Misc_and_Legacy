@@ -2,6 +2,7 @@
 using System.IO;
 using O2.Interfaces.O2Core;
 using O2.Kernel;
+using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Core.XRules
 {
@@ -18,8 +19,8 @@ namespace O2.Core.XRules
         }
 
         public static IO2Log log { get; set; }
-        public static IO2Config config { get; set; }
-        public static IReflection reflection { get; set; }
+        public static KO2Config config { get; set; }
+        public static KReflection reflection { get; set; }
         //public string hardCodedO2LocalTempFolder { get; set; }
         //public string hardCodedO2LocalBuildDir { get; set; }
         //public static string PathToLocalUnitTestsFiles { get; set; }

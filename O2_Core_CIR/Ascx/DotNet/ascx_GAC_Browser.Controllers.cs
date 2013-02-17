@@ -59,15 +59,15 @@ namespace O2.Core.CIR.Ascx.DotNet
                 {
                     tvListOfGacAssemblies.Nodes.Clear();
                     foreach (var gacAssembly in assembliesToLoad)
-                        if (RegEx.findStringInString(gacAssembly.name, filter))
+                        if (RegEx.findStringInString(gacAssembly.Name, filter))
                         {
-                            var newTreeNode = new TreeNode(gacAssembly.name)
+                            var newTreeNode = new TreeNode(gacAssembly.Name)
                                                   {
                                                       Tag = gacAssembly
                                                   };
                             if (treeViewColorFilter != null && filter != "")
                                 // for performance reasons only apply this when there is a filter
-                                if (treeViewColorFilter(gacAssembly.fullPath))
+                                if (treeViewColorFilter(gacAssembly.FullPath))
                                     // move this code to the consumers of this assembly
                                     /* if (PostSharpUtils.containsO2PostSharpHooks(gacAssembly.fullPath))*/
                                     newTreeNode.ForeColor = Color.DarkGreen;

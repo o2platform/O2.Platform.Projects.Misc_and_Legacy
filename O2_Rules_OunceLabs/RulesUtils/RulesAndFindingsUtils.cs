@@ -111,7 +111,7 @@ namespace O2.Rules.OunceLabs.RulesUtils
                 {
                     var vulnType = "O2.FindingRule." + createRuleWithType.ToString();
                     var newRule = new O2Rule(createRuleWithType,vulnType, ruleSignature, languageDBId,true);
-                    o2RulePack.o2Rules.Add(newRule);
+                    o2RulePack.O2Rules.Add(newRule);
                     if (false == indexedO2Rules.ContainsKey(ruleSignature))
                         indexedO2Rules.Add(ruleSignature, new List<IO2Rule>());
                     indexedO2Rules[ruleSignature].Add(newRule);
@@ -248,7 +248,7 @@ namespace O2.Rules.OunceLabs.RulesUtils
             // and call the function that does the mappings
             mapInRulePack_FindingsSourcesAndSinks(newRulePack, indexedCurrentO2Rules , o2Findings, languageId);
             
-            DI.log.info("{0} rules created", newRulePack.o2Rules.Count);
+            DI.log.info("{0} rules created", newRulePack.O2Rules.Count);
             
             return newRulePack;
 

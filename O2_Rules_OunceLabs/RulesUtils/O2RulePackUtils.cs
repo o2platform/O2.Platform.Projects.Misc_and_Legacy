@@ -19,7 +19,7 @@ namespace O2.Rules.OunceLabs.RulesUtils
 
         public static void addRule(IO2Rule rRule, O2RulePack o2rulePack)
         {
-            o2rulePack.o2Rules.Add((O2Rule)rRule);
+            o2rulePack.O2Rules.Add((O2Rule)rRule);
         }
         public static string saveRulePack(O2RulePack o2rulePackToSave)
         {
@@ -32,16 +32,16 @@ namespace O2.Rules.OunceLabs.RulesUtils
             if (false == File.Exists(pathToSaveFile) && false == Directory.Exists(Path.GetDirectoryName(pathToSaveFile)))
                 pathToSaveFile = DI.config.TempFileNameInTempDirectory + "_" + pathToSaveFile;
             string rulePackFile = pathToSaveFile + "_" + o2rulePackToSave.RulePackName + "_" + "(" +
-                                  o2rulePackToSave.o2Rules.Count + ")_" + sTypeOfPack + ".O2RulePack";
+                                  o2rulePackToSave.O2Rules.Count + ")_" + sTypeOfPack + ".O2RulePack";
             return saveRulePack(rulePackFile, o2rulePackToSave);
         }
 
         public static string saveRulePack(string rulePackFile, O2RulePack o2rulePackToSave)
         {
-            if (o2rulePackToSave.o2Rules.Count > 0)
+            if (o2rulePackToSave.O2Rules.Count > 0)
             {
                 Serialize.createSerializedXmlFileFromObject(o2rulePackToSave, rulePackFile);
-                DI.log.info("Saved O2RulePack {0} with {1} rules", rulePackFile, o2rulePackToSave.o2Rules.Count);
+                DI.log.info("Saved O2RulePack {0} with {1} rules", rulePackFile, o2rulePackToSave.O2Rules.Count);
                 return rulePackFile;
             }
             return "";
@@ -173,7 +173,7 @@ namespace O2.Rules.OunceLabs.RulesUtils
 
         public static List<IO2Rule> getRulesThatAreFromDB(O2RulePack o2RulePack)
         {
-            return (from IO2Rule o2Rule in o2RulePack.o2Rules where o2Rule.FromDb select o2Rule).ToList();
+            return (from IO2Rule o2Rule in o2RulePack.O2Rules where o2Rule.FromDb select o2Rule).ToList();
         }
 
         internal static IO2Rule cloneRule(IO2Rule o2RuleToClone)

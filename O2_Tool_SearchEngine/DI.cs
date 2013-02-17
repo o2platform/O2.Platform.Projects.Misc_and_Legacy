@@ -21,11 +21,11 @@ namespace O2.Tool.SearchEngine
         }
         
         public static IO2Log log { get; set;}
-        public static IO2Config config { get; set;}
+        public static KO2Config config { get; set;}
         public static DotNetWrappers.SearchApi.SearchEngine searchEngineAPI { get; set; }        
 
         public static IO2MessageQueue o2MessageQueue;
 
-        //public static IReflection reflection = new KReflection();
+        //public static KReflection reflection = new KReflection();
     }
 }

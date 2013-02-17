@@ -15,6 +15,6 @@ namespace O2.Scanner.OunceLabsCLI
         }
 
         public static IO2Log log { get; set; }
-        public static IO2Config config { get; set; }
+        public static KO2Config config { get; set; }
     }
 }

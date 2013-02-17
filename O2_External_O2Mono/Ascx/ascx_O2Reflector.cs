@@ -93,7 +93,7 @@ namespace O2.External.O2Mono.Ascx
         private void refreshAssemblyBrowser()
         {
             if (DI.assemblyAnalysis == null)
-                DI.log.e("in refreshAssemblyBrowser, DI variable is not set assemblyAnalysis, Aborting function");
+                DI.log.error("in refreshAssemblyBrowser, DI variable is not set assemblyAnalysis, Aborting function");
             else
             {
 

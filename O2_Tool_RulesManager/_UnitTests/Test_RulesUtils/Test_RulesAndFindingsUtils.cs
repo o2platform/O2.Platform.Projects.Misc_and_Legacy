@@ -43,7 +43,7 @@ namespace O2.Tool.RulesManager._UnitTests.Test_RulesUtils
 
             var o2RulePackForOzasmt = RulesAndFindingsUtils.createRulePackWithSignatures(o2RulePackToUse, uniqueSignatures,
                                                                Path.GetFileName(ozamstFileToTest), true, testLanguageDBId);
-            Assert.That(o2RulePackForOzasmt.o2Rules.Count > 0, "There were no rules in created o2RulePackForOzasmt");
+            Assert.That(o2RulePackForOzasmt.O2Rules.Count > 0, "There were no rules in created o2RulePackForOzasmt");
             timer.stop();
         }
 

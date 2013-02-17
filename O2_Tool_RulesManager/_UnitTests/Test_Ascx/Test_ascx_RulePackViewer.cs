@@ -29,7 +29,7 @@ namespace O2.Tool.RulesManager._UnitTests
             thread.Join();
             thread = rulePackViewerControl.refreshRulesViewer("All", "");
             thread.Join();
-            Assert.That(rulePackViewerControl.currentO2RulePack.o2Rules.Count >0);
+            Assert.That(rulePackViewerControl.currentO2RulePack.O2Rules.Count >0);
 
         }
 

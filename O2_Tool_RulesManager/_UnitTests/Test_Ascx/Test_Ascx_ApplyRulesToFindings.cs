@@ -39,7 +39,7 @@ namespace O2.Tool.RulesManager._UnitTests
             var thread = applyRulesToFindingsControl.loadO2RulePack(rulePackFile);
             thread.Join();
             rulePackViewerControl = applyRulesToFindingsControl.getRulePackViewerControl();
-            Assert.That(rulePackViewerControl.currentO2RulePack.o2Rules.Count > 0, "There were no rules loaded");
+            Assert.That(rulePackViewerControl.currentO2RulePack.O2Rules.Count > 0, "There were no rules loaded");
             sourceFindingsViewerControl = applyRulesToFindingsControl.getSourceFindingsViewerControl();
             
             thread = sourceFindingsViewerControl.loadO2Assessment(ozasmtFile);

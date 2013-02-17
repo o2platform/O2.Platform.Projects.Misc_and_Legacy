@@ -258,7 +258,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
             }
             else
             {
-                DI.log.e("in animateOver either the process is not active or is running");
+                DI.log.error("in animateOver either the process is not active or is running");
             }
             DI.log.info("End: Animate Over");
             return instructions;
@@ -293,7 +293,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
             }
             else
             {
-                DI.log.e("in animateInto either the process is not active or is running");
+                DI.log.error("in animateInto either the process is not active or is running");
             }
             DI.log.info("Stop: Animate Into");
             return instructions;
@@ -329,7 +329,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Objects
             }
             else
             {
-                DI.log.e("in animateBack either the process is not active or is running");
+                DI.log.error("in animateBack either the process is not active or is running");
             }
             DI.log.info("Stop: Animate Over");
             return instructions;        

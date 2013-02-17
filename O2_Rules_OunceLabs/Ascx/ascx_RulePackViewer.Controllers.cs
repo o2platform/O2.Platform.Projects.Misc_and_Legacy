@@ -466,14 +466,14 @@ namespace O2.Rules.OunceLabs.Ascx
                         if (removeNotMachedRulesOfSameType && filterByO2RuleType != O2RuleType.All)
                         {
                             var o2RulesToRemove = new List<O2Rule>();
-                            foreach (var o2Rule in currentO2RulePack.o2Rules)
+                            foreach (var o2Rule in currentO2RulePack.O2Rules)
                                 if (o2Rule.RuleType == filterByO2RuleType)
                                     if (false == o2RulesFiltered.Contains(o2Rule))
                                         o2RulesToRemove.Add(o2Rule);
                             DI.log.info("Going to remove {0} rules from currentO2RulePack", o2RulesToRemove.Count);
                             // removing them
                             foreach (var o2RuleToDelete in o2RulesToRemove)
-                                currentO2RulePack.o2Rules.Remove(o2RuleToDelete);
+                                currentO2RulePack.O2Rules.Remove(o2RuleToDelete);
                             // reindex 
                             indexedCurrentO2Rules = IndexedO2Rules.indexAll(currentO2RulePack.getIO2Rules());
                             showRules(o2RulesFiltered, true /* showRulesInFunctionsViewer*/, raiseEditCurrentSelectedRows);                                                                                       
@@ -530,7 +530,7 @@ namespace O2.Rules.OunceLabs.Ascx
         {
             var sinksWithPropagateTaint = new List<IO2Rule>();
             var currentSinks = new List<IO2Rule>();
-            foreach (var o2Rule in currentO2RulePack.o2Rules)
+            foreach (var o2Rule in currentO2RulePack.O2Rules)
                 if (o2Rule.RuleType == O2RuleType.Sink)
                     currentSinks.Add(o2Rule);
             foreach (var sinkRule in currentSinks)
@@ -587,7 +587,7 @@ namespace O2.Rules.OunceLabs.Ascx
                 () =>
                     {
                         laNumberOfRulesLoaded.Text =
-                            "# Rules Loaded:" + currentO2RulePack.o2Rules.Count + "  " +
+                            "# Rules Loaded:" + currentO2RulePack.O2Rules.Count + "  " +
                             "# Rules After Filter " + o2RulesToShow.Count;
                     });
         }
@@ -610,7 +610,7 @@ namespace O2.Rules.OunceLabs.Ascx
             DI.log.info("Deleting {0} rules from the database", rulesToDelete.Count());
             new MySqlRules_OunceV6().deleteRulesFromDatabase(rulesToDelete);
             foreach (O2Rule deletedRule in rulesToDelete)
-                currentO2RulePack.o2Rules.Remove(deletedRule);
+                currentO2RulePack.O2Rules.Remove(deletedRule);
             this.invokeOnThread(() => refreshRulesViewer(cbTypeOfRuleToView.Text, tbSignatureFilter.Text));
         }
        //  rbApplyChangesTo_AllLoadedRules.Checked,
@@ -1147,7 +1147,7 @@ namespace O2.Rules.OunceLabs.Ascx
                 foreach (DataGridViewRow selectedRow in dgvRules.SelectedRows)               // we have to do this because dgvRules.SelectedRows.Clear() doesn't work
                     selectedRow.Selected = false;
             var newRuleRow = addO2RuleToDataGridView(newO2Rule);
-            currentO2RulePack.o2Rules.Add(newO2Rule);
+            currentO2RulePack.O2Rules.Add(newO2Rule);
             newRuleRow.Selected = true;
             openRulesEditor();
         }

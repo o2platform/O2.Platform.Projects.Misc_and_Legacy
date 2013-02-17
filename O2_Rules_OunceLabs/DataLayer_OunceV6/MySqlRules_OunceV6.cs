@@ -335,11 +335,11 @@ namespace O2.Rules.OunceLabs.DataLayer_OunceV6
                 Lddb_OunceV6.action_DeleteAllRules();
             //Utils.debugBreak();
             //removeRulesFromCache();
-            DI.log.info("Adding {0} rules to database", o2rulePack.o2Rules.Count);
-            foreach (var o2Rule in o2rulePack.o2Rules)
+            DI.log.info("Adding {0} rules to database", o2rulePack.O2Rules.Count);
+            foreach (var o2Rule in o2rulePack.O2Rules)
                 if (false == addRuleToDatabase(o2Rule))
                     rulesNotProcessed.Add(o2Rule);
-            DI.log.info("Completed adding {0} rules to database", o2rulePack.o2Rules.Count);
+            DI.log.info("Completed adding {0} rules to database", o2rulePack.O2Rules.Count);
             if (rulesNotProcessed.Count > 0)
                 DI.log.info("Total number of rules NOT processed: {0}", rulesNotProcessed.Count);
             return rulesNotProcessed;

@@ -16,8 +16,8 @@ namespace O2.Rules.OunceLabs
         }
 
         public static IO2Log log { get; set; }
-        public static IO2Config config { get; set; }
+        public static KO2Config config { get; set; }
 
-        public static IReflection reflection { get; set; }
+        public static KReflection reflection { get; set; }
     }
 }
