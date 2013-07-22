@@ -2,15 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.XRules.XRulesEngine;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.O2Findings;
-using O2.Interfaces.Messages;
-using O2.Interfaces.O2Findings;
-using O2.Interfaces.XRules;
-using O2.Kernel.InterfacesBaseImpl;
-using System.IO;
-using O2.DotNetWrappers.Windows;
 
 namespace O2.Core.XRules.Ascx
 {
@@ -113,7 +110,7 @@ namespace O2.Core.XRules.Ascx
                         }
                         finally
                         {
-                            DI.log.info("Completed addXRulesToView");
+                            "Completed addXRulesToView".info();
                             //lbCompiledXRules.Enabled = true;
                             setGuiEnableState(true);
                         }
@@ -151,7 +148,7 @@ namespace O2.Core.XRules.Ascx
                     lbLoadedArtifacts.Items.Add(artifact);
             }
             else
-                DI.log.info("There is no xRulesDatabase available");
+                "There is no xRulesDatabase available".info();
         }               
 
         public void showXRuleDetails(ILoadedXRule xLoadedRule)

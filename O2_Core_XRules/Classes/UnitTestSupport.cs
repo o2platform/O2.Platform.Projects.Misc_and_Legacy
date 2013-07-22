@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using O2.External.O2Mono.MonoCecil;
-using O2.Interfaces.XRules;
-using O2.Kernel.Interfaces.XRules;
-using O2.Kernel;
+
 //O2Ref:mono.cecil.dll
 
 namespace O2.Core.XRules.Classes

@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.XRules.Ascx
 {
     partial class ascx_XRules_UnitTestExecution_BigGUI
@@ -34,7 +37,7 @@ namespace O2.Core.XRules.Ascx
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tvAssembliesToLookForUnitTests = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.directory_targetAssemblies = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.directory_targetAssemblies = new DirectoryViewer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.tvXRules = new System.Windows.Forms.TreeView();
@@ -136,7 +139,7 @@ namespace O2.Core.XRules.Ascx
             this.directory_targetAssemblies._ProcessDroppedObjects = false;
             this.directory_targetAssemblies._ShowFileSize = true;
             this.directory_targetAssemblies._ShowLinkToUpperFolder = true;
-            this.directory_targetAssemblies._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.directory_targetAssemblies._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.directory_targetAssemblies._WatchFolder = true;
             this.directory_targetAssemblies.BackColor = System.Drawing.SystemColors.Control;
             this.directory_targetAssemblies.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -312,7 +315,7 @@ namespace O2.Core.XRules.Ascx
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directory_targetAssemblies;
+        private DirectoryViewer directory_targetAssemblies;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TreeView tvAssembliesToLookForUnitTests;

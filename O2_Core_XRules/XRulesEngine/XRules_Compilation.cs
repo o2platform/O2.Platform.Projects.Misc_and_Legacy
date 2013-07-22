@@ -1,13 +1,9 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using O2.Interfaces.XRules;
-using O2.Kernel;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using O2.External.O2Mono.MonoCecil;
 
 namespace O2.Core.XRules.XRulesEngine
@@ -15,7 +11,7 @@ namespace O2.Core.XRules.XRulesEngine
     public class XRules_Compilation
     {
 
-        public static void loadXRules(O2Thread.FuncVoidT1<List<IXRule>> onLoad, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static void loadXRules(Action<List<IXRule>> onLoad, Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             O2Thread.mtaThread(
                 () =>
@@ -30,7 +26,7 @@ namespace O2.Core.XRules.XRulesEngine
             return getCompiledXRules(null, null, null);
         }
 
-        public static List<IXRule> getCompiledXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static List<IXRule> getCompiledXRules(Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             if (XRules_Config.xRulesDatabase != null)
             {
@@ -41,7 +37,7 @@ namespace O2.Core.XRules.XRulesEngine
             return new List<IXRule>();
         }
 
-        public static void compileXRules(O2Thread.FuncVoidT1<List<IXRule>> onCompilation, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static void compileXRules(Action<List<IXRule>> onCompilation, Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             O2Thread.mtaThread(
                 () =>
@@ -51,7 +47,7 @@ namespace O2.Core.XRules.XRulesEngine
                     });
         }
 
-        public static List<IXRule> loadXRules(List<string>xRulesAssemblies, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static List<IXRule> loadXRules(List<string>xRulesAssemblies, Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {           
             if (currentTask != null)
                 currentTask("Loading XRules");
@@ -70,7 +66,7 @@ namespace O2.Core.XRules.XRulesEngine
             return xRules;
         }
 
-        public static List<IXRule> compileXRules(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static List<IXRule> compileXRules(Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             var compiledXRulesFiles = getCompiledXRulesAssemblies(currentTask,numberOfStepsToPerform, onStepEvent);
             
@@ -115,7 +111,7 @@ namespace O2.Core.XRules.XRulesEngine
             return targetDirectory;
         }
 
-        public static List<String> getCompiledXRulesAssemblies(O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static List<String> getCompiledXRulesAssemblies(Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             currentTask("Compiling all rules together");
             numberOfStepsToPerform(1);
@@ -143,7 +139,7 @@ namespace O2.Core.XRules.XRulesEngine
             return new CompileEngine().compileSourceFiles(filesToCompile);
         }
 
-        public static List<String> compileAllFilesIndividually(List<String> filesToCompile, O2Thread.FuncVoidT1<string> currentTask, O2Thread.FuncVoidT1<int> numberOfStepsToPerform, Action onStepEvent)
+        public static List<String> compileAllFilesIndividually(List<String> filesToCompile, Action<string> currentTask, Action<int> numberOfStepsToPerform, Action onStepEvent)
         {
             currentTask("Compiling all rules individualy (one file at the time)");
             numberOfStepsToPerform(filesToCompile.Count);

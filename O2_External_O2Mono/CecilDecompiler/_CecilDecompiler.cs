@@ -5,9 +5,9 @@ using System.Text;
 using Cecil.Decompiler.Cil;
 using Cecil.Decompiler.ControlFlow;
 using Cecil.Decompiler.Languages;
+using FluentSharp.CoreLib.API;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using O2.DotNetWrappers.Windows;
 using O2.External.O2Mono.MonoCecil;
 
 namespace O2.External.O2Mono.CecilDecompiler

@@ -1,18 +1,15 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using System;
+
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.XRules.Classes;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.Interfaces.Messages;
-using O2.Kernel;
-using O2.DotNetWrappers.Windows;
-using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Core.XRules.Ascx
 {

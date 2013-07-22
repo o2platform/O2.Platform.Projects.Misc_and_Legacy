@@ -9,3 +9,4 @@ UpgradeLog.xml
 *.suo
 *.pidb
 *.userprefs
+*.ncrunchsolution

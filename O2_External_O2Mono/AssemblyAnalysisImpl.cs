@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using O2.Interfaces.Controllers;
-using O2.Kernel.CodeUtils;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Interfaces;
 
 namespace O2.External.O2Mono
 {
