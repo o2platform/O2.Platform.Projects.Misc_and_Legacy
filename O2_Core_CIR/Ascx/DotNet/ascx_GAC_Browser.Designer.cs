@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.CIR.Ascx.DotNet
 {
     partial class ascx_GAC_Browser
@@ -37,7 +40,7 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.tpConfig = new System.Windows.Forms.TabPage();
             this.gbBackupGAC = new System.Windows.Forms.GroupBox();
             this.llBackUpGAC = new System.Windows.Forms.LinkLabel();
-            this.directory_ToBackupGAC = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.directory_ToBackupGAC = new DirectoryViewer();
             this.tabControl1.SuspendLayout();
             this.tpGacContents.SuspendLayout();
             this.tpConfig.SuspendLayout();
@@ -146,7 +149,7 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.directory_ToBackupGAC._ShowFileContentsOnTopTip = false;
             this.directory_ToBackupGAC._ShowFileSize = false;
             this.directory_ToBackupGAC._ShowLinkToUpperFolder = true;
-            this.directory_ToBackupGAC._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.directory_ToBackupGAC._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.directory_ToBackupGAC._WatchFolder = false;
             this.directory_ToBackupGAC.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -181,7 +184,7 @@ namespace O2.Core.CIR.Ascx.DotNet
         private System.Windows.Forms.TabPage tpGacContents;
         private System.Windows.Forms.TabPage tpConfig;
         private System.Windows.Forms.GroupBox gbBackupGAC;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directory_ToBackupGAC;
+        private DirectoryViewer directory_ToBackupGAC;
         private System.Windows.Forms.LinkLabel llBackUpGAC;
         private System.Windows.Forms.TreeView tvListOfGacAssemblies;
         private System.Windows.Forms.TextBox tbGacAssemblyFilter;

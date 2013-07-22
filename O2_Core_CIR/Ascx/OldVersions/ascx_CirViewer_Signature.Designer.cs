@@ -1,7 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
 using O2.Core.CIR.Ascx.OldVersions;
-using O2.Views.ASCX.CoreControls;
-using O2.Views.ASCX.DataViewers;
+
 
 namespace O2.Core.CIR.Ascx
 {
@@ -43,7 +44,7 @@ namespace O2.Core.CIR.Ascx
             this.lBoxVariables = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.lbBoxSsaVariables = new System.Windows.Forms.ListBox();
-            this.asv_SelectVisiblePanels = new ascx_SelectVisiblePanels();
+            this.asv_SelectVisiblePanels = new SelectVisiblePanels();
             this.scBottom = new System.Windows.Forms.SplitContainer();
             this.afv_IsCalledBy = new ascx_FunctionsViewer();
             this.scHostControl = new System.Windows.Forms.SplitContainer();
@@ -369,7 +370,7 @@ namespace O2.Core.CIR.Ascx
         private System.Windows.Forms.ListBox lBoxVariables;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lbBoxSsaVariables;
-        private ascx_SelectVisiblePanels asv_SelectVisiblePanels;
+        private SelectVisiblePanels asv_SelectVisiblePanels;
         private System.Windows.Forms.SplitContainer scBottom;
         private System.Windows.Forms.SplitContainer scHostControl;
         private System.Windows.Forms.SplitContainer scTop;

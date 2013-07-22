@@ -1,5 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
+
 
 namespace O2.Core.CIR.Ascx
 {
@@ -33,7 +36,7 @@ namespace O2.Core.CIR.Ascx
         {
             this.lbLoadedO2CirDataFiles = new System.Windows.Forms.ListBox();
             this.cbClearPreviousO2CirData = new System.Windows.Forms.CheckBox();
-            this.ascx_DropObject1 = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.DropObject1 = new DropObject();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.llClearLoadedData = new System.Windows.Forms.LinkLabel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -70,25 +73,25 @@ namespace O2.Core.CIR.Ascx
             this.cbClearPreviousO2CirData.Text = "On Drop, clear previous o2CirData ";
             this.cbClearPreviousO2CirData.UseVisualStyleBackColor = true;
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(171, 22);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(98, 81);
-            this.ascx_DropObject1.TabIndex = 106;
-            this.ascx_DropObject1.Text = "Drop here CirDump or CirData files to Load";
-            this.ascx_DropObject1.Load += new System.EventHandler(this.ascx_DropObject1_Load);
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(171, 22);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(98, 81);
+            this.DropObject1.TabIndex = 106;
+            this.DropObject1.Text = "Drop here CirDump or CirData files to Load";
+            this.DropObject1.Load += new System.EventHandler(this.DropObject1_Load);
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.llClearLoadedData);
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.ascx_DropObject1);
+            this.groupBox1.Controls.Add(this.DropObject1);
             this.groupBox1.Controls.Add(this.lbLoadedO2CirDataFiles);
             this.groupBox1.Controls.Add(this.cbClearPreviousO2CirData);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -169,7 +172,7 @@ namespace O2.Core.CIR.Ascx
 
         private System.Windows.Forms.ListBox lbLoadedO2CirDataFiles;
         private System.Windows.Forms.CheckBox cbClearPreviousO2CirData;
-        private ascx_DropObject ascx_DropObject1;
+        private DropObject DropObject1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox2;

@@ -1,5 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Views.ASCX.DataViewers;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -83,7 +85,7 @@ namespace O2.Core.CIR.Ascx
             this.decompiledSourceCodeAndCreateTempSourceFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onFileDropOrLoadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.calculateTheCallersCalleswillLoadSlowerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.functionsViewer = new O2.Views.ASCX.DataViewers.ascx_FunctionsViewer();
+            this.functionsViewer = new ascx_FunctionsViewer();
             this.toolStrip1.SuspendLayout();
             this.gbSelectedItemInfo.SuspendLayout();
             this.gbCirTrace.SuspendLayout();
@@ -587,11 +589,11 @@ namespace O2.Core.CIR.Ascx
             this.functionsViewer.NamespaceDepthValue = 2;
             this.functionsViewer.Size = new System.Drawing.Size(977, 470);
             this.functionsViewer.TabIndex = 2;
-            this.functionsViewer._onItemDrag += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onItemDrag);
+            this.functionsViewer._onItemDrag += new Callbacks.dMethod_Object(this.functionsViewer__onItemDrag);
             this.functionsViewer._onMouseMove += new System.Action<System.Windows.Forms.TreeNode>(this.functionsViewer__onMouseMove);
-            this.functionsViewer._onDoubleClick += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onDoubleClick);
-            this.functionsViewer._onAfterSelect += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onAfterSelect);
-            this.functionsViewer._onDrop += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onDrop);
+            this.functionsViewer._onDoubleClick += new Callbacks.dMethod_Object(this.functionsViewer__onDoubleClick);
+            this.functionsViewer._onAfterSelect += new Callbacks.dMethod_Object(this.functionsViewer__onAfterSelect);
+            this.functionsViewer._onDrop += new Callbacks.dMethod_Object(this.functionsViewer__onDrop);
             // 
             // ascx_CirDataViewer
             // 

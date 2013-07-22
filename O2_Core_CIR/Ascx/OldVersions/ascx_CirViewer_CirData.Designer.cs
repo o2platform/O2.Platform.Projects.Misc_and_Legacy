@@ -1,8 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
 using O2.Core.CIR.Ascx.OldVersions;
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
-using O2.Views.ASCX.DataViewers;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -43,9 +42,9 @@ namespace O2.Core.CIR.Ascx
             this.cbOnlyShowClassesWithFunctionsWithControlFlowGraphs = new System.Windows.Forms.CheckBox();
             this.cbCalculateSuperClasses = new System.Windows.Forms.CheckBox();
             this.scBottom = new System.Windows.Forms.SplitContainer();
-            this.asvp_Panels = new O2.Views.ASCX.CoreControls.ascx_SelectVisiblePanels();
-            this.afv_Classes = new O2.Views.ASCX.DataViewers.ascx_FunctionsViewer();
-            this.afv_SuperClasses = new O2.Views.ASCX.DataViewers.ascx_FunctionsViewer();
+            this.asvp_Panels = new SelectVisiblePanels();
+            this.afv_Classes = new ascx_FunctionsViewer();
+            this.afv_SuperClasses = new ascx_FunctionsViewer();
             this.acv_Class = new ascx_CirViewer_Class();
             this.acv_Signature = new O2.Core.CIR.Ascx.ascx_CirViewer_Signature();
             this.scHost.Panel1.SuspendLayout();
@@ -231,7 +230,7 @@ namespace O2.Core.CIR.Ascx
         private ascx_FunctionsViewer afv_SuperClasses;
         private ascx_CirViewer_Class acv_Class;
         private ascx_CirViewer_Signature acv_Signature;
-        private ascx_SelectVisiblePanels asvp_Panels;
+        private SelectVisiblePanels asvp_Panels;
         private System.Windows.Forms.SplitContainer scBottom;
         private System.Windows.Forms.CheckBox cbOnlyShowClassesWithFunctionsWithControlFlowGraphs;
         private System.Windows.Forms.CheckBox cbCalculateSuperClasses;

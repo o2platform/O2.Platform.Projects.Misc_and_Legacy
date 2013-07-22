@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using O2.Interfaces.CIR;
-using O2.DotNetWrappers.ExtensionMethods;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.Interfaces;
 using O2.External.O2Mono.MonoCecil;
-using O2.Kernel.ExtensionMethods;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirCreator.DotNet;
-using O2.Core.CIR.ExtensionMethods;
 
 namespace O2.Core.CIR.ExtensionMethods
 {
@@ -36,7 +33,7 @@ namespace O2.Core.CIR.ExtensionMethods
         public static ICirClass toCir(this Type type)
         {
             var cirData = new CirData();
-            var assemblyLocation = type.assemblyLocation();
+            var assemblyLocation = type.assembly_Location();
             var assembly = CecilUtils.getAssembly(assemblyLocation);
             var cirFactory = new CirFactory();
             cirFactory.loadAndMapSymbols(assembly, assemblyLocation, false, "");

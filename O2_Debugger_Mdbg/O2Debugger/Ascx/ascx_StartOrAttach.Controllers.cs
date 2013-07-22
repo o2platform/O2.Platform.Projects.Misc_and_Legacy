@@ -3,9 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.O2Debugger.Objects;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms;
 
 namespace O2.Debugger.Mdbg.O2Debugger.Ascx
 {
@@ -28,7 +27,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Ascx
 
         private void refreshListOfAvailableManagedProcesses()
         {
-            if (Threads_ExtensionMethods.okThread((Control) lvManagedProcesses, delegate { refreshListOfAvailableManagedProcesses(); }))
+            if (Thread_Invoke_ExtensionMethods.okThread((Control) lvManagedProcesses, delegate { refreshListOfAvailableManagedProcesses(); }))
             {
                 lvManagedProcesses.Items.Clear();
                 var processes = DI.o2MDbg.sessionData.getManagedProcesses();

@@ -1,15 +1,12 @@
 using System.Windows.Forms;
 using System.Drawing;
-using System.Net;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms;
 using mshtml;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System;
 using System.Drawing.Drawing2D;
-
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.External.IE.ExtensionMethods;
-using O2.DotNetWrappers.DotNet;
 
 namespace O2.External.IE.Wrapper
 {

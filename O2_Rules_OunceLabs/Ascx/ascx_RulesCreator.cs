@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.WinForms.Utils;
 using O2.Rules.OunceLabs.DataLayer;
 
 namespace O2.Rules.OunceLabs.Ascx

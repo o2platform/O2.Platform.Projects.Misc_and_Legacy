@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Pdb;
 using O2.Core.CIR.CirObjects;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.Windows;
 using O2.External.O2Mono.MonoCecil;
-using O2.Interfaces.CIR;
-using O2.Kernel;
 using System.Reflection;
 using O2.External.O2Mono.CecilDecompiler;
 

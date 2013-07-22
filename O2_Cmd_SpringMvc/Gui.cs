@@ -1,19 +1,15 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using System;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.REPL.Controls;
+using FluentSharp.REPL.Utils;
+using FluentSharp.WinFormUI.Utils;
+using FluentSharp.WinForms.Controls;
 using O2.Cmd.SpringMvc.Ascx;
-using O2.Cmd.SpringMvc.Scripts;
 using O2.Core.CIR.Ascx;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.O2CmdShell;
 using O2.External.Python.Ascx;
-using O2.External.SharpDevelop;
-using O2.External.SharpDevelop.Ascx;
-using O2.External.WinFormsUI.Forms;
-using O2.External.WinFormsUI.O2Environment;
 using O2.ImportExport.OunceLabs;
-using O2.Interfaces.Views;
-using O2.Kernel.InterfacesBaseImpl;
-using O2.Views.ASCX.O2Findings;
 
 namespace O2.Cmd.SpringMvc
 {

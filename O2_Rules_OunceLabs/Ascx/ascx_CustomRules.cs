@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.WinForms.Utils;
 using O2.Rules.OunceLabs.DataLayer;
 using O2.Rules.OunceLabs.DataLayer_OunceV6;
 
@@ -113,7 +113,7 @@ namespace O2.Rules.OunceLabs.Ascx
         //        }
 
 
-        private void ascx_DropObject1_eDnDAction_ObjectDataReceived_Event(object oVar)
+        private void DropObject1_eDnDAction_ObjectDataReceived_Event(object oVar)
         {
         }
 
@@ -166,7 +166,7 @@ namespace O2.Rules.OunceLabs.Ascx
                                                               lbSelectedActionObjectId.Text);
         }
 
-        private void ascx_DropObject1_Load(object sender, EventArgs e)
+        private void DropObject1_Load(object sender, EventArgs e)
         {
         }
 

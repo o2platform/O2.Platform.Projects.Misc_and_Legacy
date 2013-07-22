@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.Kernel.CodeUtils;
+using FluentSharp.WinForms.Utils;
 
 namespace O2.Tool.SearchEngine.Ascx
 {

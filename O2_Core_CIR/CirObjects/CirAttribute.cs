@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using O2.Interfaces.CIR;
-
+using FluentSharp.CoreLib.Interfaces;
 namespace O2.Core.CIR.CirObjects
 {
     public class CirAttribute : ICirAttribute

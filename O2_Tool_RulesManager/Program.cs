@@ -1,22 +1,16 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.REPL.Controls;
+using FluentSharp.REPL.Utils;
+using FluentSharp.WinFormUI.Utils;
+using FluentSharp.WinForms.Controls;
 using O2.Cmd.FindingsFilter.Ascx;
 using O2.Core.CIR.Ascx;
-using O2.DotNetWrappers.DotNet;
-using O2.External.SharpDevelop;
-using O2.External.SharpDevelop.Ascx;
-using O2.External.WinFormsUI.Forms;
-using O2.External.WinFormsUI.O2Environment;
 using O2.ImportExport.OunceLabs;
-using O2.ImportExport.OunceLabs.Ozasmt_OunceV6;
-using O2.Interfaces.Views;
-using O2.Kernel.InterfacesBaseImpl;
 using O2.Rules.OunceLabs.Ascx;
 using O2.Scanner.OunceLabsCLI.Ascx;
-using O2.Views.ASCX.DataViewers;
-using O2.Views.ASCX.O2Findings;
-using O2.Core.XRules.Ascx;
 
 namespace O2.Tool.RulesManager
 {
@@ -50,7 +44,7 @@ namespace O2.Tool.RulesManager
 
                 O2AscxGUI.addControlToMenu(typeof(ascx_FindingsFilterDevGui), O2DockState.Document, "Fidings Filter");
 
-                O2AscxGUI.addControlToMenu(typeof(ascx_SourceCodeEditor), O2DockState.Document, "Source Code Editor");
+                O2AscxGUI.addControlToMenu(typeof(SourceCodeEditor), O2DockState.Document, "Source Code Editor");
                 O2AscxGUI.addControlToMenu(typeof(ascx_FunctionsViewer), O2DockState.Document, "Functions Signatures");
                 O2AscxGUI.addControlToMenu(typeof(ascx_ApplyRulesToFindings), O2DockState.Document, "O2 'Call-Flow Scanner' (Apply Rules To Findings)");
                 O2AscxGUI.openAscx(typeof(ascx_XRules_Editor), O2DockState.Document, "O2 XRules Editor");

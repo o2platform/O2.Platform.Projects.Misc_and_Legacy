@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Interfaces;
 using O2.Debugger.Mdbg.corapi;
 using O2.Debugger.Mdbg.Debugging.CorDebug;
 using O2.Debugger.Mdbg.Debugging.MdbgEngine;
 using O2.Debugger.Mdbg.OriginalMdbgCode.mdbg;
-using O2.DotNetWrappers.DotNet;
-using O2.Interfaces.Messages;
 
 //var breakpoint = o2MDbgOLD.O2BreakPoints.add("mscorlib.dll", "System.Console", "WriteLine", 0);  // is set but wasn't fireing (I could have placed the BP on the wrong method
 

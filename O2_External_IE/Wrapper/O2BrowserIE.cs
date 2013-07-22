@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Network;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
+using FluentSharp.WinForms.Utils;
 using O2.External.IE.Interfaces;
 using O2.External.IE.ExtensionMethods;
 using O2.External.IE.WebObjects;
-using O2.Kernel;
-
-using O2.Views.ASCX.classes.MainGUI;
 
 namespace O2.External.IE.Wrapper
 {
@@ -145,7 +143,7 @@ namespace O2.External.IE.Wrapper
                     var doc = (mshtml.IHTMLDocument2) Document.DomDocument;
                     return (doc.designMode == "On");
                 }
-                O2.Kernel.PublicDI.log.error("in DesignMode.get Document == null");
+                PublicDI.log.error("in DesignMode.get Document == null");
                 return false;
             }
             set

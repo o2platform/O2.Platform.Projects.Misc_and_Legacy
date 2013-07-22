@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using FluentSharp.CoreLib;
 using mshtml;
 using O2.External.IE.Interfaces;
-using O2.DotNetWrappers.ExtensionMethods;
 
 namespace O2.External.IE.WebObjects
 {

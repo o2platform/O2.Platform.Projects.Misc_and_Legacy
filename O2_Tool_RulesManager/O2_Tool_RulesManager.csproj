@@ -62,6 +62,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentSharp.WinForms, Version=5.3.0.0, Culture=neutral, PublicKeyToken=55a0f9bf4256d533, processorArchitecture=MSIL" />
     <Reference Include="nunit.framework">
       <HintPath>..\O2_External_O2Mono\_External_Dlls\nunit.framework.dll</HintPath>
     </Reference>
@@ -117,15 +118,11 @@
     <Compile Include="_UnitTests\Test_RulesUtils\Test_RulesAndFindingsUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.BCL\FluentSharp.BCL.csproj">
-      <Project>{DF7E73CB-02AC-4689-BB8C-AC21FFCCDDC5}</Project>
-      <Name>FluentSharp.BCL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.CoreLib\FluentSharp.CoreLib.csproj">
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.CoreLib\FluentSharp.CoreLib.csproj">
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>FluentSharp.CoreLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.REPL\FluentSharp.REPL.csproj">
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.REPL\FluentSharp.REPL.csproj">
       <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
       <Name>FluentSharp.REPL</Name>
     </ProjectReference>

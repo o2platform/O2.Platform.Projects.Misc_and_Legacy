@@ -6,14 +6,12 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
-using O2.Core.CIR;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
 using O2.Core.CIR.Xsd;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
-using O2.Kernel.CodeUtils;
 
 namespace O2.Core.CIR.Ascx.Rnd
 {
@@ -791,7 +789,7 @@ namespace O2.Core.CIR.Ascx.Rnd
              */
         }
 
-        private void ascx_DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
+        private void DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
         {
             //String ads = oObject.GetType().Name;
             if (oObject.GetType().Name == "List`1")

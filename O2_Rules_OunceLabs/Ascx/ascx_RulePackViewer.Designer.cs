@@ -1,4 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Rules.OunceLabs.Ascx
 {
     partial class ascx_RulePackViewer
@@ -61,7 +65,7 @@ namespace O2.Rules.OunceLabs.Ascx
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.laNotAllRulesShow = new System.Windows.Forms.ToolStripLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.functionsViewer = new O2.Views.ASCX.DataViewers.ascx_FunctionsViewer();
+            this.functionsViewer = new ascx_FunctionsViewer();
             this.scRulesAndMySqlProperties = new System.Windows.Forms.SplitContainer();
             this.rbViewMode_TaggedAndInDb = new System.Windows.Forms.RadioButton();
             this.rbViewMode_OnlyNotInDbAndMapped = new System.Windows.Forms.RadioButton();
@@ -452,8 +456,8 @@ namespace O2.Rules.OunceLabs.Ascx
             this.functionsViewer.NamespaceDepthValue = 1;
             this.functionsViewer.Size = new System.Drawing.Size(197, 462);
             this.functionsViewer.TabIndex = 0;
-            this.functionsViewer._onDoubleClick += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onDoubleClick);
-            this.functionsViewer._onAfterSelect += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.functionsViewer__onAfterSelect);
+            this.functionsViewer._onDoubleClick += new Callbacks.dMethod_Object(this.functionsViewer__onDoubleClick);
+            this.functionsViewer._onAfterSelect += new Callbacks.dMethod_Object(this.functionsViewer__onAfterSelect);
             // 
             // scRulesAndMySqlProperties
             // 
@@ -1544,7 +1548,7 @@ namespace O2.Rules.OunceLabs.Ascx
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripLabel laNotAllRulesShow;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private O2.Views.ASCX.DataViewers.ascx_FunctionsViewer functionsViewer;
+        private ascx_FunctionsViewer functionsViewer;
         private System.Windows.Forms.SplitContainer scRulesAndMySqlProperties;
         private System.Windows.Forms.LinkLabel llDragSelectedRules;
         private System.Windows.Forms.LinkLabel llDragFilteredRules;

@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using O2.DotNetWrappers.O2CmdShell;
-using O2.DotNetWrappers.O2Findings;
-using O2.Interfaces.O2Findings;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.O2Findings;
 
 namespace O2.Cmd.FindingsFilter.Filters
 {

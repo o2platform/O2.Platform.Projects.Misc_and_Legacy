@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.DotNetWrappers.Zip;
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.classes.MainGUI;
+using FluentSharp.CoreLib.API;
+using FluentSharp.REPL.Utils;
+using FluentSharp.WinForms.Utils;
 
 namespace O2.Scanner.OunceLabsCLI.Utils
 {

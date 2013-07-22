@@ -2,15 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.O2Findings;
-using O2.Interfaces.O2Findings;
-using O2.Interfaces.Rules;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Controls;
 using O2.Rules.OunceLabs.Filters;
-using O2.Rules.OunceLabs.RulesUtils;
-using O2.Views.ASCX.O2Findings;
 
 namespace O2.Rules.OunceLabs.Ascx
 {
@@ -44,7 +40,7 @@ namespace O2.Rules.OunceLabs.Ascx
             return findingsViewerSourceFindings;
         }
 
-        public Thread executeFilter(AvailableFilters filterToApply, bool addFindingsWithNoMatches, O2Thread.FuncVoidT1<List<IO2Finding>> onCompletion)
+        public Thread executeFilter(AvailableFilters filterToApply, bool addFindingsWithNoMatches, Action<List<IO2Finding>> onCompletion)
         {
 	        var o2TargetO2Findings = findingsViewerSourceFindings.currentO2Findings;
 	        var o2RulesToUse = rulePackViewer.currentO2RulePack.O2Rules;

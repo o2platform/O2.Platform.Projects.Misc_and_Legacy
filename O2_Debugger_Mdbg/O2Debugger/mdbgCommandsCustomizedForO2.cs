@@ -4,19 +4,18 @@ using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using FluentSharp.CoreLib.API;
 using O2.Debugger.Mdbg.Debugging.CorDebug;
 using O2.Debugger.Mdbg.Debugging.CorDebug.NativeApi;
 using O2.Debugger.Mdbg.Debugging.CorPublish;
 using O2.Debugger.Mdbg.Debugging.MdbgEngine;
-using O2.Debugger.Mdbg.O2Debugger;
 using O2.Debugger.Mdbg.Tools.Mdbg;
-using O2.DotNetWrappers.DotNet;
 
 namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
 {
     public class mdbgCommandsCustomizedForO2
     {
-        public static void FuncEvalCmd(string arguments, IMDbgShell Shell, O2Thread.FuncVoidT1<string> execOnEval)
+        public static void FuncEvalCmd(string arguments, IMDbgShell Shell, Action<string> execOnEval)
         {
             try
             {
@@ -158,7 +157,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
         }
 
 
-        public static void ProcessEnumCmd(string arguments, O2Thread.FuncVoidT1<CorPublishProcess> handleManagedProcess) // extended with Lambda method
+        public static void ProcessEnumCmd(string arguments, Action<CorPublishProcess> handleManagedProcess) // extended with Lambda method
         {
             var cp = new CorPublish();
 
@@ -196,7 +195,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
         }
         // O2.Debugger.Mdbg.OriginalMdbgCode.mdbg.mdbgCommandsCustomizedForO2
         // , O2Thread.FuncVoid<string> o2Callback)
-        public static bool AttachCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static bool AttachCmd(string arguments, Action<string> o2Callback)
         {
             try
             {
@@ -232,7 +231,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             }                        
         }
 
-        public static void PrintCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static void PrintCmd(string arguments, Action<string> o2Callback)
         {
             const string debuggerVarsOpt = "d";
             const string noFuncevalOpt = "nf";
@@ -309,7 +308,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             }
         }
 
-        public static void WhereCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static void WhereCmd(string arguments, Action<string> o2Callback)
         {
             const int default_depth = 100; // default number of frames to print
 
@@ -405,7 +404,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             }
         }
 
-        public static void ListBreakpoints(O2Thread.FuncVoidT1<string> o2Callback)
+        public static void ListBreakpoints(Action<string> o2Callback)
         {
             if (CommandBase.Debugger.Processes.HaveActive)
             {
@@ -431,7 +430,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             }
         }
 
-        public static void BreakCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static void BreakCmd(string arguments, Action<string> o2Callback)
         {
             if (arguments.Length == 0)
             {
@@ -451,7 +450,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             CommandBase.WriteOutput(bpnew.ToString());
         }
 
-        public static void DeleteCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static void DeleteCmd(string arguments, Action<string> o2Callback)
 
         {
             var ap = new ArgParser(arguments);
@@ -473,7 +472,7 @@ namespace O2.Debugger.Mdbg.OriginalMdbgCode.mdbg
             }
         }
 
-        public static void ShowCmd(string arguments, O2Thread.FuncVoidT1<string> o2Callback)
+        public static void ShowCmd(string arguments, Action<string> o2Callback)
         {
 
             MDbgSourcePosition pos = CommandBase.Debugger.Processes.Active.Threads.Active.CurrentSourcePosition;

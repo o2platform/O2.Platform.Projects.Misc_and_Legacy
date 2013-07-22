@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
 using System.Drawing;
-using O2.Kernel.CodeUtils;
 using O2.Core.CIR.CirUtils.DotNet;
 
 namespace O2.Core.CIR.Ascx

@@ -2,10 +2,8 @@ using System;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using FluentSharp.CoreLib.API;
 using mshtml;
-using O2.DotNetWrappers.DotNet;
-using O2.Kernel;
-using O2.Kernel.CodeUtils;
 
 // this file uses code from: http://blogs.artinsoft.net/mrojas/archive/2008/09/18/newwindow2-events-in-the-c-webbrowsercontrol.aspx
 

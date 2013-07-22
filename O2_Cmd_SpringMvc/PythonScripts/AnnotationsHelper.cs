@@ -3,17 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.REPL.Utils;
+using FluentSharp.WinForms.O2Findings;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.O2Findings;
-using O2.DotNetWrappers.Zip;
 using O2.External.Python.Jython;
-using O2.Interfaces.CIR;
-using O2.Interfaces.O2Findings;
-using O2.DotNetWrappers.Windows;
 
 namespace O2.Cmd.SpringMvc.PythonScripts
 {
@@ -130,7 +127,7 @@ namespace O2.Cmd.SpringMvc.PythonScripts
 //            var o2FindingsOfTypeO2SpringMvcController = (from o2Finding in o2Assessment.o2Findings where o2Finding.vulnType == "O2.SpringMvc.Controller" select o2Finding).ToList();
 //            DI.log.debug("There are {0}  o2FindingsOfTypeO2SpringMvcController");
 
-/*            O2.Views.ASCX.O2Findings.ascx_FindingsViewer.openInFloatWindow(o2FindingsOfTypeO2SpringMvcController);
+/*            ascx_FindingsViewer.openInFloatWindow(o2FindingsOfTypeO2SpringMvcController);
             saveFindingsInNewO2AssessmentFile(o2FindingsOfTypeO2SpringMvcController, pathToOzasmtFile + "_SpringMvcController.ozasmt");
  * */
         }

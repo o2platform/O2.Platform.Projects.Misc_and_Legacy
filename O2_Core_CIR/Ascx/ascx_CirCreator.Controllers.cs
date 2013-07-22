@@ -1,11 +1,10 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System.IO;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Controls;
 using O2.Core.CIR.CirCreator.DotNet;
 using O2.Core.CIR.CirObjects;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
-using O2.Views.ASCX.CoreControls;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -33,12 +32,12 @@ namespace O2.Core.CIR.Ascx
         }
         
 
-        public ascx_Directory getDirectoryControlFor_CirCreationQueue()
+        public DirectoryViewer getDirectoryControlFor_CirCreationQueue()
         {
             return directory_CirCreationQueue;
         }
 
-        public ascx_Directory getDirectoryControlFor_CreatedCirFiles()
+        public DirectoryViewer getDirectoryControlFor_CreatedCirFiles()
         {
             return directory_CreatedCirFiles;
         }

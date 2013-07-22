@@ -3,15 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
-using O2.DotNetWrappers.Zip;
-using O2.Interfaces.DotNet;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
 
 namespace O2.Core.CIR.Ascx.DotNet
 {
@@ -19,7 +14,7 @@ namespace O2.Core.CIR.Ascx.DotNet
     {
 
         public Func<string, bool> treeViewColorFilter = null;
-        public event O2Thread.FuncVoidT1<IGacDll> _onGacDllSelected;
+        public event Action<IGacDll> _onGacDllSelected;
 
         public void setTreeViewcolorFilter( Func<string, bool>  filter)
         {

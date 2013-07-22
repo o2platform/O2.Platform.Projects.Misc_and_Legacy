@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FluentSharp.CoreLib;
+using FluentSharp.WinForms;
 using mshtml;
-using O2.DotNetWrappers.ExtensionMethods;
 using O2.External.IE.Interfaces;
 using O2.External.IE.WebObjects;
 using O2.External.IE.Wrapper;

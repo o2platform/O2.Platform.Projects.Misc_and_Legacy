@@ -2,25 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinFormUI.Utils;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.O2Findings;
+using FluentSharp.WinForms.Utils;
 using O2.Cmd.SpringMvc.Classes;
 using O2.Cmd.SpringMvc.Objects;
 using O2.Cmd.SpringMvc.PythonScripts;
 using O2.Core.CIR.CirCreator.Java;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.O2Findings;
-using O2.DotNetWrappers.Windows;
-using O2.DotNetWrappers.Zip;
-using O2.External.WinFormsUI.Forms;
-using O2.Interfaces.CIR;
-using O2.Interfaces.O2Findings;
-using O2.Kernel.CodeUtils;
 
 namespace O2.Cmd.SpringMvc.Ascx
 {

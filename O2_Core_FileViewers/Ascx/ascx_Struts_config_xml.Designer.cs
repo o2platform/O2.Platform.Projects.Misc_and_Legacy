@@ -1,4 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using System;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.FileViewers.Ascx
 {
     partial class ascx_Struts_config_xml
@@ -31,11 +35,11 @@ namespace O2.Core.FileViewers.Ascx
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tableList_FormBeans = new O2.Views.ASCX.DataViewers.ascx_TableList();
-            this.tableList_GlobalForwards = new O2.Views.ASCX.DataViewers.ascx_TableList();
+            this.tableList_FormBeans = new ctrl_TableList();
+            this.tableList_GlobalForwards = new ctrl_TableList();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.tableList_ActionMappings = new O2.Views.ASCX.DataViewers.ascx_TableList();
-            this.tableList_PlugIns = new O2.Views.ASCX.DataViewers.ascx_TableList();
+            this.tableList_ActionMappings = new ctrl_TableList();
+            this.tableList_PlugIns = new ctrl_TableList();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -96,7 +100,7 @@ namespace O2.Core.FileViewers.Ascx
             this.tableList_FormBeans.Name = "tableList_FormBeans";
             this.tableList_FormBeans.Size = new System.Drawing.Size(243, 275);
             this.tableList_FormBeans.TabIndex = 5;
-            this.tableList_FormBeans._onTableListDrop += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
+            this.tableList_FormBeans._onTableListDrop += new Action<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
             // 
             // tableList_GlobalForwards
             // 
@@ -106,7 +110,7 @@ namespace O2.Core.FileViewers.Ascx
             this.tableList_GlobalForwards.Name = "tableList_GlobalForwards";
             this.tableList_GlobalForwards.Size = new System.Drawing.Size(243, 115);
             this.tableList_GlobalForwards.TabIndex = 6;
-            this.tableList_GlobalForwards._onTableListDrop += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
+            this.tableList_GlobalForwards._onTableListDrop += new Action<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
             // 
             // splitContainer3
             // 
@@ -135,7 +139,7 @@ namespace O2.Core.FileViewers.Ascx
             this.tableList_ActionMappings.Name = "tableList_ActionMappings";
             this.tableList_ActionMappings.Size = new System.Drawing.Size(296, 275);
             this.tableList_ActionMappings.TabIndex = 8;
-            this.tableList_ActionMappings._onTableListDrop += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
+            this.tableList_ActionMappings._onTableListDrop += new Action<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
             // 
             // tableList_PlugIns
             // 
@@ -145,7 +149,7 @@ namespace O2.Core.FileViewers.Ascx
             this.tableList_PlugIns.Name = "tableList_PlugIns";
             this.tableList_PlugIns.Size = new System.Drawing.Size(296, 115);
             this.tableList_PlugIns.TabIndex = 9;
-            this.tableList_PlugIns._onTableListDrop += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
+            this.tableList_PlugIns._onTableListDrop += new Action<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
             // 
             // label3
             // 
@@ -193,14 +197,14 @@ namespace O2.Core.FileViewers.Ascx
 
         #endregion
 
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableList_FormBeans;
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableList_GlobalForwards;
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableList_ActionMappings;
+        private ctrl_TableList tableList_FormBeans;
+        private ctrl_TableList tableList_GlobalForwards;
+        private ctrl_TableList tableList_ActionMappings;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.SplitContainer splitContainer3;
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableList_PlugIns;
+        private ctrl_TableList tableList_PlugIns;
     }
 }

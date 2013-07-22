@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.CoreLib.API;
 
 namespace O2.External.Python.Jython
 {

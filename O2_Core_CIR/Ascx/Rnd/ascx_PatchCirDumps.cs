@@ -18,7 +18,7 @@ namespace O2.Core.CIR.Ascx.Rnd
             InitializeComponent();
         }
 
-        private void ascx_DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
+        private void DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
         {
             loadO2CirDataFile(oObject.ToString(),true);
         }
@@ -27,7 +27,7 @@ namespace O2.Core.CIR.Ascx.Rnd
         {
             if (DesignMode == false)
             {
-                ascx_DropObject1.setText("asd");
+                DropObject1.setText("asd");
             }
         }
 

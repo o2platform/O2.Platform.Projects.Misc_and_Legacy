@@ -1,12 +1,11 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
+using System.Threading;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinFormUI.Utils;
+using FluentSharp.WinForms;
 using O2.Debugger.Mdbg.O2Debugger.Ascx;
-using O2.Debugger.Mdbg.O2Debugger.Objects;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.External.WinFormsUI.Forms;
-using O2.Interfaces.Views;
-using O2.Kernel.CodeUtils;
 
 namespace O2.Debugger.Mdbg.O2Debugger
 {
@@ -36,7 +35,7 @@ namespace O2.Debugger.Mdbg.O2Debugger
             }
         }
 
-        private void executeO2DebugAction(O2Thread.FuncThread actionToExecute)
+        private void executeO2DebugAction(Func<Thread> actionToExecute)
         {
             var threadForAction = actionToExecute();
             // since we cant touch the current thread, lets start a new one that can wait for threadForAction

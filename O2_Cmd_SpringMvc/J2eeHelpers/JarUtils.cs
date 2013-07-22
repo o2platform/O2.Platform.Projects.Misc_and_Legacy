@@ -1,12 +1,10 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using System;
+
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using FluentSharp.CoreLib.API;
+using FluentSharp.REPL.Utils;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.Windows;
-using O2.DotNetWrappers.Zip;
 
 namespace O2.Cmd.SpringMvc.J2eeHelpers
 {

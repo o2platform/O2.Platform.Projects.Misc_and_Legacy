@@ -1,15 +1,10 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.O2Debugger.Objects;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Messages;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Interfaces;
+using FluentSharp.WinForms.Utils;
 
 namespace O2.Debugger.Mdbg.O2Debugger.Ascx
 {
@@ -98,7 +93,7 @@ namespace O2.Debugger.Mdbg.O2Debugger.Ascx
 
         public void setBreakpointTarget(string breakpointTarget)
         {
-            if (Threads_ExtensionMethods.okThread((Control) tbBreakPointSignature, delegate { setBreakpointTarget(breakpointTarget); }))
+            if (Thread_Invoke_ExtensionMethods.okThread((Control) tbBreakPointSignature, delegate { setBreakpointTarget(breakpointTarget); }))
                 tbBreakPointSignature.Text = breakpointTarget;
         }
 

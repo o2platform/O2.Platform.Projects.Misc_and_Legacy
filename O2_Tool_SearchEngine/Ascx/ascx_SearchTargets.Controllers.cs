@@ -2,9 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
 using System.IO;
-using O2.DotNetWrappers.ExtensionMethods;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Utils;
 
 namespace O2.Tool.SearchEngine.Ascx
 {
@@ -16,7 +17,7 @@ namespace O2.Tool.SearchEngine.Ascx
         {
             if (false == DesignMode && runOnLoad)
             {
-                //ascx_DropObject1.setText("file to load");
+                //DropObject1.setText("file to load");
                 tbFilesToLoad.Text = DI.config.O2TempDir;
                 DI.searchEngineAPI.clearLoadedFiles();
                 runOnLoad = false;

@@ -1,7 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.Interfaces.CIR;
 
 namespace O2.Core.CIR.Ascx
 {

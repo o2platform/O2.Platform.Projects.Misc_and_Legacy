@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.RnD.SpringMVCAnalyzer.ascx
 {
@@ -56,8 +57,8 @@ namespace O2.RnD.SpringMVCAnalyzer.ascx
             this.btMakeRulesSourcesOfTaintedData = new System.Windows.Forms.Button();
             this.lbRulesToAdd = new System.Windows.Forms.ListBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.asvp_VisiblePanels_CirAnalysis = new O2.Views.ASCX.CoreControls.ascx_SelectVisiblePanels();
-            this.ascx_DropAreaForCirDataObject = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.asvp_VisiblePanels_CirAnalysis = new SelectVisiblePanels();
+            this.ascx_DropAreaForCirDataObject = new DropObject();
             this.btLoadDataFromWebRoot = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBeans)).BeginInit();
             this.scHost.Panel1.SuspendLayout();
@@ -348,7 +349,7 @@ namespace O2.RnD.SpringMVCAnalyzer.ascx
             this.ascx_DropAreaForCirDataObject.Size = new System.Drawing.Size(150, 46);
             this.ascx_DropAreaForCirDataObject.TabIndex = 14;
             this.ascx_DropAreaForCirDataObject.Text = "Drop Content Here!!";
-            this.ascx_DropAreaForCirDataObject.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.ascx_DropAreaForCirDataObject_eDnDAction_ObjectDataReceived_Event);
+            this.ascx_DropAreaForCirDataObject.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.ascx_DropAreaForCirDataObject_eDnDAction_ObjectDataReceived_Event);
             // 
             // btLoadDataFromWebRoot
             // 
@@ -413,7 +414,7 @@ namespace O2.RnD.SpringMVCAnalyzer.ascx
         private System.Windows.Forms.SplitContainer scHost;
         private System.Windows.Forms.SplitContainer scTop;
         private System.Windows.Forms.SplitContainer scBottom;
-        private ascx_SelectVisiblePanels asvp_VisiblePanels_CirAnalysis;
+        private SelectVisiblePanels asvp_VisiblePanels_CirAnalysis;
         private System.Windows.Forms.TreeView tvSpringMvc_SuperClasses;
         private System.Windows.Forms.DataGridView dgvResolvedCommandName;
         private System.Windows.Forms.Label label5;
@@ -426,7 +427,7 @@ namespace O2.RnD.SpringMVCAnalyzer.ascx
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Button btMakeRulesSourcesOfTaintedData;
-        private ascx_DropObject ascx_DropAreaForCirDataObject;
+        private DropObject ascx_DropAreaForCirDataObject;
         private System.Windows.Forms.Button btLoadDataFromWebRoot;
     }
 }

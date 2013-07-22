@@ -7,10 +7,8 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.Interfaces.DotNet;
-using O2.Kernel.CodeUtils;
-
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 namespace O2.Core.CIR.Ascx.DotNet
 {
     public partial class ascx_GAC_Browser : UserControl

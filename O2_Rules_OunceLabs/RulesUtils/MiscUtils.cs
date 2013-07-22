@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using FluentSharp.CoreLib.Interfaces;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.Interfaces.CIR;
 
 namespace O2.Rules.OunceLabs.RulesUtils
 {

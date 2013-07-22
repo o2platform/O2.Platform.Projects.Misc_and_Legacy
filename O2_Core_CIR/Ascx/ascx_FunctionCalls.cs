@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirUtils;
 
 namespace O2.Core.CIR.Ascx
@@ -70,8 +71,8 @@ namespace O2.Core.CIR.Ascx
             if (sender is TreeView)
             {
                 ViewHelpers.raiseSourceCodeReferenceEvent(cbShowLineInSourceFile.Checked, (TreeView) sender, true /* remapLineNumber */);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(this, 400);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(tvFunctionMakesCallsTo, 410);                
+                O2Forms.SetFocusOnControl(this, 400);
+                O2Forms.SetFocusOnControl(tvFunctionMakesCallsTo, 410);                
             }
         }
 
@@ -80,8 +81,8 @@ namespace O2.Core.CIR.Ascx
             if (sender is TreeView)
             {
                 ViewHelpers.raiseSourceCodeReferenceEvent(cbShowLineInSourceFile.Checked, (TreeView)sender, false /* remapLineNumber */);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(this, 400);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(tvFunctionIsCalledBy, 410);                
+                O2Forms.SetFocusOnControl(this, 400);
+                O2Forms.SetFocusOnControl(tvFunctionIsCalledBy, 410);                
             }
         }
 
@@ -90,8 +91,8 @@ namespace O2.Core.CIR.Ascx
             if (sender is TreeView)
             {
                 ViewHelpers.raiseSourceCodeReferenceEvent(cbShowLineInSourceFile.Checked, (TreeView)sender, true /* remapLineNumber */);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(this, 400);
-                DotNetWrappers.Windows.O2Forms.SetFocusOnControl(tvFunctionIsCalledBy, 410);
+                O2Forms.SetFocusOnControl(this, 400);
+                O2Forms.SetFocusOnControl(tvFunctionIsCalledBy, 410);
             }
         }
 

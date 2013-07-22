@@ -3,12 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Windows.Forms;
-using O2.Core.CIR;
-using O2.Core.CIR.CirCreator;
-using O2.Core.CIR.Xsd;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.CoreLib.API;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -127,7 +123,7 @@ namespace O2.Core.CIR.Ascx
             {
                 ad_Directory.eDirectoryEvent_DoubleClick += ad_Directory_eDirectoryEvent_DoubleClick;
                 ad_Directory.simpleMode();
-                ascx_DropObject1.setText("Drag File or Directory To Load Here");
+                DropObject1.setText("Drag File or Directory To Load Here");
 
                 ad_DirectoryToSaveCreatedFiles.simpleMode_withAddressBar();
                 ad_DirectoryToSaveCreatedFiles.openDirectory(DI.config.O2TempDir);
@@ -180,7 +176,7 @@ namespace O2.Core.CIR.Ascx
             //ad_Directory.getCurrentDirectory()
         }
 
-        private void ascx_DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
+        private void DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
         {
             addToTargetsList(oObject.ToString());
         }

@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.CIR.Ascx
 {
     partial class ascx_CirTrace
@@ -33,7 +36,7 @@ namespace O2.Core.CIR.Ascx
             this.cirTreeView = new System.Windows.Forms.TreeView();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.traceTreeView = new O2.Views.ASCX.O2Findings.ascx_TraceTreeView();
+            this.traceTreeView = new ascx_TraceTreeView();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -125,6 +128,6 @@ namespace O2.Core.CIR.Ascx
         private System.Windows.Forms.TreeView cirTreeView;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private O2.Views.ASCX.O2Findings.ascx_TraceTreeView traceTreeView;
+        private ascx_TraceTreeView traceTreeView;
     }
 }

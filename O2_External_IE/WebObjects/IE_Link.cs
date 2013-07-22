@@ -1,7 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.CoreLib;
 using mshtml;
 using O2.External.IE.Interfaces;
-using O2.DotNetWrappers.ExtensionMethods;
 
 namespace O2.External.IE.WebObjects
 {
@@ -21,7 +22,7 @@ namespace O2.External.IE.WebObjects
         	if (_object is DispHTMLAnchorElement)
 				loadData((DispHTMLAnchorElement)_object);
 			else
-				"In IE_Link, not supported type: {0}".format(_object.comTypeName()).error();
+				"In IE_Link, not supported type: {0}".format(_object.comObject_TypeName()).error();
 		}
 		
         public IE_Link(DispHTMLAnchorElement linkElement)         

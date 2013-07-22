@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.O2Misc;
-using O2.DotNetWrappers.Windows;
+using FluentSharp.CoreLib.API;
 
 
 namespace O2.RnD.SpringMVCAnalyzer.classes

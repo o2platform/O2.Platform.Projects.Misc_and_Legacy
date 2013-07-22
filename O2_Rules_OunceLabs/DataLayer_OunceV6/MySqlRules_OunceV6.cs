@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using O2.Interfaces.Rules;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using O2.Rules.OunceLabs.DataLayer;
 using O2.Rules.OunceLabs.RulesUtils;
 

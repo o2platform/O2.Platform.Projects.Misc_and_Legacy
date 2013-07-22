@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx.Rnd
 {
@@ -90,7 +91,7 @@ namespace O2.Core.CIR.Ascx.Rnd
             this.tbCirAnalyszer_TextSearchFilter_SuperClass = new System.Windows.Forms.TextBox();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
             this.lbCirAnalyzer_Files = new System.Windows.Forms.ListBox();
-            this.ascx_DropObject1 = new ascx_DropObject();
+            this.DropObject1 = new DropObject();
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
@@ -792,23 +793,23 @@ namespace O2.Core.CIR.Ascx.Rnd
             this.lbCirAnalyzer_Files.Size = new System.Drawing.Size(33, 251);
             this.lbCirAnalyzer_Files.TabIndex = 57;            
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(0, 0);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(136, 21);
-            this.ascx_DropObject1.TabIndex = 64;
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(0, 0);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(136, 21);
+            this.DropObject1.TabIndex = 64;
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // ascx_CirAnalyzer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.Controls.Add(this.ascx_DropObject1);
+            this.Controls.Add(this.DropObject1);
             this.Controls.Add(this.splitContainer5);
             this.ForeColor = System.Drawing.Color.Black;
             this.Name = "ascx_CirAnalyzer";
@@ -886,7 +887,7 @@ namespace O2.Core.CIR.Ascx.Rnd
         private System.Windows.Forms.Button btViewByFunction_SelectAll;
         private System.Windows.Forms.CheckBox cbViewByFunction_FullSignature;
         private System.Windows.Forms.CheckBox cbCirAnaLyzer_DontUpdateOnLoad;
-        private ascx_DropObject ascx_DropObject1;
+        private DropObject DropObject1;
         private System.Windows.Forms.CheckBox cbOnSelectUpdateIsCalledByMappigns;
         private System.Windows.Forms.Button btTestToSeeIfAllFilesCanBeLoaded;
         private System.Windows.Forms.TextBox tbCirAnalyszer_TextSearchFilter_MakesCallsTo;

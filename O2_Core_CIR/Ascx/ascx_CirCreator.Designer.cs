@@ -1,4 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.CIR.Ascx
 {
     partial class ascx_CirCreator
@@ -44,8 +48,8 @@ namespace O2.Core.CIR.Ascx
             this.scMainGuiAndTasksHost = new System.Windows.Forms.SplitContainer();
             this.btCreateCirForSelectedFile = new System.Windows.Forms.Button();
             this.btProcessQueue = new System.Windows.Forms.Button();
-            this.directory_CirCreationQueue = new O2.Views.ASCX.CoreControls.ascx_Directory();
-            this.directory_CreatedCirFiles = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.directory_CirCreationQueue = new DirectoryViewer();
+            this.directory_CreatedCirFiles = new DirectoryViewer();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -244,7 +248,7 @@ namespace O2.Core.CIR.Ascx
             this.directory_CirCreationQueue._ProcessDroppedObjects = true;
             this.directory_CirCreationQueue._ShowFileSize = false;
             this.directory_CirCreationQueue._ShowLinkToUpperFolder = true;
-            this.directory_CirCreationQueue._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.directory_CirCreationQueue._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.directory_CirCreationQueue._WatchFolder = true;
             this.directory_CirCreationQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -255,16 +259,16 @@ namespace O2.Core.CIR.Ascx
             this.directory_CirCreationQueue.Name = "directory_CirCreationQueue";
             this.directory_CirCreationQueue.Size = new System.Drawing.Size(235, 142);
             this.directory_CirCreationQueue.TabIndex = 1;
-            this.directory_CirCreationQueue._onTreeViewDrop += new O2.Kernel.CodeUtils.Callbacks.dMethod_String(this.directory_CirCreationQueue__onTreeViewDrop);
-            this.directory_CirCreationQueue._onDirectoryClick += new O2.Kernel.CodeUtils.Callbacks.dMethod_String(this.directory_CirCreationQueue__onDirectoryClick);
-            this.directory_CirCreationQueue._onFileWatchEvent += new O2.DotNetWrappers.Windows.FolderWatcher.CallbackOnFolderWatchEvent(this.directory_CirCreationQueue__onFileWatchEvent);
+            this.directory_CirCreationQueue._onTreeViewDrop += new Callbacks.dMethod_String(this.directory_CirCreationQueue__onTreeViewDrop);
+            this.directory_CirCreationQueue._onDirectoryClick += new Callbacks.dMethod_String(this.directory_CirCreationQueue__onDirectoryClick);
+            this.directory_CirCreationQueue._onFileWatchEvent += new FolderWatcher.CallbackOnFolderWatchEvent(this.directory_CirCreationQueue__onFileWatchEvent);
             // 
             // directory_CreatedCirFiles
             // 
             this.directory_CreatedCirFiles._ProcessDroppedObjects = true;
             this.directory_CreatedCirFiles._ShowFileSize = false;
             this.directory_CreatedCirFiles._ShowLinkToUpperFolder = true;
-            this.directory_CreatedCirFiles._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.directory_CreatedCirFiles._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.directory_CreatedCirFiles._WatchFolder = true;
             this.directory_CreatedCirFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -316,8 +320,8 @@ namespace O2.Core.CIR.Ascx
         private System.Windows.Forms.LinkLabel llHideTaskControlHost;
         private System.Windows.Forms.FlowLayoutPanel taskHostControl;
         private System.Windows.Forms.SplitContainer scMainGuiAndTasksHost;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directory_CirCreationQueue;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directory_CreatedCirFiles;
+        private DirectoryViewer directory_CirCreationQueue;
+        private DirectoryViewer directory_CreatedCirFiles;
         private System.Windows.Forms.LinkLabel llDeleteFilesInCirCreationQueue;
         private System.Windows.Forms.Button btCreateCirForSelectedFile;
         private System.Windows.Forms.LinkLabel llDeleteFilesInCreatedCirFilesDirectory;

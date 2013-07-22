@@ -1,4 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using System;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.FileViewers.Ascx
 {
     partial class ascx_TilesDefinition_xml
@@ -30,7 +34,7 @@ namespace O2.Core.FileViewers.Ascx
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.tableList_TilesDefinitions = new O2.Views.ASCX.DataViewers.ascx_TableList();
+            this.tableList_TilesDefinitions = new ctrl_TableList();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -54,7 +58,7 @@ namespace O2.Core.FileViewers.Ascx
             this.tableList_TilesDefinitions.Name = "tableList_TilesDefinitions";
             this.tableList_TilesDefinitions.Size = new System.Drawing.Size(555, 397);
             this.tableList_TilesDefinitions.TabIndex = 8;
-            this.tableList_TilesDefinitions._onTableListDrop += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
+            this.tableList_TilesDefinitions._onTableListDrop += new Action<System.Windows.Forms.DragEventArgs>(this._onTableListDrop);
             // 
             // label3
             // 
@@ -95,7 +99,7 @@ namespace O2.Core.FileViewers.Ascx
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableList_TilesDefinitions;
+        private ctrl_TableList tableList_TilesDefinitions;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
     }

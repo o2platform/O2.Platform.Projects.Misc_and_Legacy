@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.Xsd;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.Interfaces.CIR;
-using O2.Kernel.CodeUtils;
+
 
 namespace O2.Core.CIR.CirUtils
 {
@@ -99,7 +99,7 @@ namespace O2.Core.CIR.CirUtils
                 return null;
             //if (cirFunction.FunctionSignature != "")
             //{
-            var filteredSignature = new O2.DotNetWrappers.Filters.FilteredSignature(cirClass.Signature);
+            var filteredSignature = new FilteredSignature(cirClass.Signature);
             var treeNodeName = String.Format(" => {0}", filteredSignature.sSignature);
             var newTreeNode = O2Forms.newTreeNode(treeNodeCollection, treeNodeName, cirClass.Signature, 0,
                                                       cirClass);
@@ -128,7 +128,7 @@ namespace O2.Core.CIR.CirUtils
         }
         
 
-        public static void onBeforeExpand(TreeNode selectedTreeNode, O2Thread.FuncVoidT1T2T3T4 <ICirFunctionCall, TreeNode, bool,bool> addToNodeFunction, bool dontAddRecursiveCalls)
+        public static void onBeforeExpand(TreeNode selectedTreeNode, Action <ICirFunctionCall, TreeNode, bool,bool> addToNodeFunction, bool dontAddRecursiveCalls)
         {
             if (selectedTreeNode != null)
             {

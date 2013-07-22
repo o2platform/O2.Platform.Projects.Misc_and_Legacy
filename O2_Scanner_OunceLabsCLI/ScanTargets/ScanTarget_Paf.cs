@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Controllers;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 
 
 namespace O2.Scanner.OunceLabsCLI.ScanTargets

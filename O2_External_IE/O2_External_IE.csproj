@@ -35,12 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentSharp.BCL, Version=5.0.1.0, Culture=neutral, PublicKeyToken=55a0f9bf4256d533, processorArchitecture=MSIL">
-      <HintPath>..\Nuget_Packages\FluentSharp.BCL.5.0.50\lib\net35\FluentSharp.BCL.dll</HintPath>
-    </Reference>
-    <Reference Include="FluentSharp.CoreLib, Version=5.0.1.0, Culture=neutral, PublicKeyToken=55a0f9bf4256d533, processorArchitecture=MSIL">
-      <HintPath>..\Nuget_Packages\FluentSharp.CoreLib.5.0.50\lib\net35\FluentSharp.CoreLib.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\_3rdPartyDlls\FilesWithNoCode\Microsoft.mshtml.dll</HintPath>
@@ -106,6 +100,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="nuget.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.CoreLib\FluentSharp.CoreLib.csproj">
+      <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
+      <Name>FluentSharp.CoreLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.WinForms\FluentSharp.WinForms.csproj">
+      <Project>{DF7E73CB-02AC-4689-BB8C-AC21FFCCDDC5}</Project>
+      <Name>FluentSharp.WinForms</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

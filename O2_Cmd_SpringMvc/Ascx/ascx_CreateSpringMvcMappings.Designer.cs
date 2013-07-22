@@ -1,4 +1,9 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.REPL.Controls;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Cmd.SpringMvc.Ascx
 {
     partial class ascx_CreateSpringMvcMappings
@@ -34,7 +39,7 @@ namespace O2.Cmd.SpringMvc.Ascx
             this.cbOnDropProcessJarFiles = new System.Windows.Forms.CheckBox();
             this.tbFolderToSaveMappedMvcControllers = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.dropObject = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.dropObject = new DropObject();
             this.btSaveMappedControllers = new System.Windows.Forms.Button();
             this.lbLoadedCirDataFile = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -49,10 +54,10 @@ namespace O2.Cmd.SpringMvc.Ascx
             this.cbCreateFindingForUsesOfGetParameter = new System.Windows.Forms.CheckBox();
             this.cbCreateFindingForUsesOfModelAttribute = new System.Windows.Forms.CheckBox();
             this.btCreateFindingsFromSpringMvcMappings = new System.Windows.Forms.Button();
-            this.findingsViewer = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer = new ascx_FindingsViewer();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.findingsViewerFor_SelectedController = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
-            this.sourceCodeView = new O2.External.SharpDevelop.Ascx.ascx_SourceCodeEditor();
+            this.findingsViewerFor_SelectedController = new ascx_FindingsViewer();
+            this.sourceCodeView = new SourceCodeEditor();
             this.cbDeleteTempFiles = new System.Windows.Forms.CheckBox();
             this.springMvcMappings = new O2.Cmd.SpringMvc.Ascx.ascx_SpringMvcMappings();
             this.springMvcAutoBindClassesView = new O2.Cmd.SpringMvc.Ascx.ascx_SpringMvcAutoBindClassesView();
@@ -134,7 +139,7 @@ namespace O2.Cmd.SpringMvc.Ascx
             this.dropObject.TabIndex = 0;
             this.dropObject.Text = "Drop folders or *.war (with *.class files);         zip or Jar files ;       \'Dat" +
                 "a files for Spring Mvc O2 Module\' here";
-            this.dropObject.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.dropObject_eDnDAction_ObjectDataReceived_Event);
+            this.dropObject.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.dropObject_eDnDAction_ObjectDataReceived_Event);
             // 
             // btSaveMappedControllers
             // 
@@ -411,13 +416,13 @@ namespace O2.Cmd.SpringMvc.Ascx
         private System.Windows.Forms.CheckBox cbCreateFindingForUsesOfModelAttribute;
         private System.Windows.Forms.Button btCreateFindingsFromSpringMvcMappings;
         private System.Windows.Forms.GroupBox groupBox1;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer;
+        private ascx_FindingsViewer findingsViewer;
         private System.Windows.Forms.CheckBox cbCreateFindingForUsesOfGetParameter;
         private System.Windows.Forms.TabPage tpViewSourceCodeMappings;
-        private O2.External.SharpDevelop.Ascx.ascx_SourceCodeEditor sourceCodeView;
+        private SourceCodeEditor sourceCodeView;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage4;
-        private O2.Views.ASCX.CoreControls.ascx_DropObject dropObject;
+        private DropObject dropObject;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btSaveMappedControllers;
         private System.Windows.Forms.Label lbLoadedCirDataFile;
@@ -425,7 +430,7 @@ namespace O2.Cmd.SpringMvc.Ascx
         private ascx_SpringMvcMappings springMvcMappings;
         private System.Windows.Forms.TextBox tbFolderToSaveMappedMvcControllers;
         private System.Windows.Forms.TabPage tabPage6;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewerFor_SelectedController;
+        private ascx_FindingsViewer findingsViewerFor_SelectedController;
         private System.Windows.Forms.CheckBox cbOnDropProcessJarFiles;
         private System.Windows.Forms.CheckBox cbDeleteTempFiles;
     }

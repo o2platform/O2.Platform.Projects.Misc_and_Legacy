@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Scanner.OunceLabsCLI.Ascx
 {
@@ -39,8 +40,8 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
             this.btScan = new System.Windows.Forms.Button();
             this.llClearScanTargets = new System.Windows.Forms.LinkLabel();
             this.llDeleteAddFilesInScanResultsFolder = new System.Windows.Forms.LinkLabel();
-            this.targetDirectory = new O2.Views.ASCX.CoreControls.ascx_Directory();
-            this.adoScanDropArea = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.targetDirectory = new DirectoryViewer();
+            this.adoScanDropArea = new DropObject();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.btCreateCir = new System.Windows.Forms.Button();
@@ -145,7 +146,7 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
             this.targetDirectory._ProcessDroppedObjects = false;
             this.targetDirectory._ShowFileSize = false;
             this.targetDirectory._ShowLinkToUpperFolder = true;
-            this.targetDirectory._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.targetDirectory._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.targetDirectory._WatchFolder = true;
             this.targetDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -169,7 +170,7 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
             this.adoScanDropArea.Size = new System.Drawing.Size(262, 52);
             this.adoScanDropArea.TabIndex = 11;
             this.adoScanDropArea.Text = "Drop Content Here!!";
-            this.adoScanDropArea.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.adoScanDropArea_eDnDAction_ObjectDataReceived_Event);
+            this.adoScanDropArea.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.adoScanDropArea_eDnDAction_ObjectDataReceived_Event);
             // 
             // tabControl1
             // 
@@ -347,8 +348,8 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
 
         #endregion
 
-        private ascx_DropObject adoScanDropArea;
-        private ascx_Directory targetDirectory;
+        private DropObject adoScanDropArea;
+        private DirectoryViewer targetDirectory;
         private System.Windows.Forms.Label lbStatus;
         private System.Windows.Forms.Label lbScanLog;
         private System.Windows.Forms.Label label1;

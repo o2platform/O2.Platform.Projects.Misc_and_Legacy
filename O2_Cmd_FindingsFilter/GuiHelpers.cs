@@ -1,14 +1,11 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.REPL.Controls;
+using FluentSharp.REPL.Utils;
+using FluentSharp.WinFormUI.Utils;
 using O2.Cmd.FindingsFilter.Filters;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.O2CmdShell;
-using O2.External.SharpDevelop;
-using O2.External.SharpDevelop.Ascx;
-using O2.External.WinFormsUI.Forms;
-using O2.External.WinFormsUI.O2Environment;
-using O2.Interfaces.Views;
-using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Cmd.FindingsFilter
 {
@@ -64,7 +61,7 @@ namespace O2.Cmd.FindingsFilter
         [O2CmdHide]
         public static void openSourceCodeEditorControl(string sourceCodeEditorControlName)
         {
-            O2AscxGUI.openAscx(typeof(ascx_SourceCodeEditor), O2DockState.Document,
+            O2AscxGUI.openAscx(typeof(SourceCodeEditor), O2DockState.Document,
                                                sourceCodeEditorControlName);
 
         }
@@ -72,9 +69,10 @@ namespace O2.Cmd.FindingsFilter
         [O2CmdHide]
         public static void loadSampleScripts(string findingsViewerControlName, Type typeWithSampleScripts)
         {
-            findingsViewerControlName.invokeOnAscx("loadSampleScripts", new object[] {  typeWithSampleScripts});
-
-            findingsViewerControlName.invokeOnAscx("compileSourceCode");
+            //findingsViewerControlName.invokeOnAscx("loadSampleScripts", new object[] {  typeWithSampleScripts});
+            //findingsViewerControlName.invokeOnAscx("compileSourceCode");
+            O2AscxGUI.invokeOnAscxControl(findingsViewerControlName, "loadSampleScripts", new object[] {  typeWithSampleScripts});
+            O2AscxGUI.invokeOnAscxControl(findingsViewerControlName, "compileSourceCode");
         }
     }
 }

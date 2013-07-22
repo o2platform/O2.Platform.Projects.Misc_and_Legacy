@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-
-using O2.DotNetWrappers.ExtensionMethods;
+using FluentSharp.CoreLib;
 using O2.External.IE.Wrapper;
 using O2.External.IE.Interfaces;
 using O2.External.IE.ExtensionMethods;

@@ -1,14 +1,13 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System.Collections.Generic;
 using System.IO;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.Interfaces.Controllers;
-using O2.Kernel.CodeUtils;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Controls;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirUtils;
 using O2.Scanner.OunceLabsCLI.Scan;
 using O2.Scanner.OunceLabsCLI.ScanTargets;
-using O2.DotNetWrappers.DotNet;
-using O2.Views.ASCX.O2Findings;
 
 namespace O2.Scanner.OunceLabsCLI.Ascx
 {

@@ -3,12 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.Xsd;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.O2Misc;
-using O2.Interfaces.CIR;
 
 namespace O2.Core.CIR.CirUtils
 {

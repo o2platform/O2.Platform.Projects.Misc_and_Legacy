@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Cmd.SpringMvc.Objects;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
 
 namespace O2.Cmd.SpringMvc.Classes
 {
@@ -27,7 +25,7 @@ namespace O2.Cmd.SpringMvc.Classes
                     var cirFunction = cirData.dFunctions_bySignature[targetFunction];
                     if (cirFunction.FunctionParameters.Count <= parameterIndex)
                     {
-                        var filteredSignature = new O2.DotNetWrappers.Filters.FilteredSignature(targetFunction);
+                        var filteredSignature = new FilteredSignature(targetFunction);
                         if (filteredSignature.lsParameters_Parsed.Count > parameterIndex)
                             springMvcParameter.className = filteredSignature.lsParameters_Parsed[parameterIndex];
                         else

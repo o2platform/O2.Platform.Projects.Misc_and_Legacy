@@ -1,4 +1,9 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using System;
+using FluentSharp.REPL.Controls;
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Cmd.SpringMvc.Ascx
 {
     partial class ascx_JoinControllersWithFindings
@@ -31,16 +36,16 @@ namespace O2.Cmd.SpringMvc.Ascx
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.findingsViewerWith_ScanResults = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewerWith_ScanResults = new ascx_FindingsViewer();
             this.label2 = new System.Windows.Forms.Label();
             this.splitContainer_withTempFileAndJoinTraces = new System.Windows.Forms.SplitContainer();
-            this.findingsViewerWith_JoinResults = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewerWith_JoinResults = new ascx_FindingsViewer();
             this.label1 = new System.Windows.Forms.Label();
             this.btLoadTestData = new System.Windows.Forms.Button();
             this.btGenerateJspTraces = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.springMvcMappings = new O2.Cmd.SpringMvc.Ascx.ascx_SpringMvcMappings();
-            this.sourceCodeEditor_withController = new O2.External.SharpDevelop.Ascx.ascx_SourceCodeEditor();
+            this.sourceCodeEditor_withController = new SourceCodeEditor();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -185,7 +190,7 @@ namespace O2.Cmd.SpringMvc.Ascx
             this.springMvcMappings.Name = "springMvcMappings";
             this.springMvcMappings.Size = new System.Drawing.Size(252, 460);
             this.springMvcMappings.TabIndex = 0;
-            this.springMvcMappings._onTreeViewSelect += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<System.Windows.Forms.TreeView>(this.springMvcMappings__onTreeViewSelect);
+            this.springMvcMappings._onTreeViewSelect += new Action<System.Windows.Forms.TreeView>(this.springMvcMappings__onTreeViewSelect);
             // 
             // sourceCodeEditor_withController
             // 
@@ -230,14 +235,14 @@ namespace O2.Cmd.SpringMvc.Ascx
         private System.Windows.Forms.SplitContainer splitContainer1;
         private ascx_SpringMvcMappings springMvcMappings;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewerWith_ScanResults;
+        private ascx_FindingsViewer findingsViewerWith_ScanResults;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btLoadTestData;
         private System.Windows.Forms.Button btGenerateJspTraces;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.SplitContainer splitContainer_withTempFileAndJoinTraces;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewerWith_JoinResults;
-        private O2.External.SharpDevelop.Ascx.ascx_SourceCodeEditor sourceCodeEditor_withController;
+        private ascx_FindingsViewer findingsViewerWith_JoinResults;
+        private SourceCodeEditor sourceCodeEditor_withController;
     }
 }

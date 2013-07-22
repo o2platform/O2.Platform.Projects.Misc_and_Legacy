@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
 using mshtml;
 using O2.External.IE.ExtensionMethods;
 using O2.External.IE.Interfaces;
-using O2.Kernel;
-using O2.DotNetWrappers.ExtensionMethods;
 
 namespace O2.External.IE.WebObjects
 {
@@ -39,7 +39,7 @@ namespace O2.External.IE.WebObjects
             if (_object is DispHTMLFormElement)
                 loadData((DispHTMLFormElement)_object);
             else
-                "In IE_Form, not supported type: {0}".format(_object.comTypeName()).error();
+                "In IE_Form, not supported type: {0}".format(_object.comObject_TypeName()).error();
         }
 
         public IE_Form(DispHTMLFormElement form) : this()
@@ -70,7 +70,7 @@ namespace O2.External.IE.WebObjects
 
             foreach (var element in ((IHTMLFormElement)form))
             {
-                switch (element.comTypeName())
+                switch (element.comObject_TypeName())
                 {
                     case "HTMLInputElementClass":
                     case "HTMLTextAreaElementClass":
@@ -80,7 +80,7 @@ namespace O2.External.IE.WebObjects
                         FormFields.Add(this.formField(element));                        
                         break;                                                    
                     default:
-                        O2.Kernel.PublicDI.log.error("In IE_Form. loadData, unhandled Form type :{0}", element.comTypeName());
+                        PublicDI.log.error("In IE_Form. loadData, unhandled Form type :{0}", element.comObject_TypeName());
                         break;
                 }
                 //PublicDI.log.debug(element.type().Name);

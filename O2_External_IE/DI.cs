@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using O2.Interfaces.O2Core;
-using O2.Kernel;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 
 namespace O2.External.IE
 {

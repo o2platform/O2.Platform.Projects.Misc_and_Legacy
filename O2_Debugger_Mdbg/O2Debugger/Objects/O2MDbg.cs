@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
-using O2.Debugger.Mdbg.Debugging.CorDebug;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Debugger.Mdbg.Debugging.MdbgEngine;
 using O2.Debugger.Mdbg.OriginalMdbgCode.mdbg;
 using O2.Debugger.Mdbg.Tools.Mdbg;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Messages;
-using O2.Kernel.CodeUtils;
 
 namespace O2.Debugger.Mdbg.O2Debugger.Objects
 {

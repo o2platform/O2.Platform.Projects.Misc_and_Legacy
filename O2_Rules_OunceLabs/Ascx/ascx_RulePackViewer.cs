@@ -2,12 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Filters;
-using O2.Interfaces.Rules;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Utils;
 using O2.Rules.OunceLabs.DataLayer_OunceV6;
-using O2.Rules.OunceLabs.RulesUtils;
 
 namespace O2.Rules.OunceLabs.Ascx
 {

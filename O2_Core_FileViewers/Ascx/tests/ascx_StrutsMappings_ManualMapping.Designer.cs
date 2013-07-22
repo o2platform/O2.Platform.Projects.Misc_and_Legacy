@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.FileViewers.Ascx.tests
 {
     partial class ascx_StrutsMappings_ManualMapping
@@ -36,14 +39,14 @@ namespace O2.Core.FileViewers.Ascx.tests
             this.label4 = new System.Windows.Forms.Label();
             this.btCreateFindingsFromStrutsMapings = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.findingsViewer_FromStrutsMappings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer_FromStrutsMappings = new ascx_FindingsViewer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.label2 = new System.Windows.Forms.Label();
-            this.findingsViewer_SourceFindings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer_SourceFindings = new ascx_FindingsViewer();
             this.cbShowConsolidatedView = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btMapStrutsFindings = new System.Windows.Forms.Button();
-            this.findingsViewer_MappedFindings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer_MappedFindings = new ascx_FindingsViewer();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -270,8 +273,8 @@ namespace O2.Core.FileViewers.Ascx.tests
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer_SourceFindings;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer_MappedFindings;
+        private ascx_FindingsViewer findingsViewer_SourceFindings;
+        private ascx_FindingsViewer findingsViewer_MappedFindings;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btMapStrutsFindings;
@@ -279,7 +282,7 @@ namespace O2.Core.FileViewers.Ascx.tests
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btCreateFindingsFromStrutsMapings;
         private System.Windows.Forms.Label label5;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer_FromStrutsMappings;
+        private ascx_FindingsViewer findingsViewer_FromStrutsMappings;
         private System.Windows.Forms.CheckBox cbShowConsolidatedView;
         private ascx_StrutsMappings strutsMappings;
     }

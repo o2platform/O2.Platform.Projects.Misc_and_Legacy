@@ -1,16 +1,12 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using O2.Core.CIR.CirObjects;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
-using O2.Kernel.CodeUtils;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Utils;
 
 namespace O2.Cmd.SpringMvc.Ascx
 {
@@ -139,12 +135,12 @@ namespace O2.Cmd.SpringMvc.Ascx
                                                 {
                                                     if (cfCirFunction.File != null && cfCirFunction.FileLine != null)
                                                     {
-                                                        var sourceCodeLine = O2.DotNetWrappers.Windows.Files_WinForms.getLineFromSourceCode(cfCirFunction.File, UInt32.Parse(cfCirFunction.FileLine),false);
+                                                        var sourceCodeLine = Files_WinForms.getLineFromSourceCode(cfCirFunction.File, UInt32.Parse(cfCirFunction.FileLine),false);
                                                         var specialTagTextStart = "O2Helper:MVCAutoBindListObject:";
                                                         var indexOfSpecialTagStart = sourceCodeLine.IndexOf(specialTagTextStart);
                                                         if (indexOfSpecialTagStart > -1)
                                                         {
-                                                            var previousLine = O2.DotNetWrappers.Windows.Files_WinForms.getLineFromSourceCode(cfCirFunction.File, UInt32.Parse(cfCirFunction.FileLine) -1,false);
+                                                            var previousLine = Files_WinForms.getLineFromSourceCode(cfCirFunction.File, UInt32.Parse(cfCirFunction.FileLine) -1,false);
                                                             if (previousLine.contains("protected").isFalse())
                                                             {
                                                                 indexOfSpecialTagStart += specialTagTextStart.Length;

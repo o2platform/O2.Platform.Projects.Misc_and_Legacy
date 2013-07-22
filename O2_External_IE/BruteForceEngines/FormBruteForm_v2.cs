@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-
-using O2.DotNetWrappers.ExtensionMethods;
+using FluentSharp.CoreLib;
 using O2.External.IE.Interfaces;
 
 namespace O2.External.IE.BruteForceEngines

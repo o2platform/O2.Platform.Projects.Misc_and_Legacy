@@ -1,6 +1,6 @@
+using FluentSharp.CoreLib;
 using mshtml;
 using O2.External.IE.Interfaces;
-using O2.DotNetWrappers.ExtensionMethods;
 
 namespace O2.External.IE.WebObjects
 {
@@ -13,7 +13,7 @@ namespace O2.External.IE.WebObjects
         	if (_object is DispHTMLAnchorElement)
 				loadData((DispHTMLAnchorElement)_object);
 			else
-				"In IE_Anchor, not supported type: {0}".format(_object.comTypeName()).error();
+				"In IE_Anchor, not supported type: {0}".format(_object.comObject_TypeName()).error();
 		}
 		
         public IE_Anchor(DispHTMLAnchorElement anchor)

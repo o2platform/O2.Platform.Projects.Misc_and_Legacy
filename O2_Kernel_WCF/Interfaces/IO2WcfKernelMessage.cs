@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 //using O2.Interfaces.Messages;
-using O2.Interfaces.Views;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.Interfaces;
 
 namespace O2.Kernel.WCF.Interfaces
 {

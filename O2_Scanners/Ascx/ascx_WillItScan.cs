@@ -3,11 +3,10 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Controllers;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Rules.OunceLabs.DataLayer;
-using O2.Scanner.MsCatNet.Scan;
 using O2.Scanner.OunceLabsCLI.Scan;
 
 namespace O2.Scanners.Ascx
@@ -22,7 +21,7 @@ namespace O2.Scanners.Ascx
             InitializeComponent();
         }
 
-        private void ascx_DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
+        private void DropObject1_eDnDAction_ObjectDataReceived_Event(object oObject)
         {
             addFileOrFolderAsScanTargets(oObject.ToString());
         }

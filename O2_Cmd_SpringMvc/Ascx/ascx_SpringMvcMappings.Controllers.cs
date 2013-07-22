@@ -2,23 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Utils;
 using O2.Cmd.SpringMvc.Classes;
 using O2.Cmd.SpringMvc.Objects;
-using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
 
 namespace O2.Cmd.SpringMvc.Ascx
 {
     partial class ascx_SpringMvcMappings
     {
-        public event O2Thread.FuncVoidT1<TreeView> _onTreeViewSelect;
+        public event Action<TreeView> _onTreeViewSelect;
 
         private bool runOnLoad = true;
         //SpringMvcMappings springMvcMappings = new SpringMvcMappings();

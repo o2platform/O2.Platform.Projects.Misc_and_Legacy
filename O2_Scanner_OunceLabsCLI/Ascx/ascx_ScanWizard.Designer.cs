@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Scanner.OunceLabsCLI.Ascx
 {
     partial class ascx_ScanWizard
@@ -44,7 +47,7 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btCreateCirForAllScanTargets = new System.Windows.Forms.Button();
             this.btCreateCirForSelectedScanTarget = new System.Windows.Forms.Button();
-            this.directoryWithResults = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.directoryWithResults = new DirectoryViewer();
             this.tbTargetFolder = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -248,7 +251,7 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
             this.directoryWithResults._ProcessDroppedObjects = true;
             this.directoryWithResults._ShowFileSize = false;
             this.directoryWithResults._ShowLinkToUpperFolder = true;
-            this.directoryWithResults._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple;
+            this.directoryWithResults._ViewMode = DirectoryViewer.ViewMode.Simple;
             this.directoryWithResults._WatchFolder = true;
             this.directoryWithResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -327,7 +330,7 @@ namespace O2.Scanner.OunceLabsCLI.Ascx
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btCreateCirForAllScanTargets;
         private System.Windows.Forms.Button btCreateCirForSelectedScanTarget;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directoryWithResults;
+        private DirectoryViewer directoryWithResults;
         private System.Windows.Forms.TextBox tbTargetFolder;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;

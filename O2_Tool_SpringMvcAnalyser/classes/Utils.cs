@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml;
+using FluentSharp.CoreLib.API;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.Windows;
-using O2.ImportExport.OunceLabs.Ozasmt_OunceV6;
-using O2.Legacy.OunceV6.SavedAssessmentFile.classes;
 
 namespace O2.RnD.SpringMVCAnalyzer.classes
 {

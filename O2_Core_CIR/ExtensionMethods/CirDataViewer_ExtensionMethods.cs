@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using O2.Kernel.ExtensionMethods;
+﻿using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
 using O2.Core.CIR.Ascx;
-using O2.Core.CIR.ExtensionMethods;
-using O2.Interfaces.CIR;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.Views.ASCX.Ascx.MainGUI;
 using O2.Core.CIR.CirObjects;
 
 namespace O2.Core.CIR.ExtensionMethods

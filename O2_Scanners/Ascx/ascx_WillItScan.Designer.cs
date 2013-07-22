@@ -1,5 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Scanners.Ascx
 {
@@ -39,19 +41,19 @@ namespace O2.Scanners.Ascx
             this.label6 = new System.Windows.Forms.Label();
             this.cbDoubleClickToDeleteItem = new System.Windows.Forms.CheckBox();
             this.lbTargetFiles = new System.Windows.Forms.ListBox();
-            this.ascx_DropObject1 = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.DropObject1 = new DropObject();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.llRefreshDirectory = new System.Windows.Forms.LinkLabel();
             this.llDeleteSeletedFile = new System.Windows.Forms.LinkLabel();
-            this.adManualTestTempFiles = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.adManualTestTempFiles = new DirectoryViewer();
             this.cbDeleteDirectoryContentsRecursive = new System.Windows.Forms.CheckBox();
             this.llDeleteDirectoryContents = new System.Windows.Forms.LinkLabel();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lbMissingDependencies = new System.Windows.Forms.ListBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.ado_AddFilesOrDirectoryToScanBundle = new O2.Views.ASCX.CoreControls.ascx_DropObject();
+            this.ado_AddFilesOrDirectoryToScanBundle = new DropObject();
             this.label7 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -122,7 +124,7 @@ namespace O2.Scanners.Ascx
             this.splitContainer1.Panel1.Controls.Add(this.label6);
             this.splitContainer1.Panel1.Controls.Add(this.cbDoubleClickToDeleteItem);
             this.splitContainer1.Panel1.Controls.Add(this.lbTargetFiles);
-            this.splitContainer1.Panel1.Controls.Add(this.ascx_DropObject1);
+            this.splitContainer1.Panel1.Controls.Add(this.DropObject1);
             // 
             // splitContainer1.Panel2
             // 
@@ -214,19 +216,19 @@ namespace O2.Scanners.Ascx
             this.lbTargetFiles.DoubleClick += new System.EventHandler(this.lbTargetFiles_DoubleClick);
             this.lbTargetFiles.DragEnter += new System.Windows.Forms.DragEventHandler(this.lbTargetFiles_DragEnter);
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(9, 4);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(206, 67);
-            this.ascx_DropObject1.TabIndex = 25;
-            this.ascx_DropObject1.Text = "Drop Content Here!!";
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(9, 4);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(206, 67);
+            this.DropObject1.TabIndex = 25;
+            this.DropObject1.Text = "Drop Content Here!!";
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // splitContainer2
             // 
@@ -328,7 +330,7 @@ namespace O2.Scanners.Ascx
             this.adManualTestTempFiles._ProcessDroppedObjects = true;
             this.adManualTestTempFiles._ShowFileSize = false;
             this.adManualTestTempFiles._ShowLinkToUpperFolder = true;
-            this.adManualTestTempFiles._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.adManualTestTempFiles._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.adManualTestTempFiles._WatchFolder = true;
             this.adManualTestTempFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -339,7 +341,7 @@ namespace O2.Scanners.Ascx
             this.adManualTestTempFiles.Name = "adManualTestTempFiles";
             this.adManualTestTempFiles.Size = new System.Drawing.Size(449, 229);
             this.adManualTestTempFiles.TabIndex = 3;
-            this.adManualTestTempFiles.eDirectoryEvent_DoubleClick += new O2.Views.ASCX.CoreControls.ascx_Directory.dDirectoryEvent(this.adManualTestTempFiles_eDirectoryEvent_DoubleClick);
+            this.adManualTestTempFiles.eDirectoryEvent_DoubleClick += new DirectoryViewer.dDirectoryEvent(this.adManualTestTempFiles_eDirectoryEvent_DoubleClick);
             // 
             // cbDeleteDirectoryContentsRecursive
             // 
@@ -409,7 +411,7 @@ namespace O2.Scanners.Ascx
             this.ado_AddFilesOrDirectoryToScanBundle.Size = new System.Drawing.Size(190, 31);
             this.ado_AddFilesOrDirectoryToScanBundle.TabIndex = 28;
             this.ado_AddFilesOrDirectoryToScanBundle.Text = "Drop Content Here!!";
-            this.ado_AddFilesOrDirectoryToScanBundle.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.ado_AddFilesOrDirectoryToScanBundle_eDnDAction_ObjectDataReceived_Event);
+            this.ado_AddFilesOrDirectoryToScanBundle.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.ado_AddFilesOrDirectoryToScanBundle_eDnDAction_ObjectDataReceived_Event);
             // 
             // label7
             // 
@@ -877,9 +879,9 @@ namespace O2.Scanners.Ascx
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListBox lbTargetFiles;
-        private ascx_DropObject ascx_DropObject1;
+        private DropObject DropObject1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private ascx_Directory adManualTestTempFiles;
+        private DirectoryViewer adManualTestTempFiles;
         private System.Windows.Forms.Button btCreateCirDumpForSelectedFile;
         private System.Windows.Forms.Label lbManualTestTargetFile;
         private System.Windows.Forms.Label label1;
@@ -891,7 +893,7 @@ namespace O2.Scanners.Ascx
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox cbDoubleClickToDeleteItem;
         private System.Windows.Forms.Label label5;
-        private ascx_DropObject ado_AddFilesOrDirectoryToScanBundle;
+        private DropObject ado_AddFilesOrDirectoryToScanBundle;
         private System.Windows.Forms.GroupBox gbNoOutOfTheBoxRules;
         private System.Windows.Forms.CheckBox cbAutoAppendTargetName;
         private System.Windows.Forms.TextBox tbWorkDirectory;

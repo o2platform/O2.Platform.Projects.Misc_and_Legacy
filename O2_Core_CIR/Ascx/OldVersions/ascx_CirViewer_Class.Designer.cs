@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Views.ASCX.CoreControls;
-using O2.Views.ASCX.DataViewers;
+
+
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx.OldVersions
 {
@@ -49,7 +50,7 @@ namespace O2.Core.CIR.Ascx.OldVersions
             this.cbVisibleControls_IsSuperClassedBy = new System.Windows.Forms.CheckBox();
             this.cbVisibleControls_RulesCreator = new System.Windows.Forms.CheckBox();
             this.cbVisibleControls_SuperClass = new System.Windows.Forms.CheckBox();
-            this.asv_SelectVisiblePanels = new ascx_SelectVisiblePanels();
+            this.asv_SelectVisiblePanels = new SelectVisiblePanels();
             this.scHostControl.Panel1.SuspendLayout();
             this.scHostControl.Panel2.SuspendLayout();
             this.scHostControl.SuspendLayout();
@@ -278,7 +279,7 @@ namespace O2.Core.CIR.Ascx.OldVersions
         private System.Windows.Forms.CheckBox cbVisibleControls_IsSuperClassedBy;
         private System.Windows.Forms.CheckBox cbVisibleControls_RulesCreator;
         private System.Windows.Forms.CheckBox cbVisibleControls_SuperClass;
-        private ascx_SelectVisiblePanels asv_SelectVisiblePanels;
+        private SelectVisiblePanels asv_SelectVisiblePanels;
         private System.Windows.Forms.CheckBox cbCallsMade_OnlyShowExternal;
         private System.Windows.Forms.CheckBox cbOnlyShowFunctionsCalledBySelectedFunction;
     }

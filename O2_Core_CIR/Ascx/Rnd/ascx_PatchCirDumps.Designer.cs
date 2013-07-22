@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx.Rnd
 {
@@ -41,7 +42,7 @@ namespace O2.Core.CIR.Ascx.Rnd
             this.lbCirFileLoaded = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.ascx_DropObject1 = new ascx_DropObject();
+            this.DropObject1 = new DropObject();
             this.cbClearPreviousO2CirData = new System.Windows.Forms.CheckBox();
             this.cbFixCirDumpFiles = new System.Windows.Forms.CheckBox();
             this.cbOnlyMapWithExtra_Imp = new System.Windows.Forms.CheckBox();
@@ -94,17 +95,17 @@ namespace O2.Core.CIR.Ascx.Rnd
             this.listBox1.TabIndex = 33;
             this.listBox1.Visible = false;
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(255, 0);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(102, 21);
-            this.ascx_DropObject1.TabIndex = 34;
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(255, 0);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(102, 21);
+            this.DropObject1.TabIndex = 34;
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // cbClearPreviousO2CirData
             // 
@@ -145,7 +146,7 @@ namespace O2.Core.CIR.Ascx.Rnd
             this.Controls.Add(this.cbOnlyMapWithExtra_Imp);
             this.Controls.Add(this.cbFixCirDumpFiles);
             this.Controls.Add(this.cbClearPreviousO2CirData);
-            this.Controls.Add(this.ascx_DropObject1);
+            this.Controls.Add(this.DropObject1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.lbCirFileLoaded);
             this.Controls.Add(this.label8);
@@ -166,7 +167,7 @@ namespace O2.Core.CIR.Ascx.Rnd
         private System.Windows.Forms.Label lbCirFileLoaded;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ListBox listBox1;
-        private ascx_DropObject ascx_DropObject1;
+        private DropObject DropObject1;
         private System.Windows.Forms.CheckBox cbClearPreviousO2CirData;
         private System.Windows.Forms.CheckBox cbFixCirDumpFiles;
         private System.Windows.Forms.CheckBox cbOnlyMapWithExtra_Imp;

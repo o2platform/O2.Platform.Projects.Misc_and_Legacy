@@ -2,12 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.O2Findings;
-using O2.Interfaces.O2Findings;
-using O2.Interfaces.Rules;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.O2Findings;
 
 namespace O2.Rules.OunceLabs.RulesUtils
 {

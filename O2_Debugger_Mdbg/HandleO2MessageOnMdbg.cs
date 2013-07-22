@@ -1,11 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
+using FluentSharp.WinForms.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Debugger.Mdbg.O2Debugger;
-using O2.Interfaces.Messages;
-using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Debugger.Mdbg
 {
@@ -25,7 +22,7 @@ namespace O2.Debugger.Mdbg
                             string filename = o2MDbgAction.filename;
                             int line = o2MDbgAction.line;
                             DI.log.info("SOURCECODE REF -> {0} : {1})", new object[] { line, filename });
-                            O2.Kernel.CodeUtils.O2Messages.fileOrFolderSelected(filename, line);
+                            O2Messages.fileOrFolderSelected(filename, line);
                             //HandleO2MessageOnSD.setSelectedLineNumber(filename, line);
                             break;
                         }

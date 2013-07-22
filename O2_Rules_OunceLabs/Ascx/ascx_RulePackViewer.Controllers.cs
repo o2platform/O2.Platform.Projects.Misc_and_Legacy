@@ -5,20 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.O2Findings;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
-using O2.Interfaces.O2Findings;
-using O2.Interfaces.Rules;
-using O2.Interfaces.Views;
-using O2.Kernel.CodeUtils;
-using O2.Kernel.InterfacesBaseImpl;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.O2Findings;
+using FluentSharp.WinForms.Utils;
 using O2.Rules.OunceLabs.DataLayer_OunceV6;
 using O2.Rules.OunceLabs.RulesUtils;
-using System.Drawing;
 
 namespace O2.Rules.OunceLabs.Ascx
 {
@@ -880,7 +873,7 @@ namespace O2.Rules.OunceLabs.Ascx
         private void handleDrop(DragEventArgs e)
         {            
             if (!handleDrop_IO2Trace(
-                     (IO2Trace)Dnd.tryToGetObjectFromDroppedObject(e, typeof(O2.DotNetWrappers.O2Findings.O2Trace))))
+                     (IO2Trace)Dnd.tryToGetObjectFromDroppedObject(e, typeof(O2Trace))))
                 if (!handleDrop_list_IO2Rule(
                          (List<IO2Rule>) Dnd.tryToGetObjectFromDroppedObject(e, typeof (List<IO2Rule>))))
                     if (!handleDrop_list_ICirFunction(

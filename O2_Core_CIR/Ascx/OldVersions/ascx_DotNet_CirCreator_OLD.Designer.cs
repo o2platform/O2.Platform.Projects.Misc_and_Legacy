@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx
 {
@@ -69,14 +70,14 @@ namespace O2.Core.CIR.Ascx
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btCreateCirDumpFile = new System.Windows.Forms.Button();
             this.lbCreatedFiles_CirDump = new System.Windows.Forms.ListBox();
-            this.ad_DirectoryToSaveCreatedFiles = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.ad_DirectoryToSaveCreatedFiles = new DirectoryViewer();
             this.btClearTargetsList = new System.Windows.Forms.Button();
             this.cbAddAllAssembliesFromSelectedDirectory = new System.Windows.Forms.CheckBox();
             this.lbTargetDotNetAssesmblies = new System.Windows.Forms.ListBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.ascx_DropObject1 = new O2.Views.ASCX.CoreControls.ascx_DropObject();
-            this.ad_Directory = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.DropObject1 = new DropObject();
+            this.ad_Directory = new DirectoryViewer();
             this.label12 = new System.Windows.Forms.Label();
             this.tbPathsToSearchForReferencedAssemblies = new System.Windows.Forms.TextBox();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -481,7 +482,7 @@ namespace O2.Core.CIR.Ascx
             this.ad_DirectoryToSaveCreatedFiles._ProcessDroppedObjects = true;
             this.ad_DirectoryToSaveCreatedFiles._ShowFileSize = false;
             this.ad_DirectoryToSaveCreatedFiles._ShowLinkToUpperFolder = true;
-            this.ad_DirectoryToSaveCreatedFiles._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Advanced;
+            this.ad_DirectoryToSaveCreatedFiles._ViewMode = DirectoryViewer.ViewMode.Advanced;
             this.ad_DirectoryToSaveCreatedFiles._WatchFolder = false;
             this.ad_DirectoryToSaveCreatedFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -546,24 +547,24 @@ namespace O2.Core.CIR.Ascx
             this.label8.TabIndex = 88;
             this.label8.Text = "Choose File or Directory To Process";
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(4, 3);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(200, 21);
-            this.ascx_DropObject1.TabIndex = 65;
-            this.ascx_DropObject1.Text = "Drop Content Here!!";
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new O2.Kernel.CodeUtils.Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(4, 3);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(200, 21);
+            this.DropObject1.TabIndex = 65;
+            this.DropObject1.Text = "Drop Content Here!!";
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // ad_Directory
             // 
             this.ad_Directory._ProcessDroppedObjects = true;
             this.ad_Directory._ShowFileSize = false;
             this.ad_Directory._ShowLinkToUpperFolder = true;
-            this.ad_Directory._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Advanced;
+            this.ad_Directory._ViewMode = DirectoryViewer.ViewMode.Advanced;
             this.ad_Directory._WatchFolder = false;
             this.ad_Directory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)));
@@ -612,7 +613,7 @@ namespace O2.Core.CIR.Ascx
             this.Controls.Add(this.btCreateCir);
             this.Controls.Add(this.lbAssemblyLoaded);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.ascx_DropObject1);
+            this.Controls.Add(this.DropObject1);
             this.Controls.Add(this.ad_Directory);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "ascx_DotNet_CirCreator_OLD";
@@ -646,8 +647,8 @@ namespace O2.Core.CIR.Ascx
 
         #endregion
 
-        private ascx_Directory ad_Directory;
-        private ascx_DropObject ascx_DropObject1;
+        private DirectoryViewer ad_Directory;
+        private DropObject DropObject1;
         private System.Windows.Forms.ListBox lbTypes;
         private System.Windows.Forms.ListBox lbFunctions;
         private System.Windows.Forms.ListBox lbFunctionsCalled;
@@ -678,7 +679,7 @@ namespace O2.Core.CIR.Ascx
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Button btClearTargetsList;
         private System.Windows.Forms.Label label9;
-        private ascx_Directory ad_DirectoryToSaveCreatedFiles;
+        private DirectoryViewer ad_DirectoryToSaveCreatedFiles;
         private System.Windows.Forms.Button btCreateCirDumpFile;
         private System.Windows.Forms.ListBox lbCreatedFiles_CirDump;
         private System.Windows.Forms.GroupBox groupBox2;

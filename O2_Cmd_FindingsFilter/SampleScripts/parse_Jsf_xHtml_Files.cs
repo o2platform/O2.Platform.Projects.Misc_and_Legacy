@@ -2,16 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using O2.DotNetWrappers.O2Findings;
-using O2.DotNetWrappers.Windows;
-using O2.External.WinFormsUI.Forms;
-using O2.Interfaces.O2Core;
-using O2.Interfaces.O2Findings;
-using O2.Views.ASCX.O2Findings;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinFormUI.Utils;
+using FluentSharp.WinForms.Controls;
+using FluentSharp.WinForms.O2Findings;
 
 namespace O2.Cmd.FindingsFilter.SampleScripts
 {
@@ -20,7 +17,7 @@ namespace O2.Cmd.FindingsFilter.SampleScripts
         public static string rootDirectoryOfFiles = @"";
         public static string fileExtension = "*.xHtml";
 
-        public static IO2Log log = O2.Kernel.PublicDI.log;
+        public static IO2Log log = PublicDI.log;
 
         public static void processXHtmlfiles()
         {

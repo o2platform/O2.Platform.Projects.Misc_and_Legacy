@@ -1,5 +1,9 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Interfaces.DotNet;
+
+using System;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Core.CIR.Ascx.DotNet
 {
@@ -35,11 +39,11 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.label2 = new System.Windows.Forms.Label();
-            this.directoryLocal = new O2.Views.ASCX.CoreControls.ascx_Directory();
+            this.directoryLocal = new DirectoryViewer();
             this.gacBrowser = new O2.Core.CIR.Ascx.DotNet.ascx_GAC_Browser();
             this.label3 = new System.Windows.Forms.Label();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.tableListWithDependencies = new O2.Views.ASCX.DataViewers.ascx_TableList();
+            this.tableListWithDependencies = new ctrl_TableList();
             this.tbDependenciesFlatList = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.tvDependenciesTreeView = new System.Windows.Forms.TreeView();
@@ -121,7 +125,7 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.directoryLocal._ProcessDroppedObjects = true;
             this.directoryLocal._ShowFileSize = false;
             this.directoryLocal._ShowLinkToUpperFolder = true;
-            this.directoryLocal._ViewMode = O2.Views.ASCX.CoreControls.ascx_Directory.ViewMode.Simple_With_LocationBar;
+            this.directoryLocal._ViewMode = DirectoryViewer.ViewMode.Simple_With_LocationBar;
             this.directoryLocal._WatchFolder = false;
             this.directoryLocal.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
@@ -132,7 +136,7 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.directoryLocal.Name = "directoryLocal";
             this.directoryLocal.Size = new System.Drawing.Size(185, 164);
             this.directoryLocal.TabIndex = 0;
-            this.directoryLocal._onDirectoryClick += new O2.Kernel.CodeUtils.Callbacks.dMethod_String(this.directoryLocal__onDirectoryClick);
+            this.directoryLocal._onDirectoryClick += new Callbacks.dMethod_String(this.directoryLocal__onDirectoryClick);
             // 
             // gacBrowser
             // 
@@ -143,7 +147,7 @@ namespace O2.Core.CIR.Ascx.DotNet
             this.gacBrowser.Name = "gacBrowser";
             this.gacBrowser.Size = new System.Drawing.Size(180, 224);
             this.gacBrowser.TabIndex = 4;
-            this.gacBrowser._onGacDllSelected += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<IGacDll>(this.gacBrowser__onGacDllSelected);
+            this.gacBrowser._onGacDllSelected += new Action<IGacDll>(this.gacBrowser__onGacDllSelected);
             // 
             // label3
             // 
@@ -262,7 +266,7 @@ namespace O2.Core.CIR.Ascx.DotNet
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label label2;
-        private O2.Views.ASCX.CoreControls.ascx_Directory directoryLocal;
+        private DirectoryViewer directoryLocal;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private ascx_GAC_Browser gacBrowser;
@@ -270,6 +274,6 @@ namespace O2.Core.CIR.Ascx.DotNet
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TreeView tvDependenciesTreeView;
-        private O2.Views.ASCX.DataViewers.ascx_TableList tableListWithDependencies;
+        private ctrl_TableList tableListWithDependencies;
     }
 }

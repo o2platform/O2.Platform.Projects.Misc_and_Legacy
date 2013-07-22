@@ -1,25 +1,19 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Rules;
-using O2.Kernel.InterfacesBaseImpl;
-using O2.Rules.OunceLabs.DataLayer_OunceV6;
-using O2.Rules.OunceLabs.RulesUtils;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
 
 namespace O2.Rules.OunceLabs.Ascx
 {
     public partial class ascx_RuleEditor
     {
         // events
-        public O2Thread.FuncVoidT1<IO2Rule> onRuleChange;
+        public Action<IO2Rule> onRuleChange;
         // local vars
         private bool runOnLoad = true;
-        private O2Thread.FuncVoidT1<IO2Rule> onSave;
+        private Action<IO2Rule> onSave;
         private IO2Rule o2LoadedRule;
         
 
@@ -45,7 +39,7 @@ namespace O2.Rules.OunceLabs.Ascx
             }
         }
 
-        public void editRule(IO2Rule ruleToEdit, O2Thread.FuncVoidT1<IO2Rule> _onSave)
+        public void editRule(IO2Rule ruleToEdit, Action<IO2Rule> _onSave)
         {
             this.invokeOnThread(
                 () =>
@@ -162,7 +156,7 @@ namespace O2.Rules.OunceLabs.Ascx
             }
         }
 
-        public void EditRules(List<IO2Rule> o2RulesToEdit, O2Thread.FuncVoidT1<IO2Rule> _onSave)
+        public void EditRules(List<IO2Rule> o2RulesToEdit, Action<IO2Rule> _onSave)
         {
             this.invokeOnThread(
                 () =>

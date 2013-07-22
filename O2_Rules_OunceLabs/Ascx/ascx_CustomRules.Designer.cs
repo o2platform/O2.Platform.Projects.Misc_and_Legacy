@@ -1,6 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Kernel.CodeUtils;
-using O2.Views.ASCX.CoreControls;
+
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Rules.OunceLabs.Ascx
 {
@@ -73,7 +74,7 @@ namespace O2.Rules.OunceLabs.Ascx
             this.lbCurrentMethodSignature = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.btMarkMethodAsSink = new System.Windows.Forms.Button();
-            this.ascx_DropObject1 = new ascx_DropObject();
+            this.DropObject1 = new DropObject();
             this.dgvCustomRulesForMethodSignature = new System.Windows.Forms.DataGridView();
             this.btDeleteSelectedActionObject = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -191,7 +192,7 @@ namespace O2.Rules.OunceLabs.Ascx
             this.tabPage1.Controls.Add(this.lbCurrentMethodSignature);
             this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.btMarkMethodAsSink);
-            this.tabPage1.Controls.Add(this.ascx_DropObject1);
+            this.tabPage1.Controls.Add(this.DropObject1);
             this.tabPage1.Controls.Add(this.dgvCustomRulesForMethodSignature);
             this.tabPage1.Controls.Add(this.btDeleteSelectedActionObject);
             this.tabPage1.Controls.Add(this.groupBox1);
@@ -549,17 +550,17 @@ namespace O2.Rules.OunceLabs.Ascx
             this.btMarkMethodAsSink.UseVisualStyleBackColor = true;
             this.btMarkMethodAsSink.Click += new System.EventHandler(this.btMarkMethodAsSink_Click);
             // 
-            // ascx_DropObject1
+            // DropObject1
             // 
-            this.ascx_DropObject1.AllowDrop = true;
-            this.ascx_DropObject1.BackColor = System.Drawing.Color.Maroon;
-            this.ascx_DropObject1.ForeColor = System.Drawing.Color.White;
-            this.ascx_DropObject1.Location = new System.Drawing.Point(558, 35);
-            this.ascx_DropObject1.Name = "ascx_DropObject1";
-            this.ascx_DropObject1.Size = new System.Drawing.Size(76, 50);
-            this.ascx_DropObject1.TabIndex = 50;
-            this.ascx_DropObject1.Load += new System.EventHandler(this.ascx_DropObject1_Load);
-            this.ascx_DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.ascx_DropObject1_eDnDAction_ObjectDataReceived_Event);
+            this.DropObject1.AllowDrop = true;
+            this.DropObject1.BackColor = System.Drawing.Color.Maroon;
+            this.DropObject1.ForeColor = System.Drawing.Color.White;
+            this.DropObject1.Location = new System.Drawing.Point(558, 35);
+            this.DropObject1.Name = "DropObject1";
+            this.DropObject1.Size = new System.Drawing.Size(76, 50);
+            this.DropObject1.TabIndex = 50;
+            this.DropObject1.Load += new System.EventHandler(this.DropObject1_Load);
+            this.DropObject1.eDnDAction_ObjectDataReceived_Event += new Callbacks.dMethod_Object(this.DropObject1_eDnDAction_ObjectDataReceived_Event);
             // 
             // dgvCustomRulesForMethodSignature
             // 
@@ -907,7 +908,7 @@ namespace O2.Rules.OunceLabs.Ascx
         private System.Windows.Forms.Button btDeleteSourceActionObject;
         private System.Windows.Forms.Button btDeleteSelectedActionObject;
         private System.Windows.Forms.DataGridView dgvCustomRulesForMethodSignature;
-        private ascx_DropObject ascx_DropObject1;
+        private DropObject DropObject1;
         private System.Windows.Forms.Button btMarkMethodAsSink;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lbCurrentMethodSignature;

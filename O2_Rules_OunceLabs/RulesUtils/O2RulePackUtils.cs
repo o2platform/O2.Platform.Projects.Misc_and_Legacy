@@ -3,13 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.Interfaces.CIR;
-using O2.Interfaces.O2Findings;
-using O2.Interfaces.Rules;
-using O2.Kernel.InterfacesBaseImpl;
 
 namespace O2.Rules.OunceLabs.RulesUtils
 {

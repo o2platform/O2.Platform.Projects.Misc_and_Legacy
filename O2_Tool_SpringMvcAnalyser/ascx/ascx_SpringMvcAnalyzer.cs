@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirObjects;
 using O2.Core.CIR.CirUtils;
 using O2.Core.CIR.Xsd;
-using O2.DotNetWrappers.Filters;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.CIR;
 using O2.RnD.SpringMVCAnalyzer.classes;
 //using O2.Rules.OunceLabs.DataLayer;
 

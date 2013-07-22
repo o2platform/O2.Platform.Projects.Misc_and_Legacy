@@ -146,15 +146,15 @@
     <Content Include="_UnitTests\_test_LoadSpringMvcData.cs.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.BCL\FluentSharp.BCL.csproj">
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.WinForms\FluentSharp.WinForms.csproj">
       <Project>{DF7E73CB-02AC-4689-BB8C-AC21FFCCDDC5}</Project>
-      <Name>FluentSharp.BCL</Name>
+      <Name>FluentSharp.WinForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.CoreLib\FluentSharp.CoreLib.csproj">
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.CoreLib\FluentSharp.CoreLib.csproj">
       <Project>{0A7CE0E0-B092-43B5-AB80-99BA909019C9}</Project>
       <Name>FluentSharp.CoreLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\O2.FluentSharp\O2.FluentSharp.REPL\FluentSharp.REPL.csproj">
+    <ProjectReference Include="..\..\FluentSharp\FluentSharp.REPL\FluentSharp.REPL.csproj">
       <Project>{D742BBEF-BFDC-477F-9880-5E0E2C89B6B2}</Project>
       <Name>FluentSharp.REPL</Name>
     </ProjectReference>

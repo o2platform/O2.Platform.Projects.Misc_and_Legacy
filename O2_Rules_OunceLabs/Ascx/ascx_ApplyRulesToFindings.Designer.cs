@@ -1,5 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
-using O2.Interfaces.O2Findings;
+
+using System;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms.Controls;
 
 namespace O2.Rules.OunceLabs.Ascx
 {
@@ -45,8 +48,8 @@ namespace O2.Rules.OunceLabs.Ascx
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.rulePackViewer = new O2.Rules.OunceLabs.Ascx.ascx_RulePackViewer();
-            this.findingsViewerSourceFindings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
-            this.findingsViewerMappedFindings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewerSourceFindings = new ascx_FindingsViewer();
+            this.findingsViewerMappedFindings = new ascx_FindingsViewer();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -228,9 +231,9 @@ namespace O2.Rules.OunceLabs.Ascx
             this.findingsViewerSourceFindings.Name = "findingsViewerSourceFindings";
             this.findingsViewerSourceFindings.Size = new System.Drawing.Size(374, 238);
             this.findingsViewerSourceFindings.TabIndex = 2;
-            this.findingsViewerSourceFindings._onFolderSelectEvent += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<string>(this.findingsViewerSourceFindings__onFolderSelectEvent);
-            this.findingsViewerSourceFindings._onFindingSelected += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<IO2Finding>(this.findingsViewerSourceFindings__onFindingSelected);
-            this.findingsViewerSourceFindings._onTraceSelected += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<IO2Trace>(this.findingsViewerSourceFindings__onTraceSelected);
+            this.findingsViewerSourceFindings._onFolderSelectEvent += new Action<string>(this.findingsViewerSourceFindings__onFolderSelectEvent);
+            this.findingsViewerSourceFindings._onFindingSelected += new Action<IO2Finding>(this.findingsViewerSourceFindings__onFindingSelected);
+            this.findingsViewerSourceFindings._onTraceSelected += new Action<IO2Trace>(this.findingsViewerSourceFindings__onTraceSelected);
             // 
             // findingsViewerMappedFindings
             // 
@@ -241,8 +244,8 @@ namespace O2.Rules.OunceLabs.Ascx
             this.findingsViewerMappedFindings.Name = "findingsViewerMappedFindings";
             this.findingsViewerMappedFindings.Size = new System.Drawing.Size(383, 237);
             this.findingsViewerMappedFindings.TabIndex = 4;
-            this.findingsViewerMappedFindings._onFindingSelected += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<IO2Finding>(this.findingsViewerMappedFindings__onFindingSelected);
-            this.findingsViewerMappedFindings._onTraceSelected += new O2.DotNetWrappers.DotNet.O2Thread.FuncVoidT1<IO2Trace>(this.findingsViewerMappedFindings__onTraceSelected);
+            this.findingsViewerMappedFindings._onFindingSelected += new Action<IO2Finding>(this.findingsViewerMappedFindings__onFindingSelected);
+            this.findingsViewerMappedFindings._onTraceSelected += new Action<IO2Trace>(this.findingsViewerMappedFindings__onTraceSelected);
             // 
             // ascx_ApplyRulesToFindings
             // 
@@ -273,8 +276,8 @@ namespace O2.Rules.OunceLabs.Ascx
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private ascx_RulePackViewer rulePackViewer;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewerSourceFindings;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewerMappedFindings;
+        private ascx_FindingsViewer findingsViewerSourceFindings;
+        private ascx_FindingsViewer findingsViewerMappedFindings;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btFilter_BasicSinksMapping;

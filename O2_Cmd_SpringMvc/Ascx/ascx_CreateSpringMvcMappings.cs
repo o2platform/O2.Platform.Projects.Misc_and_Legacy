@@ -1,15 +1,8 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows.Forms;
+using FluentSharp.WinForms.Utils;
 using O2.Cmd.SpringMvc.Classes;
-using O2.Cmd.SpringMvc.Objects;
-using O2.Cmd.SpringMvc.PythonScripts;
-using O2.Core.CIR.CirCreator.Java;
-using O2.Core.CIR.CirObjects;
-using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
 
 namespace O2.Cmd.SpringMvc.Ascx
 {

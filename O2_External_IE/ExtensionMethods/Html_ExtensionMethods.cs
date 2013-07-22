@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Network;
+using FluentSharp.CoreLib;
+using FluentSharp.CoreLib.API;
+using FluentSharp.WinForms.Utils;
 using O2.External.IE.Interfaces;
-using O2.Kernel;
 
 
 namespace O2.External.IE.ExtensionMethods
@@ -84,7 +84,7 @@ namespace O2.External.IE.ExtensionMethods
                 if (fields.ContainsKey(fieldName))
                     fields[fieldName].Value = value;
                 else
-                    O2.Kernel.PublicDI.log.error("the provided IO2HtmlForm.form did not contain the field: {0}", fieldName);
+                    PublicDI.log.error("the provided IO2HtmlForm.form did not contain the field: {0}", fieldName);
                 return form;
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace O2.External.IE.ExtensionMethods
             if (fields.ContainsKey(fieldName))
                 return fields[fieldName].Value;
 
-            O2.Kernel.PublicDI.log.error("the provided IO2HtmlForm.form did not contain the field: {0}", fieldName);
+            PublicDI.log.error("the provided IO2HtmlForm.form did not contain the field: {0}", fieldName);
             return "";
         }
 

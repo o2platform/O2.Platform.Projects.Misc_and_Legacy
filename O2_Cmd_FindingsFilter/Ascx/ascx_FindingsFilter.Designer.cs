@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Cmd.FindingsFilter.Ascx
 {
     partial class ascx_FindingsFilter
@@ -31,7 +34,7 @@ namespace O2.Cmd.FindingsFilter.Ascx
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.findingsViewer_SourceFindings = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer_SourceFindings = new ascx_FindingsViewer();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tvAvailableFilters = new System.Windows.Forms.TreeView();
@@ -39,7 +42,7 @@ namespace O2.Cmd.FindingsFilter.Ascx
             this.btApplyFilter = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.btEditFilters = new System.Windows.Forms.Button();
-            this.findingsViewer_Results = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
+            this.findingsViewer_Results = new ascx_FindingsViewer();
             this.label4 = new System.Windows.Forms.Label();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -228,10 +231,10 @@ namespace O2.Cmd.FindingsFilter.Ascx
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btEditFilters;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer_Results;
+        private ascx_FindingsViewer findingsViewer_Results;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btApplyFilter;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer_SourceFindings;
+        private ascx_FindingsViewer findingsViewer_SourceFindings;
         private System.Windows.Forms.TreeView tvAvailableFilters;
     }
 }

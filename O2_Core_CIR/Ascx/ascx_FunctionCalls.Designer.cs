@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Core.CIR.Ascx
 {
     partial class ascx_FunctionCalls
@@ -53,7 +56,7 @@ namespace O2.Core.CIR.Ascx
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.cbIgnoreCoreObjectClass = new System.Windows.Forms.CheckBox();
             this.cbViewInheritedMethods = new System.Windows.Forms.CheckBox();
-            this.functionViewerForClassMethods = new O2.Views.ASCX.DataViewers.ascx_FunctionsViewer();
+            this.functionViewerForClassMethods = new ascx_FunctionsViewer();
             this.cbShowLineInSourceFile = new System.Windows.Forms.CheckBox();
             this.cbDontExpandRecursiveCalls = new System.Windows.Forms.CheckBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -493,7 +496,7 @@ namespace O2.Core.CIR.Ascx
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.CheckBox cbViewInheritedMethods;
-        private O2.Views.ASCX.DataViewers.ascx_FunctionsViewer functionViewerForClassMethods;
+        private ascx_FunctionsViewer functionViewerForClassMethods;
         private System.Windows.Forms.CheckBox cbIgnoreCoreObjectClass;
         private System.Windows.Forms.CheckBox cbShowLineInSourceFile;
         private System.Windows.Forms.CheckBox cbDontExpandRecursiveCalls;

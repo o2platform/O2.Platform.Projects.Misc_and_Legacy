@@ -1,4 +1,7 @@
 // This file is part of the OWASP O2 Platform (http://www.owasp.org/index.php/OWASP_O2_Platform) and is released under the Apache 2.0 License (http://www.apache.org/licenses/LICENSE-2.0)
+
+using FluentSharp.WinForms.Controls;
+
 namespace O2.Debugger.Mdbg.O2Debugger.Ascx
 {
     partial class ascx_FindingsCreator
@@ -33,8 +36,8 @@ namespace O2.Debugger.Mdbg.O2Debugger.Ascx
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.llMakeTraceIntoFindings = new System.Windows.Forms.LinkLabel();
-            this.findingsViewer = new O2.Views.ASCX.O2Findings.ascx_FindingsViewer();
-            this.traceViewer = new O2.Views.ASCX.O2Findings.ascx_TraceTreeView();
+            this.findingsViewer = new ascx_FindingsViewer();
+            this.traceViewer = new ascx_TraceTreeView();
             this.llClearTrace = new System.Windows.Forms.LinkLabel();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -153,8 +156,8 @@ namespace O2.Debugger.Mdbg.O2Debugger.Ascx
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private O2.Views.ASCX.O2Findings.ascx_FindingsViewer findingsViewer;
-        private O2.Views.ASCX.O2Findings.ascx_TraceTreeView traceViewer;
+        private ascx_FindingsViewer findingsViewer;
+        private ascx_TraceTreeView traceViewer;
         private System.Windows.Forms.LinkLabel llMakeTraceIntoFindings;
         private System.Windows.Forms.LinkLabel llClearTrace;
     }

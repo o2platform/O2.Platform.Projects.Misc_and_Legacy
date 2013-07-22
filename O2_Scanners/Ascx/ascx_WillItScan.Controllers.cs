@@ -2,18 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentSharp.CoreLib.API;
+using FluentSharp.CoreLib.Interfaces;
+using FluentSharp.WinForms;
+using FluentSharp.WinForms.Utils;
 using O2.Core.CIR.CirUtils;
-using O2.DotNetWrappers.DotNet;
-using O2.DotNetWrappers.ExtensionMethods;
-using O2.DotNetWrappers.Windows;
-using O2.Interfaces.Controllers;
-using O2.Kernel.InterfacesBaseImpl;
 using O2.Rules.OunceLabs.RulesUtils;
-using O2.Scanner.MsCatNet.Scan;
 using O2.Scanner.OunceLabsCLI.Scan;
 using O2.Scanner.OunceLabsCLI.ScanTargets;
 using O2.Scanner.OunceLabsCLI.Utils;
-using O2.Views.ASCX.classes;
 
 namespace O2.Scanners.Ascx
 {
@@ -27,10 +24,10 @@ namespace O2.Scanners.Ascx
         {
             if (runOnLoad && DesignMode == false)
             {
-                rbScannerMSCatNet.Enabled = MsCatNetConfig.isCatScannerAvailable();
+                //rbScannerMSCatNet.Enabled = MsCatNetConfig.isCatScannerAvailable();
                 adManualTestTempFiles.simpleMode_withAddressBar();
                 adManualTestTempFiles._ShowFileSize = true;
-                ascx_DropObject1.setText("Drop Files to Process Here  -  \n supports: *.dll, *.exe,*.sln and most Ounce generated files \n (paf, ppf, gaf, ewf,epf, etc...)");
+                DropObject1.setText("Drop Files to Process Here  -  \n supports: *.dll, *.exe,*.sln and most Ounce generated files \n (paf, ppf, gaf, ewf,epf, etc...)");
                 ado_AddFilesOrDirectoryToScanBundle.setText("Drop Files or Folders to add to Scan Bundle");
                 tbWorkDirectory.Text = DI.config.O2TempDir;
                 updateLabelWithNumberOfRulesInDatabase();
@@ -110,7 +107,7 @@ namespace O2.Scanners.Ascx
                     cliScanning.scanApplication(scCurrentScanTarget.ApplicationFile, sSaveAssessmentTo,
                                                       logCallback, scanCompleted_Callback);
                 }
-                else if (rbScannerMSCatNet.Checked)
+              /*  else if (rbScannerMSCatNet.Checked)
                 {
                     cbEnableNoOutOfTheBoxRules.Checked = false;
                     if (scCurrentScanTarget.GetType() == typeof(ScanTarget_DotNet))
@@ -122,7 +119,7 @@ namespace O2.Scanners.Ascx
                 else if (rbScannerAppScanDE.Checked)
                 {
                     
-                }
+                }*/
 
             }
         }
